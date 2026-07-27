@@ -95,16 +95,24 @@ jobs:
         distribution: 'temurin'
         java-version: '21'
 
+    - name: Detect keystore availability
+      run: |
+        if [ -n "${{ secrets.APP_KEYSTORE_BASE64 }}" ]; then
+          echo "HAS_KEYSTORE=true" >> "$GITHUB_ENV"
+        else
+          echo "HAS_KEYSTORE=false" >> "$GITHUB_ENV"
+        fi
+
     - name: Decode Keystore
       uses: timheuer/base64-to-file@v2.0.0
       id: android_keystore
-      if: ${{ secrets.APP_KEYSTORE_BASE64 != '' }}
+      if: env.HAS_KEYSTORE == 'true'
       with:
         fileName: "android_keystore.jks"
         encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
 
     - name: Build APK (release keystore)
-      if: ${{ secrets.APP_KEYSTORE_BASE64 != '' }}
+      if: env.HAS_KEYSTORE == 'true'
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
@@ -117,7 +125,7 @@ jobs:
           -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
 
     - name: Build APK (debug signing fallback)
-      if: ${{ secrets.APP_KEYSTORE_BASE64 == '' }}
+      if: env.HAS_KEYSTORE == 'false'
       run: |
         cd ${{ github.workspace }}/V2rayNG
         echo "sdk.dir=${ANDROID_HOME}" > local.properties
