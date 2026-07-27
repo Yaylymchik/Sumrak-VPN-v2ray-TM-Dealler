@@ -27,7 +27,7 @@ jobs:
     - name: Ensure build dependencies
       run: |
         if [ ! -d hev-socks5-tunnel/.git ]; then
-          git clone --depth 1 https://github.com/heiher/hev-socks5-tunnel hev-socks5-tunnel
+          git clone --recursive --depth 1 https://github.com/heiher/hev-socks5-tunnel hev-socks5-tunnel
         fi
         if [ ! -d AndroidLibXrayLite/.git ]; then
           git clone https://github.com/2dust/AndroidLibXrayLite AndroidLibXrayLite
