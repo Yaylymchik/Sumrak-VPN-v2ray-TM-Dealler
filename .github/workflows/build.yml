@@ -4,164 +4,201 @@ on:
   workflow_dispatch:
     inputs:
       release_tag:
+        description: 'Optional tag to publish (e.g. v2.2.13). Leave empty to build only.'
         required: false
         type: string
   push:
     branches:
-      - master
       - main
+      - master
     tags:
       - 'v*'
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
 
+env:
+  GRADLE_OPTS: -Dorg.gradle.daemon=false
+
 jobs:
   build:
+    name: Build
+    runs-on: ubuntu-latest
+    outputs:
+      version_name: ${{ steps.version.outputs.version_name }}
+      apk_dir: ${{ steps.apk_dir.outputs.path }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Ensure build dependencies
+        run: |
+          if [ ! -d hev-socks5-tunnel/.git ]; then
+            git clone --recursive --depth 1 https://github.com/heiher/hev-socks5-tunnel hev-socks5-tunnel
+          fi
+          if [ ! -d AndroidLibXrayLite/.git ]; then
+            git clone https://github.com/2dust/AndroidLibXrayLite AndroidLibXrayLite
+          fi
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v4
+        with:
+          log-accepted-android-sdk-licenses: false
+          cmdline-tools-version: '14742923'
+          packages: 'platforms;android-37.0 build-tools;37.0.0 platform-tools'
+
+      - name: Install NDK
+        run: |
+          echo "y" | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            --channel=0 \
+            --install "ndk;29.0.14206865"
+          echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.14206865" >> "$GITHUB_ENV"
+          sed -i '10i\
+          \
+              ndkVersion = "29.0.14206865"' "${{ github.workspace }}/V2rayNG/app/build.gradle.kts"
+
+      - name: Restore libhevtun cache
+        id: cache-libhevtun-restore
+        uses: actions/cache/restore@v5
+        with:
+          path: ${{ github.workspace }}/libs
+          key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('compile-hevtun.sh', 'hev-socks5-tunnel/.git/HEAD') }}
+
+      - name: Build libhevtun
+        if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
+        run: bash compile-hevtun.sh
+
+      - name: Save libhevtun cache
+        if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: ${{ github.workspace }}/libs
+          key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('compile-hevtun.sh', 'hev-socks5-tunnel/.git/HEAD') }}
+
+      - name: Copy libhevtun
+        run: cp -r "${{ github.workspace }}/libs" "${{ github.workspace }}/V2rayNG/app"
+
+      - name: Resolve libv2ray tag
+        run: |
+          CURRENT_TAG="$(git -C AndroidLibXrayLite describe --tags --abbrev=0)"
+          echo "CURRENT_TAG=$CURRENT_TAG" >> "$GITHUB_ENV"
+          echo "Using AndroidLibXrayLite tag: $CURRENT_TAG"
+
+      - name: Download libv2ray
+        uses: robinraju/release-downloader@v1.13
+        with:
+          repository: 2dust/AndroidLibXrayLite
+          tag: ${{ env.CURRENT_TAG }}
+          fileName: libv2ray.aar
+          out-file-path: V2rayNG/app/libs/
+
+      - name: Setup Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Detect signing keystore
+        run: |
+          if [ -n "${{ secrets.APP_KEYSTORE_BASE64 }}" ]; then
+            echo "HAS_KEYSTORE=true" >> "$GITHUB_ENV"
+          else
+            echo "HAS_KEYSTORE=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Decode keystore
+        if: env.HAS_KEYSTORE == 'true'
+        uses: timheuer/base64-to-file@v2.0.0
+        id: android_keystore
+        with:
+          fileName: android_keystore.jks
+          encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
+
+      - name: Build signed release APKs
+        if: env.HAS_KEYSTORE == 'true'
+        run: |
+          cd "${{ github.workspace }}/V2rayNG"
+          echo "sdk.dir=${ANDROID_HOME}" > local.properties
+          chmod +x gradlew
+          ./gradlew assembleRelease \
+            -Pandroid.injected.signing.store.file="${{ steps.android_keystore.outputs.filePath }}" \
+            -Pandroid.injected.signing.store.password="${{ secrets.APP_KEYSTORE_PASSWORD }}" \
+            -Pandroid.injected.signing.key.alias="${{ secrets.APP_KEYSTORE_ALIAS }}" \
+            -Pandroid.injected.signing.key.password="${{ secrets.APP_KEY_PASSWORD }}"
+
+      - name: Build debug-signed release APKs
+        if: env.HAS_KEYSTORE == 'false'
+        run: |
+          cd "${{ github.workspace }}/V2rayNG"
+          echo "sdk.dir=${ANDROID_HOME}" > local.properties
+          chmod +x gradlew
+          ./gradlew assemblePlaystoreRelease
+
+      - name: Resolve APK output directory
+        id: apk_dir
+        run: |
+          APK_DIR="$(find "${{ github.workspace }}/V2rayNG/app/build/outputs/apk" -type d -name release | head -n 1)"
+          if [ -z "$APK_DIR" ] || [ -z "$(find "$APK_DIR" -name '*.apk' -print -quit)" ]; then
+            echo "No release APKs found under V2rayNG/app/build/outputs/apk"
+            exit 1
+          fi
+          echo "path=$APK_DIR" >> "$GITHUB_OUTPUT"
+          ls -lh "$APK_DIR"
+
+      - name: Read app version
+        id: version
+        run: |
+          VERSION_NAME="$(grep -m1 'versionName' V2rayNG/app/build.gradle.kts | sed -E 's/.*\"([^\"]+)\".*/\1/')"
+          echo "version_name=$VERSION_NAME" >> "$GITHUB_OUTPUT"
+          echo "App version: $VERSION_NAME"
+
+      - name: Upload APK artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: sumrax-apks-${{ github.sha }}
+          path: ${{ steps.apk_dir.outputs.path }}/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    name: Publish Release
+    needs: build
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.release_tag != '')
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v6
-      with:
-        submodules: 'recursive'
-        fetch-depth: '0'
+      - name: Download APK artifacts
+        uses: actions/download-artifact@v7
+        with:
+          name: sumrax-apks-${{ github.sha }}
+          path: release-apks
 
-    - name: Ensure build dependencies
-      run: |
-        if [ ! -d hev-socks5-tunnel/.git ]; then
-          git clone --recursive --depth 1 https://github.com/heiher/hev-socks5-tunnel hev-socks5-tunnel
-        fi
-        if [ ! -d AndroidLibXrayLite/.git ]; then
-          git clone https://github.com/2dust/AndroidLibXrayLite AndroidLibXrayLite
-        fi
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.event.inputs.release_tag != '' && github.event.inputs.release_tag || github.ref_name }}
+          name: SumraX ${{ needs.build.outputs.version_name }}
+          body: |
+            ## SumraX ${{ needs.build.outputs.version_name }}
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v4
-      with:
-        log-accepted-android-sdk-licenses: false
-        cmdline-tools-version: '14742923'
-        packages: 'platforms;android-37.0 build-tools;37.0.0 platform-tools'
+            ### Install
+            - **Most phones:** `SumraX_${{ needs.build.outputs.version_name }}_universal.apk`
+            - **arm64:** `SumraX_${{ needs.build.outputs.version_name }}_arm64-v8a.apk`
 
-    - name: Install NDK
-      run: |
-        echo "y" | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-          --channel=0 \
-          --install "ndk;29.0.14206865"
-        echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.14206865" >> $GITHUB_ENV
-        sed -i '10i\
-        \
-            ndkVersion = "29.0.14206865"' ${{ github.workspace }}/V2rayNG/app/build.gradle.kts
-
-    - name: Restore cached libhevtun
-      id: cache-libhevtun-restore
-      uses: actions/cache/restore@v5
-      with:
-        path: ${{ github.workspace }}/libs
-        key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('hev-socks5-tunnel/HEAD', 'compile-hevtun.sh') }}
-
-    - name: Build libhevtun
-      if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
-      run: |
-        bash compile-hevtun.sh
-    
-    - name: Save libhevtun
-      if: steps.cache-libhevtun-restore.outputs.cache-hit != 'true'
-      uses: actions/cache/save@v5
-      with:
-        path: ${{ github.workspace }}/libs
-        key: libhevtun-${{ runner.os }}-${{ env.NDK_HOME }}-${{ hashFiles('hev-socks5-tunnel/HEAD', 'compile-hevtun.sh') }}
-
-    - name: Copy libhevtun
-      run: |
-        cp -r ${{ github.workspace }}/libs ${{ github.workspace }}/V2rayNG/app
-
-    - name: Fetch AndroidLibXrayLite tag
-      run: |
-        pushd AndroidLibXrayLite
-        CURRENT_TAG=$(git describe --tags --abbrev=0)
-        echo "Current tag in this repo: $CURRENT_TAG"
-        echo "CURRENT_TAG=$CURRENT_TAG" >> $GITHUB_ENV
-        popd
-
-    - name: Download libv2ray
-      uses: robinraju/release-downloader@v1.13
-      with:
-        repository: '2dust/AndroidLibXrayLite'
-        tag: ${{ env.CURRENT_TAG }}
-        fileName: 'libv2ray.aar'
-        out-file-path: V2rayNG/app/libs/
-
-    - name: Setup Java
-      uses: actions/setup-java@v5
-      with:
-        distribution: 'temurin'
-        java-version: '21'
-
-    - name: Detect keystore availability
-      run: |
-        if [ -n "${{ secrets.APP_KEYSTORE_BASE64 }}" ]; then
-          echo "HAS_KEYSTORE=true" >> "$GITHUB_ENV"
-        else
-          echo "HAS_KEYSTORE=false" >> "$GITHUB_ENV"
-        fi
-
-    - name: Decode Keystore
-      uses: timheuer/base64-to-file@v2.0.0
-      id: android_keystore
-      if: env.HAS_KEYSTORE == 'true'
-      with:
-        fileName: "android_keystore.jks"
-        encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
-
-    - name: Build APK (release keystore)
-      if: env.HAS_KEYSTORE == 'true'
-      run: |
-        cd ${{ github.workspace }}/V2rayNG
-        echo "sdk.dir=${ANDROID_HOME}" > local.properties
-        chmod 755 gradlew
-        ./gradlew licenseFdroidReleaseReport
-        ./gradlew assembleRelease \
-          -Pandroid.injected.signing.store.file=${{ steps.android_keystore.outputs.filePath }} \
-          -Pandroid.injected.signing.store.password=${{ secrets.APP_KEYSTORE_PASSWORD }} \
-          -Pandroid.injected.signing.key.alias=${{ secrets.APP_KEYSTORE_ALIAS }} \
-          -Pandroid.injected.signing.key.password=${{ secrets.APP_KEY_PASSWORD }}
-
-    - name: Build APK (debug signing fallback)
-      if: env.HAS_KEYSTORE == 'false'
-      run: |
-        cd ${{ github.workspace }}/V2rayNG
-        echo "sdk.dir=${ANDROID_HOME}" > local.properties
-        chmod 755 gradlew
-        ./gradlew assemblePlaystoreRelease
-    
-    - name: Upload arm64-v8a APK
-      uses: actions/upload-artifact@v7
-      if: ${{  success() }}
-      with:
-        name: arm64-v8a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*arm64-v8a*.apk
-
-    - name: Upload armeabi-v7a APK
-      uses: actions/upload-artifact@v7
-      if: ${{  success() }}
-      with:
-        name: armeabi-v7a
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*armeabi-v7a*.apk
-
-    - name: Upload x86 APK
-      uses: actions/upload-artifact@v7
-      if: ${{  success() }}
-      with:
-        name: x86-apk
-        path: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*x86*.apk
-
-    - name: Upload to release
-      uses: svenstaro/upload-release-action@v2
-      if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.release_tag != ''
-      with:
-        file: ${{ github.workspace }}/V2rayNG/app/build/outputs/apk/*/release/*.apk
-        tag: ${{ github.event.inputs.release_tag != '' && github.event.inputs.release_tag || github.ref_name }}
-        file_glob: true
-        prerelease: false
-        overwrite: true
+            ### Highlights
+            - Happ-compatible `happ://crypt5/...` import
+            - Profile tunnel settings applied on connect
+          files: release-apks/*.apk
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          make_latest: true
+          overwrite_files: true
