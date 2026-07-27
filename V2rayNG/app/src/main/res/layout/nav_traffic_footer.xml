@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nav_traffic_footer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_nav_traffic_footer"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/padding_spacing_dp16"
+    android:paddingTop="@dimen/padding_spacing_dp8"
+    android:paddingEnd="@dimen/padding_spacing_dp16"
+    android:paddingBottom="@dimen/padding_spacing_dp16">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="@string/drawer_traffic_usage_title"
+        android:textAppearance="@style/SumraX.Caption"
+        android:textColor="@color/sumrax_text_secondary" />
+
+    <TextView
+        android:id="@+id/tv_proxy_traffic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_spacing_dp8"
+        android:fontFamily="sans-serif"
+        android:text="proxy • 0 B/s↑  0 B/s↓"
+        android:textAppearance="@style/SumraX.Body"
+        android:textColor="@color/sumrax_accent" />
+
+    <TextView
+        android:id="@+id/tv_proxy_total"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textAppearance="@style/SumraX.Caption" />
+
+    <TextView
+        android:id="@+id/tv_direct_traffic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_spacing_dp8"
+        android:fontFamily="sans-serif"
+        android:text="direct • 0 B/s↑  0 B/s↓"
+        android:textAppearance="@style/SumraX.Body"
+        android:textColor="@color/sumrax_magenta" />
+
+    <TextView
+        android:id="@+id/tv_direct_total"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:textAppearance="@style/SumraX.Caption" />
+
+    <TextView
+        android:id="@+id/tv_monthly_traffic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/padding_spacing_dp8"
+        android:fontFamily="sans-serif-medium"
+        android:textAppearance="@style/SumraX.Body"
+        android:textColor="@color/sumrax_success"
+        android:textStyle="bold" />
+
+</LinearLayout>

@@ -1,0 +1,8 @@
+<!-- Glass spacer between subscription cards -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:height="6dp">
+        <shape>
+            <solid android:color="@android:color/transparent" />
+        </shape>
+    </item>
+</layer-list>

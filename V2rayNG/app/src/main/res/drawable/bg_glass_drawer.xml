@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- SidebarBackground: vertical gradient -->
+    <item>
+        <shape android:shape="rectangle">
+            <gradient
+                android:angle="270"
+                android:endColor="@color/sumrax_bg_secondary"
+                android:startColor="@color/sumrax_bg"
+                android:type="linear" />
+        </shape>
+    </item>
+    <!-- BorderGlow right edge -->
+    <item android:gravity="end">
+        <shape android:shape="rectangle">
+            <size android:width="1dp" />
+            <solid android:color="@color/sumrax_border_glow" />
+        </shape>
+    </item>
+</layer-list>

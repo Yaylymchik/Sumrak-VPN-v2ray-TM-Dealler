@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/layout_jumpjump_home"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="@dimen/padding_spacing_dp16"
+    android:paddingEnd="@dimen/padding_spacing_dp16">
+
+    <LinearLayout
+        android:id="@+id/layout_home_center"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/server_picker_embed"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.5">
+
+        <com.v2ray.ang.ui.LaptopHeroView
+            android:id="@+id/laptop_hero"
+            android:layout_width="220dp"
+            android:layout_height="220dp"
+            android:clickable="true"
+            android:contentDescription="@string/jumpjump_connection_status"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:id="@+id/tv_home_status_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp16"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            android:text="@string/jumpjump_not_connected"
+            android:textColor="@color/sumrax_text_primary"
+            android:textSize="22sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tv_home_status_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:gravity="center"
+            android:text="@string/jumpjump_tap_mac_connect"
+            android:textColor="@color/sumrax_text_secondary"
+            android:textSize="14sp" />
+
+        <com.v2ray.ang.ui.SegmentedConnectionModeView
+            android:id="@+id/connection_mode_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp16" />
+
+        <com.v2ray.ang.ui.SegmentedModeSwitchView
+            android:id="@+id/mode_switch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp8" />
+
+        <LinearLayout
+            android:id="@+id/layout_home_traffic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp16"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/tv_home_proxy_traffic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:textColor="@color/sumrax_accent"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_home_direct_traffic"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp4"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:textColor="@color/sumrax_magenta"
+                android:textSize="13sp" />
+
+            <TextView
+                android:id="@+id/tv_home_connection_test"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp8"
+                android:clickable="true"
+                android:contentDescription="@string/connection_test_pending"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:textColor="@color/sumrax_success"
+                android:textSize="13sp"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tv_home_connection_ip"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp4"
+                android:fontFamily="monospace"
+                android:gravity="center"
+                android:textColor="@color/sumrax_text_secondary"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_connection_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:gravity="center"
+            android:textColor="@color/sumrax_error"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <include
+        android:id="@+id/server_picker_embed"
+        layout="@layout/jumpjump_server_card"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/padding_spacing_dp16"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

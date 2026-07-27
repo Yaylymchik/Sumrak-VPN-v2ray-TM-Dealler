@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/server_picker_overlay"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:visibility="gone">
+
+    <View
+        android:id="@+id/overlay_backdrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC18181B" />
+
+    <LinearLayout
+        android:id="@+id/overlay_sheet"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="@drawable/bg_picker_sheet"
+        android:clickable="true"
+        android:focusable="true"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/padding_spacing_dp16">
+
+        <View
+            android:layout_width="40dp"
+            android:layout_height="4dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:background="@drawable/bg_picker_handle" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="@dimen/padding_spacing_dp16"
+            android:paddingTop="@dimen/padding_spacing_dp8"
+            android:paddingEnd="@dimen/padding_spacing_dp16">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌐"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/padding_spacing_dp8"
+                android:layout_weight="1"
+                android:fontFamily="monospace"
+                android:text="@string/sumrax_picker_title"
+                android:textColor="@color/sumrax_text_primary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <ImageButton
+                android:id="@+id/btn_close_picker"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:contentDescription="@string/sumrax_picker_close"
+                android:src="@drawable/ic_close_24dp"
+                app:tint="@color/sumrax_text_secondary" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/padding_spacing_dp16"
+            android:layout_marginTop="@dimen/padding_spacing_dp8"
+            android:layout_marginEnd="@dimen/padding_spacing_dp16"
+            android:background="@drawable/bg_glass_panel"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_spacing_dp16">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:text="@string/sumrax_node_import"
+                android:textColor="@color/sumrax_accent"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_import_link"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp8"
+                android:background="@drawable/bg_glass_input"
+                android:fontFamily="monospace"
+                android:hint="@string/sumrax_import_hint"
+                android:minHeight="44dp"
+                android:padding="@dimen/padding_spacing_dp8"
+                android:textColor="@color/sumrax_text_primary"
+                android:textColorHint="@color/sumrax_text_tertiary"
+                android:textSize="12sp" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/padding_spacing_dp8"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_paste_import"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:text="@string/sumrax_paste"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        app:strokeColor="@color/sumrax_glass_stroke" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_import_link"
+                        style="@style/Widget.Material3.Button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:text="@string/sumrax_import"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        app:backgroundTint="@color/sumrax_accent" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_import_qr"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:text="QR"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        app:strokeColor="@color/sumrax_glass_stroke" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_refresh_subs"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="6dp"
+                        android:text="@string/sumrax_refresh_subs"
+                        android:textAllCaps="false"
+                        android:textSize="12sp"
+                        app:strokeColor="@color/sumrax_glass_stroke" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btn_test_all"
+                        style="@style/Widget.Material3.Button.OutlinedButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/sumrax_test_all"
+                        android:textAllCaps="false"
+                        android:textColor="@color/sumrax_success"
+                        android:textSize="12sp"
+                        app:strokeColor="@color/sumrax_success" />
+                </LinearLayout>
+            </HorizontalScrollView>
+        </LinearLayout>
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_filter"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/padding_spacing_dp16"
+            android:paddingTop="@dimen/padding_spacing_dp8"
+            android:paddingEnd="@dimen/padding_spacing_dp16"
+            app:singleSelection="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_places"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="true"
+                android:text="@string/sumrax_picker_places"
+                app:chipStrokeColor="@color/sumrax_accent"
+                app:chipStrokeWidth="1dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_favorites"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sumrax_picker_favorites"
+                app:chipStrokeColor="@color/sumrax_glass_stroke"
+                app:chipStrokeWidth="1dp" />
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/chip_recent"
+                style="@style/Widget.Material3.Chip.Filter"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sumrax_picker_recent"
+                app:chipStrokeColor="@color/sumrax_glass_stroke"
+                app:chipStrokeWidth="1dp" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_picker_servers"
+            android:layout_width="match_parent"
+            android:layout_height="360dp"
+            android:clipToPadding="false"
+            android:paddingStart="@dimen/padding_spacing_dp8"
+            android:paddingEnd="@dimen/padding_spacing_dp8"
+            android:paddingBottom="@dimen/padding_spacing_dp8" />
+
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:overScrollMode="never"
+    android:padding="@dimen/padding_spacing_dp16"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="monospace"
+            android:text="@string/sumrax_statistics_section"
+            android:textColor="@color/sumrax_accent"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <include
+            android:id="@+id/traffic_panel"
+            layout="@layout/nav_traffic_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp16" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_spacing_dp16"
+            android:fontFamily="sans-serif"
+            android:text="@string/sumrax_statistics_hint"
+            android:textColor="@color/sumrax_text_tertiary"
+            android:textSize="13sp" />
+
+    </LinearLayout>
+</ScrollView>

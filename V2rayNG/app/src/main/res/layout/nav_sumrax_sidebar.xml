@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_glass_drawer"
+    android:fillViewport="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/padding_spacing_dp16">
+
+        <include
+            android:id="@+id/nav_brand_include"
+            layout="@layout/nav_sumrax_brand" />
+
+        <TextView
+            style="@style/SumraX.NavSection"
+            android:text="@string/sumrax_nav_core" />
+
+        <include
+            android:id="@+id/nav_item_home"
+            layout="@layout/item_nav_sumrax" />
+
+        <TextView
+            style="@style/SumraX.NavSection"
+            android:text="@string/sumrax_nav_security" />
+
+        <include
+            android:id="@+id/nav_item_protection"
+            layout="@layout/item_nav_sumrax" />
+
+        <TextView
+            style="@style/SumraX.NavSection"
+            android:text="@string/sumrax_nav_ai" />
+
+        <include
+            android:id="@+id/nav_item_ai"
+            layout="@layout/item_nav_sumrax" />
+
+        <TextView
+            style="@style/SumraX.NavSection"
+            android:text="@string/sumrax_nav_system" />
+
+        <include
+            android:id="@+id/nav_item_settings"
+            layout="@layout/item_nav_sumrax" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="24dp" />
+
+        <include
+            android:id="@+id/nav_footer_include"
+            layout="@layout/nav_sumrax_footer" />
+
+        <include
+            android:id="@+id/nav_traffic_footer_include"
+            layout="@layout/nav_traffic_footer" />
+
+    </LinearLayout>
+</ScrollView>

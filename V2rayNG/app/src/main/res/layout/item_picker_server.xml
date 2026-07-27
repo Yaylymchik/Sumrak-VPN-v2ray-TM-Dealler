@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/item_picker_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/padding_spacing_dp8"
+    android:layout_marginTop="4dp"
+    android:layout_marginEnd="@dimen/padding_spacing_dp8"
+    android:layout_marginBottom="4dp"
+    android:background="@drawable/bg_glass_profile_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/padding_spacing_dp16"
+    android:paddingTop="12dp"
+    android:paddingEnd="@dimen/padding_spacing_dp16"
+    android:paddingBottom="12dp">
+
+    <ImageView
+        android:id="@+id/iv_device_icon"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:contentDescription="@string/sumrax_device_mac"
+        android:src="@drawable/ic_laptop_mini" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_spacing_dp16"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_picker_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="1"
+            android:textColor="@color/sumrax_text_primary"
+            android:textSize="15sp"
+            tools:text="DeTroit (iOS)" />
+
+        <TextView
+            android:id="@+id/tv_picker_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif"
+            android:maxLines="1"
+            android:textColor="@color/sumrax_text_tertiary"
+            android:textSize="12sp"
+            android:visibility="gone"
+            tools:text="VLESS" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/btn_favorite"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginEnd="4dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/sumrax_picker_favorites"
+        android:padding="6dp"
+        android:src="@drawable/ic_star_border_24dp" />
+
+    <TextView
+        android:id="@+id/tv_picker_ping"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:textColor="@color/sumrax_success"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        tools:text="59 ms" />
+
+</LinearLayout>

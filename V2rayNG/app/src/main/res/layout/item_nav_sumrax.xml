@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nav_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/padding_spacing_dp8"
+    android:layout_marginTop="2dp"
+    android:layout_marginEnd="@dimen/padding_spacing_dp8"
+    android:layout_marginBottom="2dp"
+    android:background="@drawable/bg_nav_item_selector"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingStart="@dimen/padding_spacing_dp16"
+    android:paddingTop="10dp"
+    android:paddingEnd="@dimen/padding_spacing_dp16"
+    android:paddingBottom="10dp">
+
+    <TextView
+        android:id="@+id/tv_nav_icon"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:text="▣"
+        android:textColor="@color/sumrax_accent"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_nav_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/padding_spacing_dp16"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="@color/sumrax_nav_item"
+        android:textSize="14sp" />
+
+</LinearLayout>

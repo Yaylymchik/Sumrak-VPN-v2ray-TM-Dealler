@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/check_pre_release"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/update_check_pre_release" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/layout_check_update"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/update_check_for_update"
+            android:textAllCaps="false" />
+
+        <TextView
+            android:id="@+id/tv_update_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/sumrax_text_secondary"
+            android:textSize="14sp" />
+    </LinearLayout>
+</ScrollView>

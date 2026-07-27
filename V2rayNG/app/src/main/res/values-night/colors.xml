@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="color_fab_active">#00A8FF</color>
+    <color name="color_fab_inactive">#5A6A7A</color>
+    <color name="divider_color_light">#1AFFFFFF</color>
+    <color name="colorConfigType">#00A8FF</color>
+    <color name="colorPing">#00FF88</color>
+    <color name="colorPingRed">#FF3366</color>
+    <color name="colorIndicator">@color/sumrax_accent</color>
+
+    <color name="md_theme_primary">#00A8FF</color>
+    <color name="md_theme_onPrimary">#FFFFFF</color>
+    <color name="md_theme_primaryContainer">#0E2030</color>
+    <color name="md_theme_onPrimaryContainer">#B8E4FF</color>
+
+    <color name="md_theme_secondary">#8A2EFF</color>
+    <color name="md_theme_onSecondary">#FFFFFF</color>
+    <color name="md_theme_secondaryContainer">#2A1A48</color>
+    <color name="md_theme_onSecondaryContainer">#D4B8FF</color>
+
+    <color name="md_theme_tertiary">#00FF88</color>
+    <color name="md_theme_onTertiary">#061018</color>
+    <color name="md_theme_tertiaryContainer">#061810</color>
+    <color name="md_theme_onTertiaryContainer">#A7FFD4</color>
+
+    <color name="md_theme_error">#FF3366</color>
+    <color name="md_theme_errorContainer">#180810</color>
+    <color name="md_theme_onError">#FFFFFF</color>
+    <color name="md_theme_onErrorContainer">#FFB8C8</color>
+
+    <color name="md_theme_background">#18181B</color>
+    <color name="md_theme_onBackground">#F4F8FF</color>
+
+    <color name="md_theme_surface">#18181B</color>
+    <color name="md_theme_onSurface">#F4F8FF</color>
+    <color name="md_theme_surfaceVariant">#232228</color>
+    <color name="md_theme_onSurfaceVariant">#9AA8B8</color>
+    <color name="md_theme_inverseSurface">#F4F8FF</color>
+    <color name="md_theme_inverseOnSurface">#18181B</color>
+
+    <color name="md_theme_outline">#2E2D34</color>
+    <color name="md_theme_outlineVariant">#232228</color>
+
+    <color name="md_theme_inversePrimary">#00A8FF</color>
+    <color name="md_theme_shadow">#000000</color>
+    <color name="md_theme_surfaceTint">#00A8FF</color>
+    <color name="md_theme_scrim">#CC18181B</color>
+</resources>

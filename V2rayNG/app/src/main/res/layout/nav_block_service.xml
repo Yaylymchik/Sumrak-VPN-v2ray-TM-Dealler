@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.v2ray.ang.ui.NeonBorderView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="@dimen/padding_spacing_dp16"
+    android:layout_marginTop="@dimen/padding_spacing_dp8"
+    android:layout_marginEnd="@dimen/padding_spacing_dp16"
+    android:layout_marginBottom="@dimen/padding_spacing_dp8">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_block_service_inner"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center"
+        android:letterSpacing="0.08"
+        android:paddingStart="@dimen/padding_spacing_dp16"
+        android:paddingTop="@dimen/padding_spacing_dp8"
+        android:paddingEnd="@dimen/padding_spacing_dp16"
+        android:paddingBottom="@dimen/padding_spacing_dp8"
+        android:text="@string/drawer_block_service"
+        android:textAllCaps="true"
+        android:textColor="@color/sumrax_text_primary"
+        android:textSize="13sp"
+        android:textStyle="bold" />
+
+</com.v2ray.ang.ui.NeonBorderView>
