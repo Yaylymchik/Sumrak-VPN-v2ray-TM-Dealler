@@ -2,14 +2,13 @@ package com.v2ray.ang.util.encrypt
 
 import com.happproxy.util.ErrorCodeJNIWrapper
 
-/**
- * Delegates to liberror-code.so via [ErrorCodeJNIWrapper] (Happ-compatible JNI names).
- */
 internal object ErrorCodeNative {
 
+    private val wrapper by lazy { ErrorCodeJNIWrapper() }
+
     fun decryptWithMode(mode: Int, payload: String): String =
-        ErrorCodeJNIWrapper.decryptWithMode(mode, payload)
+        wrapper.decryptWithMode(mode, payload)
 
     fun decryptFromString2(payload: String): String =
-        ErrorCodeJNIWrapper.decryptFromString2(payload)
+        wrapper.decryptFromString2(payload)
 }

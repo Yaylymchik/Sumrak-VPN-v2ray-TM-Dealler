@@ -180,11 +180,12 @@ object AngConfigManager {
      * @return A pair containing the number of configurations and subscriptions imported.
      */
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
+        val input = server?.let { EncryptedCryptResolver.canonicalize(it) }
         val resolvedServer = when {
-            EncryptedCryptResolver.isEncryptedDeeplink(server) ->
-                EncryptedCryptResolver.resolve(server)
+            EncryptedCryptResolver.isEncryptedDeeplink(input) ->
+                EncryptedCryptResolver.resolve(input)
 
-            else -> EncryptedCryptResolver.resolve(server) ?: server
+            else -> EncryptedCryptResolver.resolve(input) ?: input
         }
         if (resolvedServer.isNullOrBlank()) {
             return 0 to 0

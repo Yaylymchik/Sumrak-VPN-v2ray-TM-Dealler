@@ -3,11 +3,11 @@ package com.v2ray.ang.util.encrypt
 import android.util.Base64
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.Utils
 
 object EncryptedCryptResolver {
 
     private val knownSchemes = listOf("happ://", "sumrax://", "v2rayng://")
+    private val corruptFragmentSuffixes = listOf("=ff", "#ff", "%23ff")
 
     enum class CryptMode(val prefix: String) {
         RSA_1024("crypt/"),
@@ -24,7 +24,7 @@ object EncryptedCryptResolver {
 
     fun isEncryptedDeeplink(value: String?): Boolean {
         if (value.isNullOrBlank()) return false
-        return cryptModeOf(normalize(value)) != null
+        return cryptModeOf(canonicalize(value)) != null
     }
 
     /**
@@ -33,19 +33,33 @@ object EncryptedCryptResolver {
      */
     fun resolve(value: String?): String? {
         if (value.isNullOrBlank()) return value
-        val normalized = normalize(value)
+        val normalized = canonicalize(value)
         val mode = cryptModeOf(normalized) ?: return value
-        val path = stripScheme(normalized)
-        val payload = path.removePrefix(mode.prefix)
+        val payload = extractPayload(normalized, mode) ?: return null
         if (payload.isBlank()) return null
 
-        val decrypted = runCatching { decrypt(mode, normalizePayload(payload)) }
-            .onFailure { LogUtil.e(AppConfig.TAG, "Encrypted deeplink decrypt failed", it) }
-            .getOrNull()
-            ?.trim()
-            ?.takeIf { it.isNotBlank() && !isEncryptedDeeplink(it) }
+        for (candidate in payloadCandidates(payload)) {
+            val decrypted = runCatching { decrypt(mode, candidate) }
+                .onFailure { LogUtil.e(AppConfig.TAG, "Encrypted deeplink decrypt failed", it) }
+                .getOrNull()
+                ?.trim()
+                ?.takeIf { it.isNotBlank() && !isEncryptedDeeplink(it) }
+            if (!decrypted.isNullOrBlank()) {
+                LogUtil.i(AppConfig.TAG, "Encrypted deeplink resolved (${mode.name})")
+                return decrypted
+            }
+        }
+        LogUtil.e(AppConfig.TAG, "Encrypted deeplink decrypt produced no valid URL (${mode.name})")
+        return null
+    }
 
-        return decrypted
+    /** Normalizes clipboard / intent deeplinks (Happ uses plain prefix stripping, not Uri). */
+    fun canonicalize(value: String): String {
+        var trimmed = value.trim()
+        if (trimmed.contains('#')) {
+            trimmed = trimmed.substringBefore('#')
+        }
+        return trimmed
     }
 
     private fun cryptModeOf(normalized: String): CryptMode? {
@@ -62,23 +76,41 @@ object EncryptedCryptResolver {
         return value
     }
 
-    private fun normalize(value: String): String {
-        var trimmed = value.trim()
-        val hashIndex = trimmed.indexOf('#')
-        if (hashIndex >= 0) {
-            trimmed = trimmed.substring(0, hashIndex)
-        }
-        return trimmed
+    private fun extractPayload(normalized: String, mode: CryptMode): String? {
+        val path = stripScheme(normalized)
+        if (!path.startsWith(mode.prefix, ignoreCase = true)) return null
+        return path.substring(mode.prefix.length)
     }
 
-    private fun normalizePayload(payload: String): String {
-        var normalized = payload.trim()
-        normalized = normalized.replace(' ', '+')
-        val urlDecoded = runCatching { Utils.urlDecode(normalized) }.getOrNull()?.trim()
-        if (!urlDecoded.isNullOrBlank() && urlDecoded != normalized) {
-            normalized = urlDecoded.replace(' ', '+')
+    private fun payloadCandidates(payload: String): List<String> {
+        val base = payload.trim().replace(' ', '+')
+        val out = linkedSetOf<String>()
+
+        // Common paste mistake: trailing "#ff" copied as "=ff"
+        for (suffix in corruptFragmentSuffixes) {
+            if (base.endsWith(suffix, ignoreCase = true) && base.length > suffix.length) {
+                out.add(base.dropLast(suffix.length))
+            }
         }
-        return normalized
+
+        out.add(base)
+
+        if (base.contains('%')) {
+            runCatching {
+                java.net.URLDecoder.decode(base, Charsets.UTF_8.name())
+                    .trim()
+                    .replace(' ', '+')
+            }.getOrNull()?.takeIf { it.isNotBlank() }?.let { decoded ->
+                out.add(decoded)
+                for (suffix in corruptFragmentSuffixes) {
+                    if (decoded.endsWith(suffix, ignoreCase = true) && decoded.length > suffix.length) {
+                        out.add(decoded.dropLast(suffix.length))
+                    }
+                }
+            }
+        }
+
+        return out.toList()
     }
 
     private fun decrypt(mode: CryptMode, payload: String): String {
@@ -131,17 +163,19 @@ object EncryptedCryptResolver {
     }
 
     private fun decodeFlexibleBase64(input: String): String {
-        decodeBase64OrNull(input)?.let { return it }
+        decodeBase64OrNull(input, Base64.NO_WRAP)?.let { return it }
+        decodeBase64OrNull(input, Base64.URL_SAFE or Base64.NO_WRAP)?.let { return it }
         if (input.contains('=')) {
             val trimmed = input.trimEnd('=')
-            decodeBase64OrNull(trimmed)?.let { return it }
+            decodeBase64OrNull(trimmed, Base64.NO_WRAP)?.let { return it }
+            decodeBase64OrNull(trimmed, Base64.URL_SAFE or Base64.NO_WRAP)?.let { return it }
         }
         return input
     }
 
-    private fun decodeBase64OrNull(input: String): String? {
-        return runCatching { String(Base64.decode(input, Base64.NO_WRAP), Charsets.UTF_8) }
-            .recoverCatching { String(Base64.decode(input, Base64.URL_SAFE), Charsets.UTF_8) }
+    private fun decodeBase64OrNull(input: String, flags: Int): String? {
+        return runCatching { String(Base64.decode(input, flags), Charsets.UTF_8) }
             .getOrNull()
+            ?.takeIf { it.isNotBlank() }
     }
 }

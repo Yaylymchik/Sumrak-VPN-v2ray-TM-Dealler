@@ -24,3 +24,7 @@
 -keepclasseswithmembernames class com.happproxy.util.ErrorCodeJNIWrapper {
     native <methods>;
 }
+-keep class com.happproxy.util.protection.EncryptedSubUrlHelper {
+    public static java.lang.String getHelp(java.lang.String);
+}
+-keep class defpackage.** { *; }

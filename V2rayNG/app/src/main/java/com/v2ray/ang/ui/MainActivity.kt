@@ -1199,7 +1199,7 @@ class MainActivity : HelperBaseActivity() {
                         }
 
                         countSub > 0 -> setupGroupTab()
-                        EncryptedCryptResolver.isEncryptedDeeplink(server) ->
+                        EncryptedCryptResolver.isEncryptedDeeplink(server?.let { EncryptedCryptResolver.canonicalize(it) }) ->
                             toastError(R.string.toast_encrypted_import_failed)
                         else -> toastError(R.string.toast_failure)
                     }

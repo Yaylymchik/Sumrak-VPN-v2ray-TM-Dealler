@@ -163,6 +163,32 @@
                 <data android:host="install-config" />
                 <data android:host="install-sub" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="happ" />
+                <data android:host="crypt" />
+                <data android:host="crypt2" />
+                <data android:host="crypt3" />
+                <data android:host="crypt4" />
+                <data android:host="crypt5" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:scheme="sumrax" />
+                <data android:host="crypt" />
+                <data android:host="crypt2" />
+                <data android:host="crypt3" />
+                <data android:host="crypt4" />
+                <data android:host="crypt5" />
+            </intent-filter>
         </activity>
         <activity
             android:name=".ui.BackupActivity"
