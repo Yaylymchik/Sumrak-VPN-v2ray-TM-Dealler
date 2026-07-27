@@ -446,8 +446,8 @@ object SettingsManager {
     /**
      * Set night mode.
      */
-    fun setNightMode() {
-        when (MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
+    fun setNightMode(mode: String? = null) {
+        when (mode ?: MmkvManager.decodeSettingsString(AppConfig.PREF_UI_MODE_NIGHT, "0")) {
             "0" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
             "1" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             "2" -> AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -544,6 +544,31 @@ object SettingsManager {
         )
     }
 
+    fun getAutoConnectType(subscriptionId: String = ""): String {
+        if (subscriptionId.isNotEmpty()) {
+            val sub = MmkvManager.decodeSubscription(subscriptionId)
+            sub?.autoConnectType?.takeIf { it.isNotBlank() }?.let { return it }
+            if (sub?.autoConnect == false) {
+                return AppConfig.AUTO_CONNECT_LAST_USED
+            }
+        }
+        return MmkvManager.decodeSettingsString(
+            AppConfig.PREF_AUTO_CONNECT_TYPE,
+            AppConfig.AUTO_CONNECT_LOWEST_DELAY
+        ) ?: AppConfig.AUTO_CONNECT_LOWEST_DELAY
+    }
+
+    fun getPingType(subscriptionId: String = ""): String {
+        if (subscriptionId.isNotEmpty()) {
+            MmkvManager.decodeSubscription(subscriptionId)
+                ?.pingType
+                ?.takeIf { it.isNotBlank() }
+                ?.let { return it }
+        }
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_PING_TYPE, AppConfig.PING_TYPE_TCP)
+            ?: AppConfig.PING_TYPE_TCP
+    }
+
     fun resetUserSettings() {
         MmkvManager.clearAllSettings()
         ensureDefaultSettings()
@@ -578,6 +603,7 @@ object SettingsManager {
     private fun ensureDefaultSettings() {
         ensureDefaultValue(AppConfig.PREF_MODE, VPN)
         ensureDefaultValue(AppConfig.PREF_CONNECTION_MODE, AppConfig.CONNECTION_MODE_SMART)
+        ensureDefaultValue(AppConfig.PREF_AUTO_CONNECT_TYPE, AppConfig.AUTO_CONNECT_LOWEST_DELAY)
         ensureDefaultValue(AppConfig.PREF_VPN_DNS, AppConfig.DNS_VPN)
         ensureDefaultValue(AppConfig.PREF_VPN_MTU, AppConfig.VPN_MTU.toString())
         ensureDefaultValue(AppConfig.PREF_VPN_BYPASS_LAN, "1")

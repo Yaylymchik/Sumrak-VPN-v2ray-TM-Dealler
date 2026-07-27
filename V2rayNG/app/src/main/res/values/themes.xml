@@ -59,10 +59,10 @@
         <item name="preferenceTheme">@style/SumraX.PreferenceTheme</item>
     </style>
 
-    <!-- Day/Night theme: inherit common values and set dark-mode-specific items -->
+    <!-- Day theme: light status / navigation bar icons -->
     <style name="AppThemeDayNight" parent="AppThemeBase">
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar" tools:targetApi="27">false</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="27">true</item>
     </style>
 
     <!-- Theme without ActionBar -->

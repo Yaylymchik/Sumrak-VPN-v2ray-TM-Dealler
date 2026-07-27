@@ -12,7 +12,8 @@ import com.v2ray.ang.databinding.FragmentSettingsHubBinding
 import com.v2ray.ang.databinding.ItemSettingsSectionBinding
 
 /**
- * Happ-style settings hub: sectioned list (Interface / Connection / Data / Xray / System).
+ * Settings hub ordered to match the reference client sections:
+ * UI → Tunnel → Advanced → Other → About.
  */
 class HappSettingsHostFragment : Fragment() {
 
@@ -43,28 +44,34 @@ class HappSettingsHostFragment : Fragment() {
     }
 
     private fun bindRows() {
-        bind(binding.rowUi, R.string.sumrax_settings_ui, UISettingsActivity::class.java)
-        bind(binding.rowLanguage, R.string.sumrax_settings_language, LanguageActivitySettings::class.java)
-        bind(binding.rowTun, R.string.sumrax_settings_vpn, VpnSettingsActivity::class.java)
-        bind(binding.rowRouting, R.string.sumrax_settings_routing, RoutingSettingActivity::class.java)
-        bind(binding.rowExcludedApps, R.string.sumrax_settings_excluded_apps, PerAppProxyActivity::class.java)
-        bind(binding.rowExcludedRoutes, R.string.sumrax_settings_excluded_routes, ExcludedRoutesActivity::class.java)
-        bind(binding.rowInbound, R.string.sumrax_settings_inbound_auth, InboundAuthActivity::class.java)
-        bind(binding.rowConnectionSecurity, R.string.sumrax_settings_dns_network, CoreDnsSettingsActivity::class.java)
-        bind(binding.rowPing, R.string.sumrax_settings_ping, PingSettingsActivity::class.java)
-        bind(binding.rowSubscriptions, R.string.sumrax_settings_subscriptions, SubscriptionSettingsActivity::class.java)
-        bind(binding.rowGeoFiles, R.string.sumrax_settings_geo_files, UserAssetActivity::class.java)
-        bind(binding.rowAdvanced, R.string.sumrax_settings_advanced, AdvancedSettingsActivity::class.java)
-        bind(binding.rowOther, R.string.sumrax_settings_other, OtherSettingsActivity::class.java)
-        bind(binding.rowLogs, R.string.sumrax_settings_logs, LogsSettingsActivity::class.java)
-        bind(binding.rowLogsView, R.string.sumrax_settings_logs_view, LogsViewSettingsActivity::class.java)
-        bind(binding.rowStatistics, R.string.sumrax_settings_statistics, StatisticsSettingsActivity::class.java)
-        bind(binding.rowDiagnostics, R.string.sumrax_settings_diagnostics, DiagnosticsActivity::class.java)
-        bind(binding.rowBackup, R.string.sumrax_settings_backup, BackupActivity::class.java)
-        bind(binding.rowReset, R.string.sumrax_settings_reset, ResetSettingsActivity::class.java)
-        bind(binding.rowFaq, R.string.sumrax_settings_faq, FaqActivity::class.java)
-        bind(binding.rowReport, R.string.sumrax_settings_report, ReportActivity::class.java)
-        // Check update is reachable from Other / Subscriptions prefs
+        // UI
+        bind(binding.rowLanguage, R.string.title_language, LanguageActivitySettings::class.java)
+        bind(binding.rowUiMode, R.string.title_pref_ui_mode_night, UiModeSettingsActivity::class.java)
+        bind(binding.rowUi, R.string.title_ui_settings, UISettingsActivity::class.java)
+
+        // Tunnel
+        bind(binding.rowRouting, R.string.routing_settings_title, RoutingSettingActivity::class.java)
+        bind(binding.rowExcludedApps, R.string.title_pref_per_app_proxy, PerAppProxyActivity::class.java)
+        bind(binding.rowTunnelOptions, R.string.title_tunnel, TunnelOptionsActivity::class.java)
+        bind(binding.rowInbound, R.string.inbound_authorization_title, InboundAuthActivity::class.java)
+
+        // Advanced
+        bind(binding.rowVpn, R.string.title_vpn_settings, VpnSettingsActivity::class.java)
+        bind(binding.rowSubscriptions, R.string.title_subscription, SubscriptionSettingsActivity::class.java)
+        bind(binding.rowPing, R.string.title_ping, PingSettingsActivity::class.java)
+        bind(binding.rowLanPorts, R.string.title_pref_proxy_sharing_enabled, LanPortsSettingsActivity::class.java)
+        bind(binding.rowAutoStart, R.string.title_pref_auto_start_vpn, AutoStartSettingsActivity::class.java)
+
+        // Other
+        bind(binding.rowCheckUpdate, R.string.title_pref_update_button_check, CheckUpdateActivity::class.java)
+        bind(binding.rowStatistics, R.string.title_statistics, StatisticsSettingsActivity::class.java)
+        bind(binding.rowLogs, R.string.title_logs, LogsSettingsActivity::class.java)
+        bind(binding.rowReset, R.string.title_reset, ResetSettingsActivity::class.java)
+
+        // About
+        bind(binding.rowFaq, R.string.title_faq, FaqActivity::class.java)
+        bind(binding.rowUrlSchemes, R.string.title_url_schemes, UrlSchemesActivity::class.java)
+        bind(binding.rowAbout, R.string.title_about, AboutActivity::class.java)
     }
 
     private fun bind(row: ItemSettingsSectionBinding, titleRes: Int, activity: Class<*>) {

@@ -10,6 +10,7 @@ import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.isNotNullEmpty
 import com.v2ray.ang.extension.nullIfBlank
 import com.v2ray.ang.handler.MmkvManager
+import com.v2ray.ang.util.FinalMaskUtil
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -36,15 +37,17 @@ object CoreOutboundBuilder {
         }
 
         outbound ?: return null
-        val ret = updateOutboundWithGlobalSettings(outbound)
+        val ret = updateOutboundWithGlobalSettings(outbound, profileItem)
         if (!ret) return null
         return outbound
     }
 
-    /** Applies global outbound options (mux, protocol-specific tweaks, etc.). */
-    private fun updateOutboundWithGlobalSettings(outbound: OutboundBean): Boolean {
+    /** Applies global / per-subscription outbound options (mux, protocol-specific tweaks, etc.). */
+    private fun updateOutboundWithGlobalSettings(outbound: OutboundBean, profileItem: ProfileItem): Boolean {
         try {
-            var muxEnabled = MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false)
+            val sub = resolveSubscription(profileItem)
+            var muxEnabled = sub?.muxEnabled
+                ?: MmkvManager.decodeSettingsBool(AppConfig.PREF_MUX_ENABLED, false)
             val protocol = outbound.protocol
             if (protocol.equals(EConfigType.SHADOWSOCKS.name, true)
                 || protocol.equals(EConfigType.SOCKS.name, true)
@@ -61,8 +64,14 @@ object CoreOutboundBuilder {
 
             if (muxEnabled) {
                 outbound.mux?.enabled = true
-                outbound.mux?.concurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_CONCURRENCY, "8").orEmpty().toInt()
-                outbound.mux?.xudpConcurrency = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "16").orEmpty().toInt()
+                outbound.mux?.concurrency = (
+                    sub?.muxConcurrency
+                        ?: MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_CONCURRENCY, "8")
+                    ).orEmpty().toIntOrNull() ?: 8
+                outbound.mux?.xudpConcurrency = (
+                    sub?.muxXudpConcurrency
+                        ?: MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "16")
+                    ).orEmpty().toIntOrNull() ?: 16
                 outbound.mux?.xudpProxyUDP443 = MmkvManager.decodeSettingsString(AppConfig.PREF_MUX_XUDP_QUIC, "reject")
                 if (protocol.equals(EConfigType.VLESS.name, true) && outbound.settings?.vnext?.first()?.users?.first()?.flow?.isNotEmpty() == true) {
                     outbound.mux?.concurrency = -1
@@ -524,7 +533,8 @@ object CoreOutboundBuilder {
             }
         }
         finalMask?.let {
-            val parsedFinalMask = JsonUtil.parseString(finalMask)
+            val normalized = FinalMaskUtil.normalizeToJson(finalMask) ?: finalMask
+            val parsedFinalMask = JsonUtil.parseString(normalized)
             if (parsedFinalMask != null) {
                 streamSettings.finalmask = parsedFinalMask
             } else {
@@ -580,7 +590,7 @@ object CoreOutboundBuilder {
         }
 
         if (profileItem.finalMask.isNullOrEmpty()) {
-            updateOutboundFragment(streamSettings)
+            updateOutboundFragment(streamSettings, profileItem)
         }
     }
 
@@ -588,13 +598,16 @@ object CoreOutboundBuilder {
      * Updates the outbound with fragment settings for traffic optimization.
      *
      * Configures packet fragmentation for TLS and REALITY protocols if enabled.
-     *
-     * @param streamSettings The streamSettings object to be modified
-     * @return true if fragment configuration was successful, false otherwise
      */
-    private fun updateOutboundFragment(streamSettings: OutboundBean.StreamSettingsBean): Boolean {
+    private fun updateOutboundFragment(
+        streamSettings: OutboundBean.StreamSettingsBean,
+        profileItem: ProfileItem
+    ): Boolean {
         try {
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false) == false) {
+            val sub = resolveSubscription(profileItem)
+            val fragmentEnabled = sub?.fragmentEnabled
+                ?: MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false)
+            if (!fragmentEnabled) {
                 return true
             }
             if (streamSettings.security != AppConfig.TLS
@@ -606,8 +619,9 @@ object CoreOutboundBuilder {
                 return true
             }
 
-            var packets =
-                MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_PACKETS) ?: "tlshello"
+            var packets = sub?.fragmentPackets
+                ?: MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_PACKETS)
+                ?: "tlshello"
             if (streamSettings.security == AppConfig.REALITY
                 && packets == "tlshello"
             ) {
@@ -618,9 +632,11 @@ object CoreOutboundBuilder {
                 type = "fragment",
                 settings = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
                     packets = packets,
-                    length = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_LENGTH)
+                    length = sub?.fragmentLength
+                        ?: MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_LENGTH)
                         ?: "50-100",
-                    delay = MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL)
+                    delay = sub?.fragmentInterval
+                        ?: MmkvManager.decodeSettingsString(AppConfig.PREF_FRAGMENT_INTERVAL)
                         ?: "10-20"
                 )
             )
@@ -647,15 +663,19 @@ object CoreOutboundBuilder {
 
             prependMask("tcp", fragmentMask)
 
-            if (MmkvManager.decodeSettingsBool(AppConfig.PREF_NOISE_ENABLED, false)) {
+            val noiseEnabled = sub?.noiseEnabled
+                ?: MmkvManager.decodeSettingsBool(AppConfig.PREF_NOISE_ENABLED, false)
+            if (noiseEnabled) {
                 val noiseMask = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean(
                     type = "noise",
                     settings = OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean(
                         noise = listOf(
                             OutboundBean.StreamSettingsBean.FinalMaskBean.MaskBean.MaskSettingsBean.NoiseMaskBean(
-                                rand = MmkvManager.decodeSettingsString(AppConfig.PREF_NOISE_RAND)
+                                rand = sub?.noiseRand
+                                    ?: MmkvManager.decodeSettingsString(AppConfig.PREF_NOISE_RAND)
                                     ?: "10-20",
-                                delay = MmkvManager.decodeSettingsString(AppConfig.PREF_NOISE_DELAY)
+                                delay = sub?.noiseDelay
+                                    ?: MmkvManager.decodeSettingsString(AppConfig.PREF_NOISE_DELAY)
                                     ?: "10-16",
                             )
                         )
@@ -670,6 +690,10 @@ object CoreOutboundBuilder {
         }
         return true
     }
+
+    private fun resolveSubscription(profileItem: ProfileItem) =
+        profileItem.subscriptionId.takeIf { it.isNotEmpty() }
+            ?.let { MmkvManager.decodeSubscription(it) }
 
     private fun getServerAddress(profileItem: ProfileItem): String {
         if (Utils.isPureIpAddress(profileItem.server.orEmpty())) {

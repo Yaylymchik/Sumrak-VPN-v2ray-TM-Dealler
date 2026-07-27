@@ -4,6 +4,7 @@ import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.NetworkType
 import com.v2ray.ang.extension.nullIfBlank
+import com.v2ray.ang.util.FinalMaskUtil
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.Utils
 import java.net.URI
@@ -67,7 +68,7 @@ open class FmtBase {
         config.authority = queryParam["authority"]
         config.xhttpMode = queryParam["mode"]
         config.xhttpExtra = queryParam["extra"]
-        config.finalMask = queryParam["fm"]
+        config.finalMask = FinalMaskUtil.normalizeToJson(queryParam["fm"]) ?: queryParam["fm"]
 
         config.security = queryParam["security"]
         if (config.security != AppConfig.TLS && config.security != AppConfig.REALITY) {

@@ -1,12 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="colorPing">#00FF88</color>
+    <color name="colorPingRed">#FF3366</color>
+    <color name="colorConfigType">#00A8FF</color>
     <color name="color_fab_active">#00A8FF</color>
     <color name="color_fab_inactive">#5A6A7A</color>
     <color name="divider_color_light">#1AFFFFFF</color>
-    <color name="colorConfigType">#00A8FF</color>
-    <color name="colorPing">#00FF88</color>
-    <color name="colorPingRed">#FF3366</color>
     <color name="colorIndicator">@color/sumrax_accent</color>
+
+    <!-- SumraX cyber palette (dark) -->
+    <color name="sumrax_bg">#18181B</color>
+    <color name="sumrax_bg_secondary">#1C1B21</color>
+    <color name="sumrax_bg_deep">#060A10</color>
+    <color name="sumrax_surface">#232228</color>
+    <color name="sumrax_surface_elevated">#2A292F</color>
+    <color name="sumrax_accent">#00A8FF</color>
+    <color name="sumrax_cyan">#00A8FF</color>
+    <color name="sumrax_magenta">#8A2EFF</color>
+    <color name="sumrax_accent_soft">#1A3050</color>
+    <color name="sumrax_glass_fill">#1F1E24</color>
+    <color name="sumrax_glass_stroke">#2E2D34</color>
+    <color name="sumrax_border_glow">#00A8FF</color>
+    <color name="sumrax_text_primary">#F4F8FF</color>
+    <color name="sumrax_text_secondary">#9AA8B8</color>
+    <color name="sumrax_text_tertiary">#5A6A7A</color>
+    <color name="sumrax_success">#00FF88</color>
+    <color name="sumrax_warning">#FFB800</color>
+    <color name="sumrax_error">#FF3366</color>
+    <color name="sumrax_icon_primary">#9AA8B8</color>
+    <color name="sumrax_icon_accent">#00A8FF</color>
+    <color name="sumrax_icon_danger">#FF3366</color>
+    <color name="sumrax_accent_alpha_10">#1A00A8FF</color>
+    <color name="sumrax_accent_alpha_20">#3300A8FF</color>
+    <color name="sumrax_accent_alpha_33">#5400A8FF</color>
+    <color name="sumrax_purple_alpha_20">#338A2EFF</color>
+    <color name="sumrax_green_alpha_10">#1A00FF88</color>
+    <color name="sumrax_green_alpha_33">#5400FF88</color>
+    <color name="sumrax_red_alpha_10">#1AFF3366</color>
+    <color name="sumrax_red_alpha_33">#54FF3366</color>
+    <color name="sumrax_track_bg">#332E2D34</color>
+    <color name="sumrax_scanline_tint">#0A00A8FF</color>
+    <color name="sumrax_nav_selected_bg">#0E1828</color>
+    <color name="sumrax_badge_success_bg">#061810</color>
+    <color name="sumrax_badge_error_bg">#180810</color>
+    <color name="sumrax_fab_deep">#061018</color>
+    <color name="sumrax_segment_highlight">#061820</color>
+    <color name="sumrax_hero_body">#3A4455</color>
+    <color name="sumrax_hero_bezel">#525D70</color>
+    <color name="sumrax_hero_screen">#080C12</color>
+    <color name="sumrax_hero_screen_on">#0A1828</color>
+    <color name="sumrax_hero_hinge">#222A38</color>
 
     <color name="md_theme_primary">#00A8FF</color>
     <color name="md_theme_onPrimary">#FFFFFF</color>

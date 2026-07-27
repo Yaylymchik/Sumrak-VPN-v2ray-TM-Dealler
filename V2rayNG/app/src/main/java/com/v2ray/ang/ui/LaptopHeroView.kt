@@ -133,9 +133,13 @@ class LaptopHeroView @JvmOverloads constructor(
     }
 
     private fun drawLaptop(canvas: Canvas, cx: Float, cy: Float, size: Float) {
-        val bodyColor = Color.parseColor("#3A4455")
-        val screenColor = if (heroState == HeroState.CONNECTED) Color.parseColor("#0A1828") else Color.parseColor("#080C12")
-        val bezelColor = Color.parseColor("#525D70")
+        val bodyColor = ContextCompat.getColor(context, R.color.sumrax_hero_body)
+        val screenColor = if (heroState == HeroState.CONNECTED) {
+            ContextCompat.getColor(context, R.color.sumrax_hero_screen_on)
+        } else {
+            ContextCompat.getColor(context, R.color.sumrax_hero_screen)
+        }
+        val bezelColor = ContextCompat.getColor(context, R.color.sumrax_hero_bezel)
         val accent = ContextCompat.getColor(context, R.color.sumrax_accent)
 
         laptopBodyPaint.color = bodyColor
@@ -192,7 +196,7 @@ class LaptopHeroView @JvmOverloads constructor(
         }
         canvas.drawPath(basePath, laptopBodyPaint)
 
-        laptopBodyPaint.color = Color.parseColor("#222A38")
+        laptopBodyPaint.color = ContextCompat.getColor(context, R.color.sumrax_hero_hinge)
         canvas.drawRect(
             cx - screenW * 0.12f,
             baseTop + baseH * 0.35f,

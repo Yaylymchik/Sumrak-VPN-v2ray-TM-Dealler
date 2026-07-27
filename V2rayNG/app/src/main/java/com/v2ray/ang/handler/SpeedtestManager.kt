@@ -9,6 +9,7 @@ import com.v2ray.ang.util.LogUtil
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import java.io.IOException
+import java.net.InetAddress
 import java.net.InetSocketAddress
 import java.net.Socket
 import java.net.UnknownHostException
@@ -36,6 +37,29 @@ object SpeedtestManager {
             }
         }
         return time
+    }
+
+    /**
+     * ICMP reachability probe (best-effort; may require network privileges).
+     */
+    suspend fun icmpPing(host: String): Long {
+        if (host.isBlank()) return -1L
+        return try {
+            val start = System.currentTimeMillis()
+            val reachable = InetAddress.getByName(host).isReachable(3000)
+            if (!reachable) {
+                // Fallback to system ping when isReachable is blocked
+                val process = ProcessBuilder("ping", "-c", "1", "-W", "3", host)
+                    .redirectErrorStream(true)
+                    .start()
+                val finished = process.waitFor()
+                if (finished != 0) return -1L
+            }
+            System.currentTimeMillis() - start
+        } catch (e: Exception) {
+            LogUtil.e(AppConfig.TAG, "icmpPing failed: $host", e)
+            -1L
+        }
     }
 
     /**

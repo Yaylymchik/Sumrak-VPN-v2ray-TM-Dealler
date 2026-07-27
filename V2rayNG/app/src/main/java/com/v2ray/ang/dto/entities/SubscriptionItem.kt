@@ -13,5 +13,32 @@ data class SubscriptionItem(
     var filter: String? = null,
     var allowInsecureUrl: Boolean = false,
     var userAgent: String? = null,
-)
 
+    /** null = inherit global [AppConfig.PREF_PING_TYPE] */
+    var pingType: String? = null,
+    /** null = inherit global auto-connect type */
+    var autoConnectType: String? = null,
+    /** null = inherit; false disables auto pick for this subscription */
+    var autoConnect: Boolean? = null,
+    var pingOnOpen: Boolean? = null,
+
+    var fragmentEnabled: Boolean? = null,
+    var fragmentPackets: String? = null,
+    var fragmentLength: String? = null,
+    var fragmentInterval: String? = null,
+
+    var muxEnabled: Boolean? = null,
+    var muxConcurrency: String? = null,
+    var muxXudpConcurrency: String? = null,
+
+    var noiseEnabled: Boolean? = null,
+    var noiseRand: String? = null,
+    var noiseDelay: String? = null,
+
+    /** Raw days from profile remarks when countdown started. */
+    var daysRawAtCapture: Int? = null,
+    /** Remaining days at capture time. */
+    var daysBaseline: Int? = null,
+    /** Local start-of-day millis when [daysBaseline] was captured. */
+    var daysCapturedAt: Long = 0L,
+)

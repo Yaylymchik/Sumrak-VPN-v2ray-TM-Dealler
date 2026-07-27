@@ -101,7 +101,9 @@ object NotificationManager {
             ProfileRemarkParser.resolveRemarksWithDays(
                 currentRemarks,
                 CoreServiceManager.getRunningServerName()
-            )
+            ),
+            subscriptionId = currentConfig?.subscriptionId,
+            guid = MmkvManager.getSelectServer()
         )
 
         mBuilder = NotificationCompat.Builder(service, channelId)

@@ -582,20 +582,29 @@ class MainActivity : HelperBaseActivity() {
 
     fun refreshDaysRemaining() {
         val selectedGuid = MmkvManager.getSelectServer()
-        val selectedRemarks = selectedGuid?.let { MmkvManager.decodeServerConfig(it)?.remarks }
+        val selectedProfile = selectedGuid?.let { MmkvManager.decodeServerConfig(it) }
+        val selectedRemarks = selectedProfile?.remarks
         val runningRemarks = CoreServiceManager.getRunningServerName().takeIf { it.isNotBlank() }
+        val fallback = findFirstProfileWithDays()
 
         val remarks = ProfileRemarkParser.resolveRemarksWithDays(
             selectedRemarks,
             runningRemarks,
-            findFirstProfileRemarksWithDays()
+            fallback?.second
         )
-        val daysLine = ProfileRemarkParser.formatDaysLine(this, remarks)
-        val days = ProfileRemarkParser.parseRemainingDays(remarks)
+        val guid = when {
+            selectedRemarks != null && ProfileRemarkParser.parseRemainingDays(selectedRemarks) != null -> selectedGuid
+            fallback != null && remarks == fallback.second -> fallback.first
+            else -> selectedGuid
+        }
+        val subscriptionId = guid?.let { MmkvManager.decodeServerConfig(it)?.subscriptionId }
+            ?: selectedProfile?.subscriptionId
+            ?: fallback?.let { MmkvManager.decodeServerConfig(it.first)?.subscriptionId }
 
-        if (daysLine != null && days != null) {
+        val days = ProfileRemarkParser.resolveLiveRemainingDays(remarks, subscriptionId, guid)
+        if (days != null) {
             binding.layoutDaysRemaining.isVisible = true
-            binding.tvDaysRemaining.text = daysLine
+            binding.tvDaysRemaining.text = ProfileRemarkParser.formatRemainingDays(this, days)
             val colorRes = when {
                 days <= 3 -> R.color.sumrax_error
                 days <= 7 -> R.color.sumrax_warning
@@ -607,7 +616,7 @@ class MainActivity : HelperBaseActivity() {
         }
     }
 
-    private fun findFirstProfileRemarksWithDays(): String? {
+    private fun findFirstProfileWithDays(): Pair<String, String>? {
         val serverList = if (mainViewModel.subscriptionId.isEmpty()) {
             MmkvManager.decodeAllServerList()
         } else {
@@ -615,7 +624,11 @@ class MainActivity : HelperBaseActivity() {
         }
         return serverList.firstNotNullOfOrNull { guid ->
             val remarks = MmkvManager.decodeServerConfig(guid)?.remarks
-            remarks?.takeIf { ProfileRemarkParser.parseRemainingDays(it) != null }
+            if (remarks != null && ProfileRemarkParser.parseRemainingDays(remarks) != null) {
+                guid to remarks
+            } else {
+                null
+            }
         }
     }
 
@@ -768,7 +781,22 @@ class MainActivity : HelperBaseActivity() {
 
         connectionErrorMessage = null
         if (SettingsManager.isSmartConnectionMode()) {
-            startSmartConnect()
+            when (SettingsManager.getAutoConnectType(mainViewModel.subscriptionId)) {
+                AppConfig.AUTO_CONNECT_LAST_USED -> beginServiceConnect()
+                AppConfig.AUTO_CONNECT_RANDOM -> {
+                    val picked = ProfileAutoSelector.applyRandomSelection(mainViewModel.subscriptionId)
+                    if (picked == null) {
+                        connectionErrorMessage = getString(R.string.sumrax_smart_no_servers)
+                        connectionUiState = ConnectionUiState.ERROR
+                        applyConnectionUi()
+                        toastError(R.string.sumrax_smart_no_servers)
+                    } else {
+                        refreshServerPickerBar()
+                        beginServiceConnect()
+                    }
+                }
+                else -> startSmartConnect()
+            }
         } else {
             beginServiceConnect()
         }

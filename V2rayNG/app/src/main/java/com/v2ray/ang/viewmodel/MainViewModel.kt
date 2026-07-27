@@ -244,21 +244,66 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
-     * Tests ping based on configured ping type (TCP or proxy).
+     * Tests ping based on configured ping type (TCP, ICMP, or proxy).
      * For proxy (real ping), [onComplete] runs after all measurements finish.
      */
     fun testAllPingWithSort(onStatus: (String) -> Unit, onComplete: (String) -> Unit) {
-        val pingType = MmkvManager.decodeSettingsString(AppConfig.PREF_PING_TYPE, "tcp")
-        if (pingType == "proxy") {
-            if (serversCache.isEmpty()) {
-                onComplete(getApplication<AngApplication>().getString(R.string.connection_test_fail))
-                return
+        val pingType = SettingsManager.getPingType(subscriptionId)
+        when (pingType) {
+            AppConfig.PING_TYPE_PROXY, AppConfig.PING_TYPE_PROXY_HEAD -> {
+                if (serversCache.isEmpty()) {
+                    onComplete(getApplication<AngApplication>().getString(R.string.connection_test_fail))
+                    return
+                }
+                pendingPingOnComplete = onComplete
+                onStatus(getApplication<AngApplication>().getString(R.string.result_ping_testing, serversCache.size))
+                testAllRealPing()
             }
-            pendingPingOnComplete = onComplete
-            onStatus(getApplication<AngApplication>().getString(R.string.result_ping_testing, serversCache.size))
-            testAllRealPing()
-        } else {
-            testAllTcpingWithSort(onStatus, onComplete)
+            AppConfig.PING_TYPE_ICMP -> testAllIcmpPingWithSort(onStatus, onComplete)
+            else -> testAllTcpingWithSort(onStatus, onComplete)
+        }
+    }
+
+    private fun testAllIcmpPingWithSort(onStatus: (String) -> Unit, onComplete: (String) -> Unit) {
+        pingBatchJob?.cancel()
+        val guids = serversCache.map { it.guid }
+        MmkvManager.clearAllTestDelayResults(guids)
+
+        val serversCopy = serversCache.toList()
+        if (serversCopy.isEmpty()) {
+            onComplete(getApplication<AngApplication>().getString(R.string.connection_test_fail))
+            return
+        }
+
+        onStatus(getApplication<AngApplication>().getString(R.string.result_ping_testing, serversCopy.size))
+
+        pingBatchJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val jobs = serversCopy.mapNotNull { item ->
+                    val serverAddress = item.profile.server ?: return@mapNotNull null
+                    async {
+                        val testResult = SpeedtestManager.icmpPing(serverAddress)
+                        withContext(Dispatchers.Main) {
+                            MmkvManager.encodeServerTestDelayMillis(item.guid, testResult)
+                            updateListAction.value = getPosition(item.guid)
+                        }
+                    }
+                }
+                jobs.awaitAll()
+
+                if (MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_SORT_AFTER_TEST, true)) {
+                    sortByTestResults()
+                }
+
+                withContext(Dispatchers.Main) {
+                    reloadServerList()
+                    onComplete(getApplication<AngApplication>().getString(R.string.result_ping_complete))
+                }
+            } catch (_: kotlinx.coroutines.CancellationException) {
+                withContext(Dispatchers.Main) {
+                    onComplete(PING_CANCELLED)
+                }
+            }
         }
     }
 

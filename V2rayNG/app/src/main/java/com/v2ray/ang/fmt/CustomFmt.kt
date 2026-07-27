@@ -3,6 +3,7 @@ package com.v2ray.ang.fmt
 import com.v2ray.ang.dto.V2rayConfig
 import com.v2ray.ang.dto.entities.ProfileItem
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.util.FinalMaskUtil
 import com.v2ray.ang.util.JsonUtil
 
 object CustomFmt : FmtBase() {
@@ -21,6 +22,14 @@ object CustomFmt : FmtBase() {
         config.remarks = fullConfig?.remarks ?: System.currentTimeMillis().toString()
         config.server = outbound?.getServerAddress()
         config.serverPort = outbound?.getServerPort()?.toString()
+
+        val fm = outbound?.streamSettings?.finalmask
+        if (fm != null) {
+            config.finalMask = when (fm) {
+                is String -> FinalMaskUtil.normalizeToJson(fm) ?: fm
+                else -> FinalMaskUtil.normalizeToJson(JsonUtil.toJson(fm)) ?: JsonUtil.toJson(fm)
+            }
+        }
 
         return config
     }

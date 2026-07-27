@@ -198,6 +198,21 @@
             android:name=".ui.UISettingsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.UiModeSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.TunnelOptionsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.LanPortsSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.AutoStartSettingsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.UrlSchemesActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.SubscriptionSettingsActivity"
             android:exported="false" />
         <activity

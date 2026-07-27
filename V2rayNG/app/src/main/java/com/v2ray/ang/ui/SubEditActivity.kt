@@ -42,6 +42,7 @@ class SubEditActivity : BaseActivity() {
         setContentViewWithToolbar(binding.root, showHomeAsUp = true, title = getString(R.string.title_sub_setting))
 
         setupProfileRemarkInputs()
+        setupEnumDropdowns()
         SettingsChangeManager.makeSetupGroupTab()
         val subItem = MmkvManager.decodeSubscription(editSubId)
         isLockedGroup = SubscriptionLock.isLocked(subItem)
@@ -63,6 +64,8 @@ class SubEditActivity : BaseActivity() {
         lockField(binding.etUpdateInterval)
         lockField(binding.etPreProfile)
         lockField(binding.etNextProfile)
+        lockField(binding.spPingType)
+        lockField(binding.spAutoConnectType)
         lockSwitch(binding.chkEnable)
         lockSwitch(binding.autoUpdateCheck)
         lockSwitch(binding.allowInsecureUrl)
@@ -70,6 +73,10 @@ class SubEditActivity : BaseActivity() {
         binding.btnPreProfileDropdown.isClickable = false
         binding.btnNextProfileDropdown.isEnabled = false
         binding.btnNextProfileDropdown.isClickable = false
+        binding.btnPingTypeDropdown.isEnabled = false
+        binding.btnPingTypeDropdown.isClickable = false
+        binding.btnAutoConnectTypeDropdown.isEnabled = false
+        binding.btnAutoConnectTypeDropdown.isClickable = false
     }
 
     private fun lockField(field: EditText) {
@@ -100,6 +107,13 @@ class SubEditActivity : BaseActivity() {
         binding.allowInsecureUrl.isChecked = subItem.allowInsecureUrl
         binding.etPreProfile.text = Utils.getEditable(subItem.prevProfile)
         binding.etNextProfile.text = Utils.getEditable(subItem.nextProfile)
+        setDropdownValue(binding.spPingType, pingTypeEntries, pingTypeValues, subItem.pingType.orEmpty())
+        setDropdownValue(
+            binding.spAutoConnectType,
+            autoConnectEntries,
+            autoConnectValues,
+            subItem.autoConnectType.orEmpty()
+        )
         return true
     }
 
@@ -111,7 +125,66 @@ class SubEditActivity : BaseActivity() {
         binding.etUpdateInterval.text = null
         binding.etPreProfile.text = null
         binding.etNextProfile.text = null
+        setDropdownValue(binding.spPingType, pingTypeEntries, pingTypeValues, "")
+        setDropdownValue(binding.spAutoConnectType, autoConnectEntries, autoConnectValues, "")
         return true
+    }
+
+    private val pingTypeEntries by lazy { resources.getStringArray(R.array.ping_type_entries_with_inherit) }
+    private val pingTypeValues by lazy { resources.getStringArray(R.array.ping_type_value_with_inherit) }
+    private val autoConnectEntries by lazy { resources.getStringArray(R.array.auto_connect_type_entries_with_inherit) }
+    private val autoConnectValues by lazy { resources.getStringArray(R.array.auto_connect_type_value_with_inherit) }
+
+    private fun setupEnumDropdowns() {
+        setupValueDropdown(
+            binding.spPingType,
+            binding.btnPingTypeDropdown,
+            pingTypeEntries
+        )
+        setupValueDropdown(
+            binding.spAutoConnectType,
+            binding.btnAutoConnectTypeDropdown,
+            autoConnectEntries
+        )
+    }
+
+    private fun setupValueDropdown(
+        input: AutoCompleteTextView,
+        dropdownButton: ImageButton,
+        entries: Array<String>
+    ) {
+        val adapter = ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, entries)
+        input.setAdapter(adapter)
+        input.threshold = 0
+        dropdownButton.setOnClickListener {
+            if (isLockedGroup) return@setOnClickListener
+            input.requestFocus()
+            input.showDropDown()
+        }
+        input.setOnClickListener {
+            if (isLockedGroup) return@setOnClickListener
+            input.showDropDown()
+        }
+    }
+
+    private fun setDropdownValue(
+        input: AutoCompleteTextView,
+        entries: Array<String>,
+        values: Array<String>,
+        value: String
+    ) {
+        val index = values.indexOf(value).takeIf { it >= 0 } ?: 0
+        input.setText(entries.getOrElse(index) { entries.firstOrNull().orEmpty() }, false)
+    }
+
+    private fun selectedDropdownValue(
+        input: AutoCompleteTextView,
+        entries: Array<String>,
+        values: Array<String>
+    ): String? {
+        val text = input.text?.toString().orEmpty()
+        val index = entries.indexOf(text).takeIf { it >= 0 } ?: 0
+        return values.getOrNull(index)?.takeIf { it.isNotEmpty() }
     }
 
     private fun setupProfileRemarkInputs() {
@@ -182,6 +255,12 @@ class SubEditActivity : BaseActivity() {
         subItem.prevProfile = binding.etPreProfile.text.toString()
         subItem.nextProfile = binding.etNextProfile.text.toString()
         subItem.allowInsecureUrl = binding.allowInsecureUrl.isChecked
+        subItem.pingType = selectedDropdownValue(binding.spPingType, pingTypeEntries, pingTypeValues)
+        subItem.autoConnectType = selectedDropdownValue(
+            binding.spAutoConnectType,
+            autoConnectEntries,
+            autoConnectValues
+        )
 
         if (TextUtils.isEmpty(subItem.remarks)) {
             toast(R.string.sub_setting_remarks)

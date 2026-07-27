@@ -101,73 +101,72 @@
                 android:textColorHint="@color/sumrax_text_tertiary"
                 android:textSize="12sp" />
 
-            <HorizontalScrollView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/padding_spacing_dp8"
-                android:scrollbars="none">
+                android:gravity="center"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                <ImageButton
+                    android:id="@+id/btn_paste_import"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/bg_picker_action_btn"
+                    android:contentDescription="@string/sumrax_paste"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_copy"
+                    app:tint="@color/sumrax_text_primary" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_paste_import"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:text="@string/sumrax_paste"
-                        android:textAllCaps="false"
-                        android:textSize="12sp"
-                        app:strokeColor="@color/sumrax_glass_stroke" />
+                <ImageButton
+                    android:id="@+id/btn_import_link"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/bg_picker_action_btn"
+                    android:contentDescription="@string/sumrax_import"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_import_24dp"
+                    app:tint="@color/sumrax_accent" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_import_link"
-                        style="@style/Widget.Material3.Button"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:text="@string/sumrax_import"
-                        android:textAllCaps="false"
-                        android:textSize="12sp"
-                        app:backgroundTint="@color/sumrax_accent" />
+                <ImageButton
+                    android:id="@+id/btn_import_qr"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/bg_picker_action_btn"
+                    android:contentDescription="@string/sumrax_import_qr"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_scan_24dp"
+                    app:tint="@color/sumrax_text_primary" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_import_qr"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:text="QR"
-                        android:textAllCaps="false"
-                        android:textSize="12sp"
-                        app:strokeColor="@color/sumrax_glass_stroke" />
+                <ImageButton
+                    android:id="@+id/btn_refresh_subs"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/bg_picker_action_btn"
+                    android:contentDescription="@string/sumrax_refresh_subs"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_refresh_24dp"
+                    app:tint="@color/sumrax_cyan" />
 
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_refresh_subs"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginEnd="6dp"
-                        android:text="@string/sumrax_refresh_subs"
-                        android:textAllCaps="false"
-                        android:textSize="12sp"
-                        app:strokeColor="@color/sumrax_glass_stroke" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/btn_test_all"
-                        style="@style/Widget.Material3.Button.OutlinedButton"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/sumrax_test_all"
-                        android:textAllCaps="false"
-                        android:textColor="@color/sumrax_success"
-                        android:textSize="12sp"
-                        app:strokeColor="@color/sumrax_success" />
-                </LinearLayout>
-            </HorizontalScrollView>
+                <ImageButton
+                    android:id="@+id/btn_test_all"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@drawable/bg_picker_action_btn"
+                    android:contentDescription="@string/sumrax_test_all"
+                    android:padding="12dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_speed_24dp"
+                    app:tint="@color/sumrax_success" />
+            </LinearLayout>
         </LinearLayout>
 
         <com.google.android.material.chip.ChipGroup

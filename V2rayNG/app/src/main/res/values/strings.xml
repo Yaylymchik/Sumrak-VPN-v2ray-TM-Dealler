@@ -279,7 +279,7 @@
     <string name="title_pref_auto_update_subscription">Automatic update subscriptions</string>
     <string name="summary_pref_auto_update_subscription">Update your subscriptions automatically at set intervals in the background. Depending on the device, this feature may not always work</string>
     <string name="title_pref_subscription_auto_update_enable">Auto-update all subscriptions</string>
-    <string name="summary_pref_subscription_auto_update_enable">Like Happ: when enabled, all subscriptions update in the background. When disabled, each subscription uses its own toggle.</string>
+    <string name="summary_pref_subscription_auto_update_enable">When enabled, all subscriptions update in the background every 30 minutes</string>
     <string name="title_pref_subscription_update_on_launch">Update subscriptions on app launch</string>
     <string name="summary_pref_subscription_update_on_launch">Refresh all subscriptions every time the app opens</string>
     <string name="title_pref_force_global_user_agent">Force global User-Agent</string>
@@ -297,7 +297,7 @@
     <string name="title_mode_help">Click me for more help</string>
     <string name="title_language">Language</string>
     <string name="title_ui_settings">UI settings</string>
-    <string name="title_pref_ui_mode_night">UI mode settings</string>
+    <string name="title_pref_ui_mode_night">Theme</string>
     <string name="title_pref_use_hev_tunnel">Enable Hev TUN Feature</string>
     <string name="summary_pref_use_hev_tunnel">When enabled, TUN will use hev-socks5-tunnel; otherwise, it will use xray-core.</string>
     <string name="title_pref_hev_tunnel_loglevel">Hev Tun Log Level</string>
@@ -414,6 +414,7 @@
     <string name="sumrax_import_hint">Paste config link…</string>
     <string name="sumrax_paste">Paste</string>
     <string name="sumrax_import">Import</string>
+    <string name="sumrax_import_qr">Scan QR</string>
     <string name="sumrax_refresh_subs">Update subscriptions</string>
     <string name="sumrax_test_all">Test all</string>
     <string name="sumrax_picker_places">Places</string>
@@ -483,8 +484,11 @@
     <string name="title_pref_noise_rand">Noise rand (min-max)</string>
     <string name="title_pref_noise_delay">Noise delay (min-max ms)</string>
     <string name="title_pref_connection_mode">Connection mode</string>
+    <string name="title_pref_auto_connect_type">Auto-connect method</string>
+    <string name="summary_pref_auto_connect_type">How Smart mode picks a server: lowest delay, last used, or random</string>
     <string name="title_pref_auto_select_profile">Auto-select best profile</string>
     <string name="summary_pref_auto_select_profile">After import, prefer the best available profile when none is selected</string>
+    <string name="sub_setting_inherit_global">Inherit global</string>
     <string name="sumrax_diagnostics_test_ping">Test current latency</string>
     <string name="sumrax_diagnostics_share">Share diagnostics</string>
     <string name="sumrax_diagnostics_need_connection">Connect first to test latency</string>
@@ -533,6 +537,34 @@
     <string name="sumrax_about_label">// ABOUT</string>
     <string name="sumrax_about_app_name">SumraX VPN</string>
     <string name="sumrax_about_version">v%1$s · %2$s</string>
+
+    <string name="title_tunnel">Tunnel Settings</string>
+    <string name="title_other">Other Settings</string>
+    <string name="title_subscription">Subscription</string>
+    <string name="title_ping">Ping</string>
+    <string name="title_logs">Logs</string>
+    <string name="title_statistics">Statistics</string>
+    <string name="title_reset">Reset</string>
+    <string name="title_faq">FAQ</string>
+    <string name="title_url_schemes">URL Schemes</string>
+    <string name="title_pref_auto_start_vpn">Auto-start application</string>
+    <string name="title_pref_update_button_check">Check update</string>
+    <string name="title_pref_ip_type">Preferred IP Type</string>
+    <string name="title_pref_xray_tun_enabled">Enable Xray TUN</string>
+    <string name="title_pref_block_bindtodevice_enabled">Block bind to tunnel</string>
+    <string name="settings_xray_tun_mtu">Xray TUN MTU</string>
+    <string name="settings_mtu_info">Range 68 to 65535</string>
+    <string name="inbound_authorization_title">Inbounds</string>
+    <string name="url_scheme_add_server">Add server (base64)</string>
+    <string name="url_scheme_crypt">Encrypted import (crypt)</string>
+    <string name="url_scheme_crypt2">Encrypted import (crypt2)</string>
+    <string name="url_scheme_crypt3">Encrypted import (crypt3)</string>
+    <string name="url_scheme_crypt4">Encrypted import (crypt4)</string>
+    <string name="url_scheme_crypt5">Encrypted import (crypt5)</string>
+    <string name="url_scheme_connect">Start VPN</string>
+    <string name="url_scheme_disconnect">Stop VPN</string>
+    <string name="url_scheme_toggle">Toggle VPN</string>
+    <string name="url_schemes_note">Deeplinks for %1$s. Encrypted crypt / crypt2–crypt5 payloads are also accepted on import from clipboard and QR.</string>
 
     <string name="sumrax_sub_locked">This subscription group cannot be edited</string>
 
@@ -664,7 +696,7 @@
     <string name="title_subscriptions_settings">Subscriptions</string>
     <string name="summary_subscriptions_settings">Manage subscription groups</string>
     <string name="title_pref_ping_type">Ping method</string>
-    <string name="summary_pref_ping_type">TCP ping measures connection latency directly to server</string>
+    <string name="summary_pref_ping_type">TCP / ICMP measure host latency; Proxy and Proxy HEAD measure via the tunnel</string>
     <string name="title_pref_ping_on_launch">Ping on launch</string>
     <string name="summary_pref_ping_on_launch">Automatically ping all servers when app starts</string>
     <string name="action_update_subscription">Update subscription</string>
@@ -706,12 +738,58 @@
 
     <string-array name="ping_type_entries">
         <item>TCP</item>
-        <item>Proxy (Real ping)</item>
+        <item>ICMP</item>
+        <item>Proxy (GET)</item>
+        <item>Proxy (HEAD)</item>
     </string-array>
 
     <string-array name="ping_type_value">
         <item>tcp</item>
+        <item>icmp</item>
         <item>proxy</item>
+        <item>proxy-head</item>
+    </string-array>
+
+    <string-array name="ping_type_entries_with_inherit">
+        <item>Inherit global</item>
+        <item>TCP</item>
+        <item>ICMP</item>
+        <item>Proxy (GET)</item>
+        <item>Proxy (HEAD)</item>
+    </string-array>
+
+    <string-array name="ping_type_value_with_inherit">
+        <item></item>
+        <item>tcp</item>
+        <item>icmp</item>
+        <item>proxy</item>
+        <item>proxy-head</item>
+    </string-array>
+
+    <string-array name="auto_connect_type_entries">
+        <item>Lowest delay</item>
+        <item>Last used</item>
+        <item>Random</item>
+    </string-array>
+
+    <string-array name="auto_connect_type_value">
+        <item>lowestdelay</item>
+        <item>lastused</item>
+        <item>random</item>
+    </string-array>
+
+    <string-array name="auto_connect_type_entries_with_inherit">
+        <item>Inherit global</item>
+        <item>Lowest delay</item>
+        <item>Last used</item>
+        <item>Random</item>
+    </string-array>
+
+    <string-array name="auto_connect_type_value_with_inherit">
+        <item></item>
+        <item>lowestdelay</item>
+        <item>lastused</item>
+        <item>random</item>
     </string-array>
 
 </resources>

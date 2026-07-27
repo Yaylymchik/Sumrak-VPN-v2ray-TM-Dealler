@@ -63,6 +63,14 @@
         android:summary="%s"
         android:title="@string/title_pref_connection_mode" />
 
+    <ListPreference
+        android:defaultValue="lowestdelay"
+        android:entries="@array/auto_connect_type_entries"
+        android:entryValues="@array/auto_connect_type_value"
+        android:key="pref_auto_connect_type"
+        android:summary="@string/summary_pref_auto_connect_type"
+        android:title="@string/title_pref_auto_connect_type" />
+
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_auto_select_profile"

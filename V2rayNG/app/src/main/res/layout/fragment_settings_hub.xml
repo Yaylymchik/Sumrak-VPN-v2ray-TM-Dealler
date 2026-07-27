@@ -26,26 +26,28 @@
             android:textSize="24sp"
             android:textStyle="bold" />
 
+        <!-- UI Settings -->
         <TextView
             style="@style/SumraX.NavSection"
             android:layout_marginTop="0dp"
-            android:text="@string/sumrax_settings_section_interface" />
-
-        <include
-            android:id="@+id/row_ui"
-            layout="@layout/item_settings_section" />
+            android:text="@string/title_ui_settings" />
 
         <include
             android:id="@+id/row_language"
             layout="@layout/item_settings_section" />
 
-        <TextView
-            style="@style/SumraX.NavSection"
-            android:text="@string/sumrax_settings_section_connection" />
+        <include
+            android:id="@+id/row_ui_mode"
+            layout="@layout/item_settings_section" />
 
         <include
-            android:id="@+id/row_tun"
+            android:id="@+id/row_ui"
             layout="@layout/item_settings_section" />
+
+        <!-- Tunnel Settings -->
+        <TextView
+            style="@style/SumraX.NavSection"
+            android:text="@string/title_tunnel" />
 
         <include
             android:id="@+id/row_routing"
@@ -56,55 +58,45 @@
             layout="@layout/item_settings_section" />
 
         <include
-            android:id="@+id/row_excluded_routes"
+            android:id="@+id/row_tunnel_options"
             layout="@layout/item_settings_section" />
 
         <include
             android:id="@+id/row_inbound"
             layout="@layout/item_settings_section" />
 
-        <include
-            android:id="@+id/row_connection_security"
-            layout="@layout/item_settings_section" />
-
-        <include
-            android:id="@+id/row_ping"
-            layout="@layout/item_settings_section" />
-
+        <!-- Advanced Settings -->
         <TextView
             style="@style/SumraX.NavSection"
-            android:text="@string/sumrax_settings_section_data" />
+            android:text="@string/title_advanced" />
+
+        <include
+            android:id="@+id/row_vpn"
+            layout="@layout/item_settings_section" />
 
         <include
             android:id="@+id/row_subscriptions"
             layout="@layout/item_settings_section" />
 
         <include
-            android:id="@+id/row_geo_files"
+            android:id="@+id/row_ping"
             layout="@layout/item_settings_section" />
 
+        <include
+            android:id="@+id/row_lan_ports"
+            layout="@layout/item_settings_section" />
+
+        <include
+            android:id="@+id/row_auto_start"
+            layout="@layout/item_settings_section" />
+
+        <!-- Other Settings -->
         <TextView
             style="@style/SumraX.NavSection"
-            android:text="@string/sumrax_settings_section_xray" />
+            android:text="@string/title_other" />
 
         <include
-            android:id="@+id/row_advanced"
-            layout="@layout/item_settings_section" />
-
-        <include
-            android:id="@+id/row_other"
-            layout="@layout/item_settings_section" />
-
-        <TextView
-            style="@style/SumraX.NavSection"
-            android:text="@string/sumrax_settings_section_system" />
-
-        <include
-            android:id="@+id/row_logs"
-            layout="@layout/item_settings_section" />
-
-        <include
-            android:id="@+id/row_logs_view"
+            android:id="@+id/row_check_update"
             layout="@layout/item_settings_section" />
 
         <include
@@ -112,23 +104,28 @@
             layout="@layout/item_settings_section" />
 
         <include
-            android:id="@+id/row_diagnostics"
-            layout="@layout/item_settings_section" />
-
-        <include
-            android:id="@+id/row_backup"
+            android:id="@+id/row_logs"
             layout="@layout/item_settings_section" />
 
         <include
             android:id="@+id/row_reset"
             layout="@layout/item_settings_section" />
 
+        <!-- About -->
+        <TextView
+            style="@style/SumraX.NavSection"
+            android:text="@string/title_about" />
+
         <include
             android:id="@+id/row_faq"
             layout="@layout/item_settings_section" />
 
         <include
-            android:id="@+id/row_report"
+            android:id="@+id/row_url_schemes"
+            layout="@layout/item_settings_section" />
+
+        <include
+            android:id="@+id/row_about"
             layout="@layout/item_settings_section" />
 
         <LinearLayout

@@ -38,12 +38,18 @@ class SettingsActivity : BaseActivity() {
     enum class SettingsFilter {
         ALL,
         TUNNEL,
+        TUNNEL_OPTIONS,
         CORE_DNS,
         ADVANCED,
         OTHER,
         PING,
         LOGS,
         INBOUND,
+        LANGUAGE,
+        UI_MODE,
+        UI_DETAILS,
+        LAN_PORTS,
+        AUTO_START,
     }
 
     companion object {
@@ -114,14 +120,27 @@ class SettingsActivity : BaseActivity() {
                 pref.summary = pref.entry ?: ""
                 pref.setOnPreferenceChangeListener { p, newValue ->
                     val lp = p as ListPreference
-                    val idx = lp.findIndexOfValue(newValue as? String)
+                    val mode = newValue as? String
+                    val idx = lp.findIndexOfValue(mode)
                     lp.summary = (if (idx >= 0) lp.entries[idx] else newValue) as CharSequence?
-                    SettingsManager.setNightMode()
+                    if (mode != null) {
+                        MmkvManager.encodeSettings(AppConfig.PREF_UI_MODE_NIGHT, mode)
+                        SettingsManager.setNightMode(mode)
+                    }
                     true
                 }
             }
             findPreference<ListPreference>(AppConfig.PREF_CONNECTION_MODE)?.let { pref ->
                 pref.summary = pref.entry ?: ""
+                pref.setOnPreferenceChangeListener { p, newValue ->
+                    val lp = p as ListPreference
+                    val idx = lp.findIndexOfValue(newValue as? String)
+                    lp.summary = (if (idx >= 0) lp.entries[idx] else newValue) as CharSequence?
+                    true
+                }
+            }
+            findPreference<ListPreference>(AppConfig.PREF_AUTO_CONNECT_TYPE)?.let { pref ->
+                pref.summary = pref.entry ?: getString(R.string.summary_pref_auto_connect_type)
                 pref.setOnPreferenceChangeListener { p, newValue ->
                     val lp = p as ListPreference
                     val idx = lp.findIndexOfValue(newValue as? String)
@@ -194,7 +213,16 @@ class SettingsActivity : BaseActivity() {
                     true
                 }
 
-            initPreferenceSummaries()
+            if (readSettingsFilter() in setOf(
+                    SettingsFilter.LANGUAGE,
+                    SettingsFilter.UI_MODE,
+                    SettingsFilter.UI_DETAILS
+                )
+            ) {
+                initInterfaceSummaries()
+            } else {
+                initPreferenceSummaries()
+            }
 
             localDns?.setOnPreferenceChangeListener { _, any ->
                 updateLocalDns(any as Boolean)
@@ -267,6 +295,57 @@ class SettingsActivity : BaseActivity() {
             findPreference<Preference>("pref_interface_settings_screen")?.let { screen.removePreference(it) }
 
             when (filter) {
+                SettingsFilter.LANGUAGE -> {
+                    preferenceScreen.removeAll()
+                    addPreferencesFromResource(R.xml.pref_interface_settings)
+                    removePreferencesExcept(preferenceScreen, setOf(AppConfig.PREF_LANGUAGE))
+                }
+
+                SettingsFilter.UI_MODE -> {
+                    preferenceScreen.removeAll()
+                    addPreferencesFromResource(R.xml.pref_interface_settings)
+                    removePreferencesExcept(preferenceScreen, setOf(AppConfig.PREF_UI_MODE_NIGHT))
+                }
+
+                SettingsFilter.UI_DETAILS -> {
+                    preferenceScreen.removeAll()
+                    addPreferencesFromResource(R.xml.pref_interface_settings)
+                    removePreferencesExcept(
+                        preferenceScreen,
+                        setOf(
+                            AppConfig.PREF_FONT_SIZE,
+                            AppConfig.PREF_SPEED_ENABLED,
+                            AppConfig.PREF_CONFIRM_REMOVE,
+                            AppConfig.PREF_START_SCAN_IMMEDIATE,
+                            AppConfig.PREF_DOUBLE_COLUMN_DISPLAY,
+                            AppConfig.PREF_GROUP_ALL_DISPLAY,
+                            AppConfig.PREF_CONNECTION_MODE,
+                            AppConfig.PREF_AUTO_CONNECT_TYPE,
+                            AppConfig.PREF_AUTO_SELECT_PROFILE,
+                        )
+                    )
+                }
+
+                SettingsFilter.TUNNEL_OPTIONS -> {
+                    preferenceScreen.removeAll()
+                    addPreferencesFromResource(R.xml.pref_settings_hub_tunnel)
+                }
+
+                SettingsFilter.LAN_PORTS -> {
+                    removePreferencesExcept(
+                        screen,
+                        setOf(
+                            AppConfig.PREF_PROXY_SHARING,
+                            AppConfig.PREF_SOCKS_PORT,
+                            AppConfig.PREF_ENABLE_LOCAL_PROXY,
+                        )
+                    )
+                }
+
+                SettingsFilter.AUTO_START -> {
+                    removePreferencesExcept(screen, setOf(AppConfig.PREF_IS_BOOTED))
+                }
+
                 SettingsFilter.PING -> {
                     val categories = mutableListOf<PreferenceCategory>()
                     for (i in screen.preferenceCount - 1 downTo 0) {
@@ -316,7 +395,7 @@ class SettingsActivity : BaseActivity() {
                             getString(R.string.title_core_settings),
                         )
                         SettingsFilter.OTHER -> setOf(getString(R.string.title_subscriptions_settings))
-                        SettingsFilter.ALL, SettingsFilter.PING, SettingsFilter.LOGS, SettingsFilter.INBOUND -> emptySet()
+                        else -> emptySet()
                     }
                     for (i in screen.preferenceCount - 1 downTo 0) {
                         val pref = screen.getPreference(i)
@@ -361,6 +440,35 @@ class SettingsActivity : BaseActivity() {
                     screen.removePreference(pref)
                 }
             }
+        }
+
+        private fun initInterfaceSummaries() {
+            fun wireList(key: String, recreate: Boolean = false, nightMode: Boolean = false) {
+                findPreference<ListPreference>(key)?.let { pref ->
+                    pref.summary = pref.entry ?: ""
+                    pref.setOnPreferenceChangeListener { p, newValue ->
+                        val lp = p as ListPreference
+                        val idx = lp.findIndexOfValue(newValue as? String)
+                        lp.summary = (if (idx >= 0) lp.entries[idx] else newValue) as CharSequence?
+                        when {
+                            nightMode -> {
+                                val mode = newValue as? String
+                                if (mode != null) {
+                                    MmkvManager.encodeSettings(AppConfig.PREF_UI_MODE_NIGHT, mode)
+                                    SettingsManager.setNightMode(mode)
+                                }
+                            }
+                            recreate -> activity?.recreate()
+                        }
+                        true
+                    }
+                }
+            }
+            wireList(AppConfig.PREF_FONT_SIZE, recreate = true)
+            wireList(AppConfig.PREF_LANGUAGE, recreate = true)
+            wireList(AppConfig.PREF_UI_MODE_NIGHT, nightMode = true)
+            wireList(AppConfig.PREF_CONNECTION_MODE)
+            wireList(AppConfig.PREF_AUTO_CONNECT_TYPE)
         }
 
         private fun initPreferenceSummaries() {

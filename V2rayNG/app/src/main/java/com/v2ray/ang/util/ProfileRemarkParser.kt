@@ -35,10 +35,21 @@ object ProfileRemarkParser {
         return context.getString(R.string.profile_days_remaining, days)
     }
 
-    fun formatDaysLine(context: Context, remarks: String?): String? {
-        val days = parseRemainingDays(remarks) ?: return null
+    fun formatDaysLine(
+        context: Context,
+        remarks: String?,
+        subscriptionId: String? = null,
+        guid: String? = null
+    ): String? {
+        val days = ProfileDaysCountdown.resolve(remarks, subscriptionId, guid) ?: return null
         return formatRemainingDays(context, days)
     }
+
+    fun resolveLiveRemainingDays(
+        remarks: String?,
+        subscriptionId: String? = null,
+        guid: String? = null
+    ): Int? = ProfileDaysCountdown.resolve(remarks, subscriptionId, guid)
 
     fun resolveRemarksWithDays(vararg candidates: String?): String? {
         return candidates.firstOrNull { parseRemainingDays(it) != null }
@@ -72,7 +83,11 @@ object ProfileAutoSelector {
                 guid = guid,
                 remarks = profile.remarks,
                 pingMs = pingMs,
-                days = ProfileRemarkParser.parseRemainingDays(profile.remarks)
+                days = ProfileRemarkParser.resolveLiveRemainingDays(
+                    remarks = profile.remarks,
+                    subscriptionId = profile.subscriptionId,
+                    guid = guid
+                )
             )
         }
     }
@@ -144,6 +159,14 @@ object ProfileAutoSelector {
         val best = findBestReachableProfile(subId) ?: return null
         MmkvManager.setSelectServer(best.guid)
         return best
+    }
+
+    fun applyRandomSelection(subId: String = ""): ReachableProfile? {
+        val candidates = loadCandidates(subId)
+        if (candidates.isEmpty()) return null
+        val pick = candidates.random()
+        MmkvManager.setSelectServer(pick.guid)
+        return ReachableProfile(pick.guid, pick.remarks, pick.pingMs)
     }
 
     data class ReachableProfile(

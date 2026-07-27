@@ -23,10 +23,14 @@ import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
-import com.v2ray.ang.util.ProfileAutoSelector
 import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.ProfileAutoSelector
+import com.v2ray.ang.util.ProfileDaysCountdown
+import com.v2ray.ang.util.ProfileFinalMaskApplier
+import com.v2ray.ang.util.ProfileRemarkParser
 import com.v2ray.ang.util.QRCodeDecoder
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.encrypt.EncryptedCryptResolver
 import java.net.URI
 
 object AngConfigManager {
@@ -176,17 +180,22 @@ object AngConfigManager {
      * @return A pair containing the number of configurations and subscriptions imported.
      */
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
-        var count = parseBatchConfig(Utils.decode(server), subid, append)
+        val resolvedServer = EncryptedCryptResolver.resolve(server) ?: server
+        var count = parseBatchConfig(Utils.decode(resolvedServer), subid, append)
         if (count <= 0) {
-            count = parseBatchConfig(server, subid, append)
+            count = parseBatchConfig(resolvedServer, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(server, subid, append)
+            count = parseCustomConfigServer(resolvedServer, subid, append)
         }
 
-        var countSub = parseBatchSubscription(server)
+        var countSub = parseBatchSubscription(resolvedServer)
         if (countSub <= 0) {
-            countSub = parseBatchSubscription(Utils.decode(server))
+            countSub = parseBatchSubscription(Utils.decode(resolvedServer))
+        }
+        if (countSub <= 0 && EncryptedCryptResolver.isEncryptedDeeplink(server)) {
+            // Encrypted payload may decode to a single subscription URL
+            countSub = parseBatchSubscription(resolvedServer)
         }
         if (countSub > 0) {
             updateConfigViaSubAll()
@@ -210,9 +219,15 @@ object AngConfigManager {
             var count = 0
             servers.lines()
                 .distinct()
-                .forEach { str ->
-                    if (Utils.isValidSubUrl(str)) {
-                        count += importUrlAsSubscription(str)
+                .forEach { raw ->
+                    val str = EncryptedCryptResolver.resolve(raw)?.trim().orEmpty().ifBlank { raw.trim() }
+                    if (Utils.isValidSubUrl(str) || EncryptedCryptResolver.isEncryptedDeeplink(raw)) {
+                        val url = if (Utils.isValidSubUrl(str)) str else EncryptedCryptResolver.resolve(raw)
+                        if (!url.isNullOrBlank() && Utils.isValidSubUrl(url)) {
+                            count += importUrlAsSubscription(url)
+                        }
+                    } else if (Utils.isValidSubUrl(raw)) {
+                        count += importUrlAsSubscription(raw)
                     }
                 }
             return count
@@ -547,7 +562,8 @@ object AngConfigManager {
                 return SubscriptionUpdateResult(skipCount = 1)
             }
 
-            val url = HttpUtil.toIdnUrl(it.subscription.url)
+            val urlRaw = EncryptedCryptResolver.resolve(it.subscription.url) ?: it.subscription.url
+            val url = HttpUtil.toIdnUrl(urlRaw)
             if (!Utils.isValidUrl(url)) {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
@@ -561,9 +577,9 @@ object AngConfigManager {
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
 
-            var configText = try {
+            var fetchResult = try {
                 val httpPort = SettingsManager.getHttpPort()
-                HttpUtil.getUrlContentWithUserAgent(
+                HttpUtil.getUrlContentResultWithUserAgent(
                     UrlContentRequest(
                         url = url,
                         userAgent = userAgent,
@@ -575,11 +591,11 @@ object AngConfigManager {
                 )
             } catch (e: Exception) {
                 LogUtil.e(AppConfig.ANG_PACKAGE, "Update subscription: proxy not ready or other error", e)
-                ""
+                null
             }
-            if (configText.isEmpty()) {
-                configText = try {
-                    HttpUtil.getUrlContentWithUserAgent(
+            if (fetchResult == null || fetchResult.body.isEmpty()) {
+                fetchResult = try {
+                    HttpUtil.getUrlContentResultWithUserAgent(
                         UrlContentRequest(
                             url = url,
                             userAgent = userAgent
@@ -587,17 +603,26 @@ object AngConfigManager {
                     )
                 } catch (e: Exception) {
                     LogUtil.e(AppConfig.TAG, "Update subscription: Failed to get URL content with user agent", e)
-                    ""
+                    null
                 }
             }
+            val configText = fetchResult?.body.orEmpty()
             if (configText.isEmpty()) {
                 return SubscriptionUpdateResult(failureCount = 1)
             }
+
+            SubscriptionMetaApplier.apply(
+                subItem = it.subscription,
+                headers = fetchResult?.headers.orEmpty(),
+                subscriptionUrl = url
+            )
 
             val count = parseConfigViaSub(configText, it.guid, false)
             if (count > 0) {
                 it.subscription.lastUpdated = System.currentTimeMillis()
                 MmkvManager.encodeSubscription(it.guid, it.subscription)
+                seedDaysCountdown(it.guid)
+                seedFinalMaskSettings(it.guid)
                 LogUtil.i(AppConfig.TAG, "Subscription updated: ${it.subscription.remarks}, $count configs")
                 return SubscriptionUpdateResult(
                     configCount = count,
@@ -672,5 +697,35 @@ object AngConfigManager {
         } ?: ""
 
         return "$addrPart : ${port ?: ""}"
+    }
+
+    /**
+     * Starts / refreshes the remaining-days countdown after subscription content is read.
+     */
+    private fun seedDaysCountdown(subId: String) {
+        val guids = MmkvManager.decodeServerList(subId)
+        for (guid in guids) {
+            val profile = MmkvManager.decodeServerConfig(guid) ?: continue
+            if (ProfileRemarkParser.parseRemainingDays(profile.remarks) == null) continue
+            ProfileDaysCountdown.resolve(
+                remarks = profile.remarks,
+                subscriptionId = subId,
+                guid = guid
+            )
+            break
+        }
+    }
+
+    private fun seedFinalMaskSettings(subId: String) {
+        val selected = MmkvManager.getSelectServer()
+        val guids = MmkvManager.decodeServerList(subId)
+        val target = when {
+            !selected.isNullOrBlank() && selected in guids -> selected
+            else -> guids.firstOrNull { guid ->
+                val profile = MmkvManager.decodeServerConfig(guid)
+                !profile?.finalMask.isNullOrBlank() || !MmkvManager.decodeServerRaw(guid).isNullOrBlank()
+            }
+        } ?: return
+        ProfileFinalMaskApplier.applyOnSelect(target)
     }
 }

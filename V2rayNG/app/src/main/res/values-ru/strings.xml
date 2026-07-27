@@ -277,7 +277,7 @@
     <string name="title_pref_auto_update_subscription">Автоматически обновлять подписки</string>
     <string name="summary_pref_auto_update_subscription">Автоматическое обновление подписок в фоновом режиме с указанным интервалом. В зависимости от устройства эта функция может работать не всегда.</string>
     <string name="title_pref_subscription_auto_update_enable">Автообновление всех подписок</string>
-    <string name="summary_pref_subscription_auto_update_enable">Как в Happ: при включении все подписки обновляются в фоне. Если выкл. — у каждой подписки свой переключатель.</string>
+    <string name="summary_pref_subscription_auto_update_enable">При включении все подписки обновляются в фоне каждые 30 минут</string>
     <string name="title_pref_subscription_update_on_launch">Обновлять подписки при запуске</string>
     <string name="summary_pref_subscription_update_on_launch">Обновлять все подписки при каждом открытии приложения</string>
     <string name="title_pref_force_global_user_agent">Общий User-Agent для всех</string>
@@ -410,6 +410,7 @@
     <string name="sumrax_import_hint">Вставьте ссылку конфигурации…</string>
     <string name="sumrax_paste">Вставить</string>
     <string name="sumrax_import">Импорт</string>
+    <string name="sumrax_import_qr">Сканировать QR</string>
     <string name="sumrax_refresh_subs">Обновить подписки сейчас</string>
     <string name="sumrax_test_all">Тест всех</string>
     <string name="sumrax_picker_places">Места</string>
@@ -479,8 +480,11 @@
     <string name="title_pref_noise_rand">Noise rand (min-max)</string>
     <string name="title_pref_noise_delay">Noise delay (min-max мс)</string>
     <string name="title_pref_connection_mode">Режим подключения</string>
+    <string name="title_pref_auto_connect_type">Метод автоподключения</string>
+    <string name="summary_pref_auto_connect_type">Как Smart выбирает сервер: минимальный пинг, последний или случайный</string>
     <string name="title_pref_auto_select_profile">Автовыбор лучшего профиля</string>
     <string name="summary_pref_auto_select_profile">При импорте выбирать лучший профиль, если ничего не выбрано</string>
+    <string name="sub_setting_inherit_global">Как в глобальных</string>
     <string name="sumrax_diagnostics_test_ping">Проверить задержку</string>
     <string name="sumrax_diagnostics_share">Поделиться диагностикой</string>
     <string name="sumrax_diagnostics_need_connection">Сначала подключитесь для теста</string>
@@ -529,6 +533,34 @@
     <string name="sumrax_about_label">// ABOUT</string>
     <string name="sumrax_about_app_name">SumraX VPN</string>
     <string name="sumrax_about_version">v%1$s · %2$s</string>
+
+    <string name="title_tunnel">Настройки туннеля</string>
+    <string name="title_other">Другие настройки</string>
+    <string name="title_subscription">Подписки</string>
+    <string name="title_ping">Пинг</string>
+    <string name="title_logs">Логи</string>
+    <string name="title_statistics">Статистика</string>
+    <string name="title_reset">Сброс</string>
+    <string name="title_faq">FAQ</string>
+    <string name="title_url_schemes">URL-схемы</string>
+    <string name="title_pref_auto_start_vpn">Автозапуск приложения</string>
+    <string name="title_pref_update_button_check">Проверить обновление</string>
+    <string name="title_pref_ip_type">Предпочтительный тип IP</string>
+    <string name="title_pref_xray_tun_enabled">Включить Xray TUN</string>
+    <string name="title_pref_block_bindtodevice_enabled">Блок привязки к туннелю</string>
+    <string name="settings_xray_tun_mtu">Xray TUN MTU</string>
+    <string name="settings_mtu_info">Диапазон от 68 до 65535</string>
+    <string name="inbound_authorization_title">Входящие</string>
+    <string name="url_scheme_add_server">Добавить сервер (base64)</string>
+    <string name="url_scheme_crypt">Шифрованный импорт (crypt)</string>
+    <string name="url_scheme_crypt2">Шифрованный импорт (crypt2)</string>
+    <string name="url_scheme_crypt3">Шифрованный импорт (crypt3)</string>
+    <string name="url_scheme_crypt4">Шифрованный импорт (crypt4)</string>
+    <string name="url_scheme_crypt5">Шифрованный импорт (crypt5)</string>
+    <string name="url_scheme_connect">Запустить VPN</string>
+    <string name="url_scheme_disconnect">Остановить VPN</string>
+    <string name="url_scheme_toggle">Переключить VPN</string>
+    <string name="url_schemes_note">Схемы для %1$s. Шифрованные crypt / crypt2–crypt5 также принимаются при импорте из буфера и QR.</string>
 
     <string name="sumrax_sub_locked">Эту группу подписки нельзя редактировать</string>
 
@@ -659,7 +691,7 @@
     <string name="title_subscriptions_settings">Подписки</string>
     <string name="summary_subscriptions_settings">Управление группами подписок</string>
     <string name="title_pref_ping_type">Метод пинга</string>
-    <string name="summary_pref_ping_type">TCP пинг измеряет задержку соединения напрямую с сервером</string>
+    <string name="summary_pref_ping_type">TCP / ICMP — напрямую к серверу; Proxy и Proxy HEAD — через туннель</string>
     <string name="title_pref_ping_on_launch">Пинг при запуске</string>
     <string name="summary_pref_ping_on_launch">Автоматически пинговать все серверы при запуске приложения</string>
     <string name="action_update_subscription">Обновить подписку</string>
@@ -701,12 +733,58 @@
 
     <string-array name="ping_type_entries">
         <item>TCP</item>
-        <item>Через прокси (реальный пинг)</item>
+        <item>ICMP</item>
+        <item>Прокси (GET)</item>
+        <item>Прокси (HEAD)</item>
     </string-array>
 
     <string-array name="ping_type_value">
         <item>tcp</item>
+        <item>icmp</item>
         <item>proxy</item>
+        <item>proxy-head</item>
+    </string-array>
+
+    <string-array name="ping_type_entries_with_inherit">
+        <item>Как в глобальных</item>
+        <item>TCP</item>
+        <item>ICMP</item>
+        <item>Прокси (GET)</item>
+        <item>Прокси (HEAD)</item>
+    </string-array>
+
+    <string-array name="ping_type_value_with_inherit">
+        <item></item>
+        <item>tcp</item>
+        <item>icmp</item>
+        <item>proxy</item>
+        <item>proxy-head</item>
+    </string-array>
+
+    <string-array name="auto_connect_type_entries">
+        <item>Минимальный пинг</item>
+        <item>Последний использованный</item>
+        <item>Случайный</item>
+    </string-array>
+
+    <string-array name="auto_connect_type_value">
+        <item>lowestdelay</item>
+        <item>lastused</item>
+        <item>random</item>
+    </string-array>
+
+    <string-array name="auto_connect_type_entries_with_inherit">
+        <item>Как в глобальных</item>
+        <item>Минимальный пинг</item>
+        <item>Последний использованный</item>
+        <item>Случайный</item>
+    </string-array>
+
+    <string-array name="auto_connect_type_value_with_inherit">
+        <item></item>
+        <item>lowestdelay</item>
+        <item>lastused</item>
+        <item>random</item>
     </string-array>
 
 </resources>

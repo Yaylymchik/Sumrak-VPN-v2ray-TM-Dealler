@@ -1,6 +1,7 @@
 package com.v2ray.ang.handler
 
 import com.tencent.mmkv.MMKV
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.DEFAULT_SUBSCRIPTION_ID
 import com.v2ray.ang.AppConfig.PREF_IS_BOOTED
 import com.v2ray.ang.AppConfig.PREF_ROUTING_RULESET
@@ -13,6 +14,8 @@ import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.dto.entities.WebDavConfig
 import com.v2ray.ang.util.JsonUtil
+import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.ProfileFinalMaskApplier
 import com.v2ray.ang.util.Utils
 
 object MmkvManager {
@@ -71,6 +74,8 @@ object MmkvManager {
      */
     fun setSelectServer(guid: String) {
         mainStorage.encode(KEY_SELECTED_SERVER, guid)
+        runCatching { ProfileFinalMaskApplier.applyOnSelect(guid) }
+            .onFailure { LogUtil.e(AppConfig.TAG, "Failed to auto-apply finalmask for $guid", it) }
     }
 
     /**
@@ -262,6 +267,13 @@ object MmkvManager {
         }
         val aff = decodeServerAffiliationInfo(guid) ?: ServerAffiliationInfo()
         aff.testDelayMillis = testResult
+        encodeServerAffiliationInfo(guid, aff)
+    }
+
+    fun encodeServerAffiliationInfo(guid: String, aff: ServerAffiliationInfo) {
+        if (guid.isBlank()) {
+            return
+        }
         serverAffStorage.encode(guid, JsonUtil.toJson(aff))
     }
 
