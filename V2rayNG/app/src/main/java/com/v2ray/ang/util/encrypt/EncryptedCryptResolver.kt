@@ -1,8 +1,9 @@
 package com.v2ray.ang.util.encrypt
 
 import android.util.Base64
-import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.util.LogUtil
+import com.v2ray.ang.util.Utils
 
 object EncryptedCryptResolver {
 
@@ -26,19 +27,25 @@ object EncryptedCryptResolver {
         return cryptModeOf(normalize(value)) != null
     }
 
+    /**
+     * Decrypts happ/sumrax crypt deeplinks. Returns the original [value] when it is not encrypted.
+     * Returns null when decryption fails.
+     */
     fun resolve(value: String?): String? {
         if (value.isNullOrBlank()) return value
         val normalized = normalize(value)
         val mode = cryptModeOf(normalized) ?: return value
         val path = stripScheme(normalized)
         val payload = path.removePrefix(mode.prefix)
-        if (payload.isBlank()) return value
+        if (payload.isBlank()) return null
 
-        return runCatching { decrypt(mode, payload) }
+        val decrypted = runCatching { decrypt(mode, normalizePayload(payload)) }
             .onFailure { LogUtil.e(AppConfig.TAG, "Encrypted deeplink decrypt failed", it) }
             .getOrNull()
-            ?.takeIf { it.isNotBlank() }
-            ?: value
+            ?.trim()
+            ?.takeIf { it.isNotBlank() && !isEncryptedDeeplink(it) }
+
+        return decrypted
     }
 
     private fun cryptModeOf(normalized: String): CryptMode? {
@@ -56,9 +63,22 @@ object EncryptedCryptResolver {
     }
 
     private fun normalize(value: String): String {
-        val trimmed = value.trim()
+        var trimmed = value.trim()
         val hashIndex = trimmed.indexOf('#')
-        return if (hashIndex > 0) trimmed.substring(0, hashIndex) else trimmed
+        if (hashIndex >= 0) {
+            trimmed = trimmed.substring(0, hashIndex)
+        }
+        return trimmed
+    }
+
+    private fun normalizePayload(payload: String): String {
+        var normalized = payload.trim()
+        normalized = normalized.replace(' ', '+')
+        val urlDecoded = runCatching { Utils.urlDecode(normalized) }.getOrNull()?.trim()
+        if (!urlDecoded.isNullOrBlank() && urlDecoded != normalized) {
+            normalized = urlDecoded.replace(' ', '+')
+        }
+        return normalized
     }
 
     private fun decrypt(mode: CryptMode, payload: String): String {
@@ -120,7 +140,7 @@ object EncryptedCryptResolver {
     }
 
     private fun decodeBase64OrNull(input: String): String? {
-        return runCatching { String(Base64.decode(input, Base64.DEFAULT), Charsets.UTF_8) }
+        return runCatching { String(Base64.decode(input, Base64.NO_WRAP), Charsets.UTF_8) }
             .recoverCatching { String(Base64.decode(input, Base64.URL_SAFE), Charsets.UTF_8) }
             .getOrNull()
     }

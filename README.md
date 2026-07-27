@@ -1,4 +1,4 @@
-﻿# Sumrak VPN (SumraX)
+# Sumrak VPN (SumraX)
 
 Android VPN client based on [v2rayNG](https://github.com/2dust/v2rayNG), branded as **SumraX**.
 

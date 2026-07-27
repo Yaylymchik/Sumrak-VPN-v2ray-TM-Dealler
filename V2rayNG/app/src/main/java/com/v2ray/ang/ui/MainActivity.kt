@@ -49,7 +49,9 @@ import com.v2ray.ang.handler.TrafficStatsHelper
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.ProfileAutoSelector
 import com.v2ray.ang.util.ProfileRemarkParser
+import com.v2ray.ang.util.ProfileSettingsApplier
 import com.v2ray.ang.util.Utils
+import com.v2ray.ang.util.encrypt.EncryptedCryptResolver
 import com.v2ray.ang.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -887,6 +889,7 @@ class MainActivity : HelperBaseActivity() {
     }
 
     private fun startV2Ray() {
+        ProfileSettingsApplier.applyForCurrentSelection()
         if (MmkvManager.getSelectServer().isNullOrEmpty()) {
             connectionErrorMessage = getString(R.string.title_file_chooser)
             connectionUiState = ConnectionUiState.ERROR
@@ -1196,6 +1199,8 @@ class MainActivity : HelperBaseActivity() {
                         }
 
                         countSub > 0 -> setupGroupTab()
+                        EncryptedCryptResolver.isEncryptedDeeplink(server) ->
+                            toastError(R.string.toast_encrypted_import_failed)
                         else -> toastError(R.string.toast_failure)
                     }
                     hideLoading()

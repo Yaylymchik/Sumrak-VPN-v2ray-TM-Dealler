@@ -32,6 +32,7 @@ signing.properties
 # Ignore shared object files (keep bundled jni if present)
 *.so
 !V2rayNG/app/libs/**
+!V2rayNG/app/src/main/jniLibs/**/liberror-code.so
 
 # Ignore Google services JSON
 V2rayNG/app/google-services.json

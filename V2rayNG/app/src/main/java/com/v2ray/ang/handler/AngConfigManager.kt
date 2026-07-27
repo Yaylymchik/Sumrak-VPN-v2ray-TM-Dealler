@@ -180,7 +180,15 @@ object AngConfigManager {
      * @return A pair containing the number of configurations and subscriptions imported.
      */
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
-        val resolvedServer = EncryptedCryptResolver.resolve(server) ?: server
+        val resolvedServer = when {
+            EncryptedCryptResolver.isEncryptedDeeplink(server) ->
+                EncryptedCryptResolver.resolve(server)
+
+            else -> EncryptedCryptResolver.resolve(server) ?: server
+        }
+        if (resolvedServer.isNullOrBlank()) {
+            return 0 to 0
+        }
         var count = parseBatchConfig(Utils.decode(resolvedServer), subid, append)
         if (count <= 0) {
             count = parseBatchConfig(resolvedServer, subid, append)
@@ -192,10 +200,6 @@ object AngConfigManager {
         var countSub = parseBatchSubscription(resolvedServer)
         if (countSub <= 0) {
             countSub = parseBatchSubscription(Utils.decode(resolvedServer))
-        }
-        if (countSub <= 0 && EncryptedCryptResolver.isEncryptedDeeplink(server)) {
-            // Encrypted payload may decode to a single subscription URL
-            countSub = parseBatchSubscription(resolvedServer)
         }
         if (countSub > 0) {
             updateConfigViaSubAll()
@@ -220,14 +224,14 @@ object AngConfigManager {
             servers.lines()
                 .distinct()
                 .forEach { raw ->
-                    val str = EncryptedCryptResolver.resolve(raw)?.trim().orEmpty().ifBlank { raw.trim() }
-                    if (Utils.isValidSubUrl(str) || EncryptedCryptResolver.isEncryptedDeeplink(raw)) {
-                        val url = if (Utils.isValidSubUrl(str)) str else EncryptedCryptResolver.resolve(raw)
-                        if (!url.isNullOrBlank() && Utils.isValidSubUrl(url)) {
-                            count += importUrlAsSubscription(url)
-                        }
-                    } else if (Utils.isValidSubUrl(raw)) {
-                        count += importUrlAsSubscription(raw)
+                    val resolved = EncryptedCryptResolver.resolve(raw)?.trim().orEmpty()
+                    val str = when {
+                        resolved.isNotBlank() -> resolved
+                        EncryptedCryptResolver.isEncryptedDeeplink(raw) -> ""
+                        else -> raw.trim()
+                    }
+                    if (Utils.isValidSubUrl(str)) {
+                        count += importUrlAsSubscription(str)
                     }
                 }
             return count
@@ -562,7 +566,12 @@ object AngConfigManager {
                 return SubscriptionUpdateResult(skipCount = 1)
             }
 
-            val urlRaw = EncryptedCryptResolver.resolve(it.subscription.url) ?: it.subscription.url
+            val urlRaw = EncryptedCryptResolver.resolve(it.subscription.url)
+                ?.takeIf { resolved -> !EncryptedCryptResolver.isEncryptedDeeplink(resolved) }
+                ?: it.subscription.url
+            if (EncryptedCryptResolver.isEncryptedDeeplink(urlRaw)) {
+                return SubscriptionUpdateResult(failureCount = 1)
+            }
             val url = HttpUtil.toIdnUrl(urlRaw)
             if (!Utils.isValidUrl(url)) {
                 return SubscriptionUpdateResult(failureCount = 1)

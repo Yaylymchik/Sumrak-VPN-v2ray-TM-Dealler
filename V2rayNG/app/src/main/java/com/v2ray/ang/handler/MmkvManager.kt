@@ -15,7 +15,7 @@ import com.v2ray.ang.dto.entities.SubscriptionItem
 import com.v2ray.ang.dto.entities.WebDavConfig
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
-import com.v2ray.ang.util.ProfileFinalMaskApplier
+import com.v2ray.ang.util.ProfileSettingsApplier
 import com.v2ray.ang.util.Utils
 
 object MmkvManager {
@@ -74,8 +74,8 @@ object MmkvManager {
      */
     fun setSelectServer(guid: String) {
         mainStorage.encode(KEY_SELECTED_SERVER, guid)
-        runCatching { ProfileFinalMaskApplier.applyOnSelect(guid) }
-            .onFailure { LogUtil.e(AppConfig.TAG, "Failed to auto-apply finalmask for $guid", it) }
+        runCatching { ProfileSettingsApplier.applyOnSelect(guid) }
+            .onFailure { LogUtil.e(AppConfig.TAG, "Failed to auto-apply profile settings for $guid", it) }
     }
 
     /**
