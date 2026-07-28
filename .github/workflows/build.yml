@@ -183,7 +183,7 @@ jobs:
           path: release-apks
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.event.inputs.release_tag != '' && github.event.inputs.release_tag || github.ref_name }}
           name: SumraX ${{ needs.build.outputs.version_name }}
