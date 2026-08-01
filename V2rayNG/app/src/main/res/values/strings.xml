@@ -123,7 +123,12 @@
     <string name="server_lab_pinned_ca256">Certificate fingerprint (SHA-256)</string>
     <string name="server_lab_browser_dialer">Enable Browser Dialer</string>
     <string name="server_lab_browser_dialer_tip">Only supports xhttp (packet-up) and ws outbound; TLS-related settings may be ignored or conflict</string>
-    <string name="toast_allow_insecure_deprecated">WARNING: Skipping certificate verification "allowInsecure" will be disabled in August 2026. Please use certificate fingerprints as soon as possible. This feature will not be available after its expiration.</string>
+    <string name="toast_allow_insecure_deprecated">WARNING: Skipping certificate verification "allowInsecure" was disabled on 2026-08-01. Use certificate fingerprints (pinnedPeerCertSha256) instead.</string>
+    <string name="title_root_mode_enabled">Root mode enabled (Root Users)</string>
+    <string name="summary_root_mode_enabled">Enable low-level transparent proxying via root privileges. This mode bypasses the standard Android system VPN to directly take over all underlying network traffic.</string>
+    <string name="toast_root_required">Root access is required for this feature</string>
+    <string name="title_root_lan_sharing">LAN / tethering sharing (Root Users)</string>
+    <string name="summary_root_lan_sharing">Route Wi-Fi hotspot and USB-tethered devices through the VPN</string>
     <string name="pinned_ca256_action_fetch">Fetch and fill certificate fingerprint</string>
     <string name="toast_fetch_cert_sha256_success">Certificate fingerprint fetched successfully</string>
     <string name="toast_fetch_cert_sha256_failed">Failed to fetch certificate fingerprint</string>

@@ -122,7 +122,12 @@
     <string name="server_lab_pinned_ca256">Отпечаток сертификата (SHA-256)</string>
     <string name="server_lab_browser_dialer">Использовать переадресацию браузера</string>
     <string name="server_lab_browser_dialer_tip">Поддерживаются только исходящие соединения XHTTP (packet-up) и WS; настройки, связанные с TLS, могут быть проигнорированы или конфликтовать</string>
-    <string name="toast_allow_insecure_deprecated">ВНИМАНИЕ: пропуск проверки сертификата («Разрешать небезопасные соединения») будет отключён в августе 2026 года. Пожалуйста, используйте отпечатки сертификатов как можно скорее. Функция будет недоступна после истечения срока действия.</string>
+    <string name="toast_allow_insecure_deprecated">ВНИМАНИЕ: пропуск проверки сертификата («allowInsecure») отключён с 2026-08-01. Используйте отпечатки сертификатов (pinnedPeerCertSha256).</string>
+    <string name="title_root_mode_enabled">Включить root-режим</string>
+    <string name="summary_root_mode_enabled">Прозрачный прокси через root. Режим обходит системный VPN Android и перехватывает сетевой трафик напрямую.</string>
+    <string name="toast_root_required">Для этой функции нужен root-доступ</string>
+    <string name="title_root_lan_sharing">Общий доступ LAN / точка доступа (root)</string>
+    <string name="summary_root_lan_sharing">Направлять трафик Wi‑Fi hotspot и USB-tethering через VPN</string>
     <string name="pinned_ca256_action_fetch">Получить и заполнить отпечаток сертификата</string>
     <string name="toast_fetch_cert_sha256_success">Отпечаток сертификата успешно получен</string>
     <string name="toast_fetch_cert_sha256_failed">Отпечаток сертификата не получен</string>

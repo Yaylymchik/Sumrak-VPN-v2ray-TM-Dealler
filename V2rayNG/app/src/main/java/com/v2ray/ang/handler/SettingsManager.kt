@@ -532,6 +532,11 @@ object SettingsManager {
         return mode == null || mode == VPN
     }
 
+    /** Root (system-wide transparent proxy) mode from upstream v2rayNG 2.2.6. */
+    fun isRootMode(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_MODE_ENABLE, false)
+    }
+
     fun isSmartConnectionMode(): Boolean {
         val mode = MmkvManager.decodeSettingsString(AppConfig.PREF_CONNECTION_MODE)
         return mode.isNullOrEmpty() || mode == AppConfig.CONNECTION_MODE_SMART

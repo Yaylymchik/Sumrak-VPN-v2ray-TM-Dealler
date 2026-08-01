@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceCategory
 import androidx.preference.CheckBoxPreference
@@ -15,11 +16,14 @@ import androidx.preference.PreferenceFragmentCompat
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.VPN
 import com.v2ray.ang.R
+import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
+import com.v2ray.ang.root.RootManager
 import com.v2ray.ang.util.Utils
+import kotlinx.coroutines.launch
 
 private fun PreferenceFragmentCompat.styleSumraXPreferenceList() {
     val pad = resources.getDimensionPixelSize(R.dimen.padding_spacing_dp16)
@@ -177,6 +181,8 @@ class SettingsActivity : BaseActivity() {
         private val noiseDelay by lazy { findPreference<EditTextPreference>(AppConfig.PREF_NOISE_DELAY) }
 
         private val mode by lazy { findPreference<ListPreference>(AppConfig.PREF_MODE) }
+        private val enableRootMode by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_ROOT_MODE_ENABLE) }
+        private val lanSharing by lazy { findPreference<CheckBoxPreference>(AppConfig.PREF_ROOT_LAN_SHARING) }
 
         private val hevTunLogLevel by lazy { findPreference<ListPreference>(AppConfig.PREF_HEV_TUNNEL_LOGLEVEL) }
         private val hevTunRwTimeout by lazy { findPreference<EditTextPreference>(AppConfig.PREF_HEV_TUNNEL_RW_TIMEOUT) }
@@ -261,6 +267,32 @@ class SettingsActivity : BaseActivity() {
                 true
             }
             mode?.dialogLayoutResource = R.layout.preference_with_help_link
+
+            enableRootMode?.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue == true && !RootManager.cachedRoot()) {
+                    lifecycleScope.launch {
+                        if (checkAndRequestRoot()) {
+                            enableRootMode?.isChecked = true
+                        }
+                    }
+                    false
+                } else {
+                    true
+                }
+            }
+
+            lanSharing?.setOnPreferenceChangeListener { _, newValue ->
+                if (newValue == true && !RootManager.cachedRoot()) {
+                    lifecycleScope.launch {
+                        if (checkAndRequestRoot()) {
+                            lanSharing?.isChecked = true
+                        }
+                    }
+                    false
+                } else {
+                    true
+                }
+            }
 
             useHevTun?.setOnPreferenceChangeListener { _, newValue ->
                 updateHevTunSettings(newValue as Boolean)
@@ -515,6 +547,15 @@ class SettingsActivity : BaseActivity() {
             }
 
             preferenceScreen?.let { traverse(it) }
+        }
+
+        private suspend fun checkAndRequestRoot(): Boolean {
+            val hasRoot = RootManager.refresh()
+            if (!isAdded) return false
+            if (!hasRoot) {
+                context?.toastError(R.string.toast_root_required)
+            }
+            return hasRoot
         }
 
         override fun onStart() {

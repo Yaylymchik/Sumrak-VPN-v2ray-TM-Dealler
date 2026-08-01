@@ -172,8 +172,16 @@ object CoreServiceManager {
             context.toast(R.string.toast_services_start)
         }
 
-        val isVpnMode = SettingsManager.isVpnMode()
-        val intent = if (isVpnMode) {
+        val isRootMode = SettingsManager.isRootMode()
+        if (isRootMode && !com.v2ray.ang.root.RootManager.isRootAvailable()) {
+            LogUtil.e(AppConfig.TAG, "StartCore-Manager: root mode requires root but none available")
+            error(context.getString(R.string.toast_root_required))
+        }
+
+        val intent = if (isRootMode) {
+            LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting Root service")
+            Intent(context.applicationContext, com.v2ray.ang.service.CoreRootService::class.java)
+        } else if (SettingsManager.isVpnMode()) {
             LogUtil.i(AppConfig.TAG, "StartCore-Manager: Starting VPN service")
             Intent(context.applicationContext, CoreVpnService::class.java)
         } else {

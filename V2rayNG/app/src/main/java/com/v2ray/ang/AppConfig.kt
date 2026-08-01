@@ -80,6 +80,8 @@ object AppConfig {
     const val PREF_LOGLEVEL = "pref_core_loglevel"
     const val PREF_OUTBOUND_DOMAIN_RESOLVE_METHOD = "pref_outbound_domain_resolve_method"
     const val PREF_MODE = "pref_mode"
+    const val PREF_ROOT_MODE_ENABLE = "pref_root_mode_enabled"
+    const val PREF_ROOT_LAN_SHARING = "pref_root_lan_sharing"
     const val PREF_CONNECTION_MODE = "pref_connection_mode"
     const val CONNECTION_MODE_SMART = "smart"
     const val CONNECTION_MODE_MANUAL = "manual"
@@ -193,6 +195,25 @@ object AppConfig {
     const val WIREGUARD_LOCAL_ADDRESS_V6 = "2606:4700:110:8f81:d551:a0:532e:a2b3/128"
     const val WIREGUARD_LOCAL_MTU = "1420"
     const val LOOPBACK = "127.0.0.1"
+
+    /** Root / transparent-proxy constants (upstream v2rayNG 2.2.6). */
+    const val ROOT_RUNTIME_DIR = "root"
+    const val ROOT_IPTABLES_CHAIN = "V2RAY_NG"
+    const val ROOT_FWMARK = 255
+    const val ROOT_MARK_ROUTE = 1
+    const val ROOT_ROUTE_TABLE = 2024
+    const val ROOT_RULE_PRIORITY = 1000
+    const val ROOT_TUN_NAME = "v2raytun0"
+    const val ROOT_TUN_ADDR_V4 = "198.18.0.1/15"
+    const val ROOT_TUN_ADDR_V6 = "fdfe:dcba:9876::1/64"
+    const val ROOT_TUN2SOCKS_BIN = "libhevsockstun.so"
+    const val ROOT_FWD_CHAIN = "V2RAY_NG_FWD"
+    const val ROOT_DNS_CHAIN = "V2RAY_NG_DNS"
+    const val ROOT_V6_CHAIN = "V2RAY_NG6"
+    const val ROOT_V6_FWD_CHAIN = "V2RAY_NG6_FWD"
+    const val ROOT_V6_PRE_CHAIN = "V2RAY_NG6_PRE"
+    const val ROOT_LAN_DNS = "1.1.1.1"
+    const val ROOT_OOM_SCORE = "-1000"
 
     /** Message constants for communication. */
     const val MSG_REGISTER_CLIENT = 1

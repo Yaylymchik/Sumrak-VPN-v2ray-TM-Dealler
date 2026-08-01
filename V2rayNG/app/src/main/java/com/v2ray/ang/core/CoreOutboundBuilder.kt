@@ -555,7 +555,8 @@ object CoreOutboundBuilder {
      */
     fun populateTlsSettings(streamSettings: OutboundBean.StreamSettingsBean, profileItem: ProfileItem, sniExt: String?) {
         val streamSecurity = profileItem.security.orEmpty()
-        val allowInsecure = profileItem.insecure == true && profileItem.pinnedCA256.isNullOrEmpty()
+        // Upstream removed allowInsecure as of 2026-08-01; keep pinned-fingerprint path only.
+        val allowInsecure = false
         val sni = if (profileItem.sni.isNullOrEmpty()) {
             when {
                 sniExt.isNotNullEmpty() && Utils.isDomainName(sniExt) -> sniExt
