@@ -45,7 +45,15 @@ object AppUpdateRunner {
     val downloaded = downloadUpdateApk(context, result)
     if (downloaded) {
       MmkvManager.encodeSettings(AppConfig.PREF_LAST_APP_UPDATE_VERSION, result.latestVersion)
-      notifyInstallReady(context, result.latestVersion, apkFileForVersion(context, result.latestVersion))
+      val apkFile = apkFileForVersion(context, result.latestVersion)
+      if (SettingsManager.isAutoInstallAppUpdateEnabled()) {
+        try {
+          context.startActivity(buildInstallIntent(context, apkFile))
+        } catch (e: Exception) {
+          LogUtil.e(AppConfig.TAG, "Auto-install intent failed", e)
+        }
+      }
+      notifyInstallReady(context, result.latestVersion, apkFile)
     } else {
       notifyUpdateAvailable(context, result)
     }

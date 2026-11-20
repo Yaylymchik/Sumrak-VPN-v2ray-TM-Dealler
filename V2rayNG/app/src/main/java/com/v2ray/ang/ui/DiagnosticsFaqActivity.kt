@@ -74,7 +74,7 @@ class DiagnosticsActivity : BaseActivity() {
         val connectMode = if (SettingsManager.isSmartConnectionMode()) "Smart" else "Manual"
         val running = CoreServiceManager.isRunning()
         return buildString {
-            appendLine("SumraX ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+            appendLine("Sumrak VPN ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
             appendLine("Mode: $mode")
             appendLine("Connect: $connectMode")
             appendLine("Running: $running")
@@ -98,7 +98,7 @@ class FaqActivity : BaseActivity() {
             title = getString(R.string.sumrax_settings_faq)
         )
         findViewById<MaterialButton>(R.id.btn_open_happ_faq).setOnClickListener {
-            val uri = Uri.parse("https://www.happ.su/main")
+            val uri = Uri.parse(AppConfig.APP_URL)
             startActivity(Intent(Intent.ACTION_VIEW, uri))
         }
     }

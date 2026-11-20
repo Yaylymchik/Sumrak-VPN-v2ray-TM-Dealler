@@ -82,6 +82,12 @@
             android:summary="@string/summary_pref_auto_download_app_update"
             android:title="@string/title_pref_auto_download_app_update" />
 
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_auto_install_app_update"
+            android:summary="@string/summary_pref_auto_install_app_update"
+            android:title="@string/title_pref_auto_install_app_update" />
+
         <EditTextPreference
             android:key="pref_app_update_api_url"
             android:summary="@string/summary_pref_app_update_api_url"

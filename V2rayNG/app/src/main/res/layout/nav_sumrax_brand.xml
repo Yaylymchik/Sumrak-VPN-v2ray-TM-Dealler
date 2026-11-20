@@ -8,17 +8,12 @@
     android:paddingEnd="@dimen/padding_spacing_dp16"
     android:paddingBottom="@dimen/padding_spacing_dp8">
 
-    <FrameLayout
+    <ImageView
         android:layout_width="44dp"
         android:layout_height="44dp"
-        android:background="@drawable/bg_cyber_logo">
-
-        <ImageView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_laptop_mini" />
-    </FrameLayout>
+        android:contentDescription="@null"
+        android:scaleType="centerCrop"
+        android:src="@drawable/sumrak_app_icon" />
 
     <LinearLayout
         android:layout_width="0dp"

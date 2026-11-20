@@ -42,6 +42,7 @@ object SettingsManager {
 
     fun initApp(context: Context) {
         ensureDefaultSettings()
+        applyAppUpdatePolicyDefaults()
         //ensureDefaultSubscription()
         initRoutingRulesets(context)
         migrateServerListToSubscriptions()
@@ -520,6 +521,19 @@ object SettingsManager {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_DOWNLOAD_APP_UPDATE, true)
     }
 
+    fun isAutoInstallAppUpdateEnabled(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_INSTALL_APP_UPDATE, true)
+    }
+
+    /** One-time: enable check, download and install prompts for app updates. */
+    fun applyAppUpdatePolicyDefaults() {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_APP_UPDATE_POLICY_V1, false)) return
+        MmkvManager.encodeSettings(AppConfig.PREF_AUTO_CHECK_UPDATE, true)
+        MmkvManager.encodeSettings(AppConfig.PREF_AUTO_DOWNLOAD_APP_UPDATE, true)
+        MmkvManager.encodeSettings(AppConfig.PREF_AUTO_INSTALL_APP_UPDATE, true)
+        MmkvManager.encodeSettings(AppConfig.PREF_APP_UPDATE_POLICY_V1, true)
+    }
+
     fun getAppUpdateApiUrl(): String {
         return MmkvManager.decodeSettingsString(AppConfig.PREF_APP_UPDATE_API_URL)
             ?.trim()
@@ -644,6 +658,7 @@ object SettingsManager {
         ensureDefaultBoolValue(AppConfig.PREF_SUBSCRIPTION_UPDATE_ON_LAUNCH, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_CHECK_UPDATE, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_DOWNLOAD_APP_UPDATE, true)
+        ensureDefaultBoolValue(AppConfig.PREF_AUTO_INSTALL_APP_UPDATE, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_SORT_AFTER_TEST, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_SELECT_PROFILE, true)
         ensureDefaultBoolValue(AppConfig.PREF_NOISE_ENABLED, false)

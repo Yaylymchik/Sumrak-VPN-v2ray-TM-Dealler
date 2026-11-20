@@ -229,6 +229,8 @@ class SettingsActivity : BaseActivity() {
                     AppUpdateScheduler.sync(forceReschedule = true)
                     true
                 }
+            findPreference<CheckBoxPreference>(AppConfig.PREF_AUTO_INSTALL_APP_UPDATE)
+                ?.setOnPreferenceChangeListener { _, _ -> true }
 
             if (readSettingsFilter() in setOf(
                     SettingsFilter.LANGUAGE,

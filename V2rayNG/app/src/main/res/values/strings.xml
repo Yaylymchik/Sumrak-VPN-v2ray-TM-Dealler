@@ -294,6 +294,8 @@
     <string name="summary_pref_auto_check_update">Check for updates in the background every 6 hours and on app launch (GitHub Releases API)</string>
     <string name="title_pref_auto_download_app_update">Auto-download updates</string>
     <string name="summary_pref_auto_download_app_update">When a new APK is found, download it in the background and show an install notification</string>
+    <string name="title_pref_auto_install_app_update">Auto-install updates</string>
+    <string name="summary_pref_auto_install_app_update">After download, open the system installer (you still confirm on screen)</string>
     <string name="notification_app_update_ready_title">Sumrak VPN %1$s is ready</string>
     <string name="notification_app_update_ready_body">Tap Install to update the app</string>
     <string name="notification_app_update_install">Install</string>

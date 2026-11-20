@@ -45,6 +45,8 @@ object AppConfig {
     const val PREF_SUBSCRIPTION_UPDATE_ON_LAUNCH = "pref_subscription_update_on_launch"
     const val PREF_AUTO_CHECK_UPDATE = "pref_auto_check_update"
     const val PREF_AUTO_DOWNLOAD_APP_UPDATE = "pref_auto_download_app_update"
+    const val PREF_AUTO_INSTALL_APP_UPDATE = "pref_auto_install_app_update"
+    const val PREF_APP_UPDATE_POLICY_V1 = "pref_app_update_policy_v1_applied"
     const val PREF_LAST_APP_UPDATE_VERSION = "pref_last_app_update_version"
     const val PREF_APP_UPDATE_API_URL = "pref_app_update_api_url"
     const val APP_UPDATE_TASK_NAME = "app_update_worker"

@@ -292,6 +292,8 @@
     <string name="summary_pref_auto_check_update">Проверка обновлений в фоне каждые 6 ч и при запуске (GitHub Releases API)</string>
     <string name="title_pref_auto_download_app_update">Автозагрузка обновлений</string>
     <string name="summary_pref_auto_download_app_update">Скачивать новый APK в фоне и показывать уведомление для установки</string>
+    <string name="title_pref_auto_install_app_update">Автоустановка обновлений</string>
+    <string name="summary_pref_auto_install_app_update">После загрузки открывать установщик (подтверждение на экране всё равно нужно)</string>
     <string name="notification_app_update_ready_title">Доступен Sumrak VPN %1$s</string>
     <string name="notification_app_update_ready_body">Нажмите «Установить», чтобы обновить приложение</string>
     <string name="notification_app_update_install">Установить</string>
