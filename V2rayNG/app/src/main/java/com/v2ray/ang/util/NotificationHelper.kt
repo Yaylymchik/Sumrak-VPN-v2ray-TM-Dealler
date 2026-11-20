@@ -3,6 +3,7 @@ package com.v2ray.ang.util
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.os.Build
@@ -41,6 +42,22 @@ object NotificationHelper {
         val notificationManager = getNotificationManager(context)
         val builder = buildNotificationBuilder(channelType, context, title, content)
         notificationManager.notify(channelType.notificationId, builder.build())
+    }
+
+    fun notifyWithAction(
+        channelType: NotificationChannelType,
+        context: Context,
+        title: String,
+        content: String,
+        actionTitle: String,
+        actionIntent: PendingIntent,
+    ) {
+        ensureChannelCreated(channelType, context)
+        val builder = buildNotificationBuilder(channelType, context, title, content)
+            .setContentIntent(actionIntent)
+            .setAutoCancel(true)
+            .addAction(0, actionTitle, actionIntent)
+        getNotificationManager(context).notify(channelType.notificationId, builder.build())
     }
 
     /**
@@ -126,10 +143,14 @@ object NotificationHelper {
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         if (notificationManager.getNotificationChannel(channelType.channelId) != null) return
 
+        val importance = when (channelType) {
+            NotificationChannelType.APP_UPDATE -> NotificationManager.IMPORTANCE_DEFAULT
+            else -> NotificationManager.IMPORTANCE_LOW
+        }
         val channel = NotificationChannel(
             channelType.channelId,
             channelType.channelName,
-            NotificationManager.IMPORTANCE_LOW
+            importance
         ).apply {
             lockscreenVisibility = Notification.VISIBILITY_PRIVATE
         }

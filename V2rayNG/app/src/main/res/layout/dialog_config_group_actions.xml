@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/config_group_actions_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/happ_card_surface"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+
+    <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <include
+        android:id="@+id/act_settings"
+        layout="@layout/item_home_group_action" />
+
+    <include
+        android:id="@+id/act_routing"
+        layout="@layout/item_home_group_action" />
+
+    <include
+        android:id="@+id/act_update_sub"
+        layout="@layout/item_home_group_action" />
+
+    <include
+        android:id="@+id/act_ping"
+        layout="@layout/item_home_group_action" />
+
+    <include
+        android:id="@+id/act_pin"
+        layout="@layout/item_home_group_action" />
+
+    <include
+        android:id="@+id/act_delete"
+        layout="@layout/item_home_group_action" />
+</LinearLayout>

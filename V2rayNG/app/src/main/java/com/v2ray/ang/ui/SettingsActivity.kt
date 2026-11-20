@@ -19,6 +19,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.extension.toastError
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.SettingsManager
+import com.v2ray.ang.handler.AppUpdateScheduler
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
 import com.v2ray.ang.root.RootManager
@@ -216,6 +217,16 @@ class SettingsActivity : BaseActivity() {
                 ?.setOnPreferenceChangeListener { _, newValue ->
                     MmkvManager.encodeSettings(AppConfig.PREF_SUBSCRIPTION_AUTO_UPDATE_ENABLE, newValue as Boolean)
                     SubscriptionUpdater.sync(forceReschedule = true)
+                    true
+                }
+            findPreference<CheckBoxPreference>(AppConfig.PREF_AUTO_CHECK_UPDATE)
+                ?.setOnPreferenceChangeListener { _, _ ->
+                    AppUpdateScheduler.sync(forceReschedule = true)
+                    true
+                }
+            findPreference<CheckBoxPreference>(AppConfig.PREF_AUTO_DOWNLOAD_APP_UPDATE)
+                ?.setOnPreferenceChangeListener { _, _ ->
+                    AppUpdateScheduler.sync(forceReschedule = true)
                     true
                 }
 

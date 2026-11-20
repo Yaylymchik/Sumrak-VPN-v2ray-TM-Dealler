@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_bottom_sheet_item"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="52dp"
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/happ_activity_horizontal_margin"
+    android:paddingVertical="12dp">
+
+    <ImageView
+        android:id="@+id/iv_action_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:importantForAccessibility="no"
+        app:tint="@color/happ_icon_primary"
+        tools:src="@drawable/ic_settings_24dp" />
+
+    <TextView
+        android:id="@+id/tv_action_label"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:textColor="@color/happ_text_primary"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="Settings" />
+</LinearLayout>

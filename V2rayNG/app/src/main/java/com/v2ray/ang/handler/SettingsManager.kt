@@ -516,6 +516,10 @@ object SettingsManager {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_CHECK_UPDATE, true)
     }
 
+    fun isAutoDownloadAppUpdateEnabled(): Boolean {
+        return MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_DOWNLOAD_APP_UPDATE, true)
+    }
+
     fun getAppUpdateApiUrl(): String {
         return MmkvManager.decodeSettingsString(AppConfig.PREF_APP_UPDATE_API_URL)
             ?.trim()
@@ -639,6 +643,7 @@ object SettingsManager {
         ensureDefaultBoolValue(AppConfig.PREF_SUBSCRIPTION_AUTO_UPDATE_ENABLE, true)
         ensureDefaultBoolValue(AppConfig.PREF_SUBSCRIPTION_UPDATE_ON_LAUNCH, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_CHECK_UPDATE, true)
+        ensureDefaultBoolValue(AppConfig.PREF_AUTO_DOWNLOAD_APP_UPDATE, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_SORT_AFTER_TEST, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_SELECT_PROFILE, true)
         ensureDefaultBoolValue(AppConfig.PREF_NOISE_ENABLED, false)

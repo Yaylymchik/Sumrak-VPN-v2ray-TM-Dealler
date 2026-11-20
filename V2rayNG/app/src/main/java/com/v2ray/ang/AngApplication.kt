@@ -6,8 +6,10 @@ import androidx.work.Configuration
 import androidx.work.WorkManager
 import com.tencent.mmkv.MMKV
 import com.v2ray.ang.AppConfig.ANG_PACKAGE
+import com.v2ray.ang.handler.AppUpdateScheduler
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.MonthlyTrafficTracker
+import com.v2ray.ang.handler.SubscriptionUpdater
 
 class AngApplication : MultiDexApplication() {
     companion object {
@@ -43,6 +45,8 @@ class AngApplication : MultiDexApplication() {
         SettingsManager.initApp(this)
         SettingsManager.setNightMode()
         MonthlyTrafficTracker.checkPeriodOnLaunch(this)
+        SubscriptionUpdater.sync(this)
+        AppUpdateScheduler.sync(this)
 
         es.dmoral.toasty.Toasty.Config.getInstance()
             .setGravity(android.view.Gravity.BOTTOM, 0, 300)

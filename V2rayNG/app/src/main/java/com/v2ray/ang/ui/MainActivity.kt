@@ -172,17 +172,7 @@ class MainActivity : HelperBaseActivity() {
     }
 
     private fun maybeCheckAppUpdate() {
-        if (!SettingsManager.isAutoCheckUpdateEnabled()) return
-        if (SettingsManager.getAppUpdateApiUrl().isBlank()) return
-        lifecycleScope.launch(Dispatchers.IO) {
-            val includePre = MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
-            val result = com.v2ray.ang.handler.UpdateCheckerManager.checkForUpdate(includePre)
-            if (result.hasUpdate) {
-                withContext(Dispatchers.Main) {
-                    toast(getString(R.string.update_new_version_found, result.latestVersion))
-                }
-            }
-        }
+        com.v2ray.ang.handler.AppUpdateScheduler.enqueueImmediate()
     }
 
     private fun setupHomeControls() {
@@ -372,24 +362,84 @@ class MainActivity : HelperBaseActivity() {
         refreshPickerList()
     }
 
-    private fun showHomeGroupMenu(subscriptionId: String, anchor: View) {
-        val popup = PopupMenu(this, anchor)
-        popup.menuInflater.inflate(R.menu.menu_home_group, popup.menu)
-        popup.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.home_group_sub_settings -> {
-                    mainViewModel.subscriptionId = subscriptionId
-                    startActivity(Intent(this, SubSettingActivity::class.java))
-                    true
+    private fun showHomeGroupMenu(subscriptionId: String, @Suppress("UNUSED_PARAMETER") anchor: View) {
+        val pinned = subscriptionId in loadPinnedSubscriptionIds()
+        val showSubActions = subscriptionId != AppConfig.DEFAULT_SUBSCRIPTION_ID
+        val sheet = HomeConfigGroupActionsBottomSheet.newInstance(
+            subscriptionId = subscriptionId,
+            pinned = pinned,
+            showSubscriptionActions = showSubActions,
+        )
+        sheet.setListener(object : HomeConfigGroupActionsBottomSheet.Listener {
+            override fun onGroupAction(
+                subId: String,
+                action: HomeConfigGroupActionsBottomSheet.Action,
+            ) {
+                when (action) {
+                    HomeConfigGroupActionsBottomSheet.Action.SETTINGS ->
+                        openHomeSubscriptionSettings(subId)
+                    HomeConfigGroupActionsBottomSheet.Action.ROUTING ->
+                        startActivity(Intent(this@MainActivity, RoutingSettingActivity::class.java))
+                    HomeConfigGroupActionsBottomSheet.Action.UPDATE_SUBSCRIPTION ->
+                        refreshSubscriptionGroup(subId)
+                    HomeConfigGroupActionsBottomSheet.Action.PING ->
+                        pingSubscriptionGroup(subId)
+                    HomeConfigGroupActionsBottomSheet.Action.PIN ->
+                        togglePinnedSubscription(subId)
+                    HomeConfigGroupActionsBottomSheet.Action.DELETE ->
+                        confirmDeleteHomeSubscription(subId)
                 }
-                R.id.home_group_update -> {
-                    refreshSubscriptionGroup(subscriptionId)
-                    true
+            }
+        })
+        sheet.show(supportFragmentManager, HomeConfigGroupActionsBottomSheet.TAG)
+    }
+
+    private fun openHomeSubscriptionSettings(subscriptionId: String) {
+        startActivity(
+            Intent(this, SubEditActivity::class.java).putExtra("subId", subscriptionId)
+        )
+    }
+
+    private fun loadPinnedSubscriptionIds(): Set<String> =
+        HappHomeListBuilder.loadPinnedSubscriptionIds().toSet()
+
+    private fun savePinnedSubscriptionIds(ids: List<String>) {
+        MmkvManager.encodeSettings(AppConfig.PREF_HOME_PINNED_SUBS, ids.joinToString(","))
+    }
+
+    private fun togglePinnedSubscription(subscriptionId: String) {
+        val pinned = HappHomeListBuilder.loadPinnedSubscriptionIds().toMutableList()
+        if (subscriptionId in pinned) {
+            pinned.remove(subscriptionId)
+        } else {
+            pinned.add(0, subscriptionId)
+        }
+        savePinnedSubscriptionIds(pinned)
+        refreshPickerList()
+    }
+
+    private fun confirmDeleteHomeSubscription(subscriptionId: String) {
+        if (subscriptionId == AppConfig.DEFAULT_SUBSCRIPTION_ID) return
+        val runDelete = {
+            lifecycleScope.launch(Dispatchers.IO) {
+                SettingsManager.removeSubscriptionWithDefault(subscriptionId)
+                expandedSubscriptionIds.remove(subscriptionId)
+                saveExpandedSubscriptions()
+                withContext(Dispatchers.Main) {
+                    mainViewModel.reloadServerList()
+                    refreshPickerList()
                 }
-                else -> false
             }
         }
-        popup.show()
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_CONFIRM_REMOVE)) {
+            AlertDialog.Builder(this)
+                .setMessage(R.string.del_config_comfirm)
+                .setPositiveButton(android.R.string.ok) { _, _ -> runDelete() }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        } else {
+            runDelete()
+        }
     }
 
     private fun openHomeServerEditor(guid: String, subscriptionId: String) {

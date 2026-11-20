@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_widget_name">SumraX</string>
-    <string name="app_tile_name">SumraX</string>
+    <string name="app_widget_name">Sumrak VPN</string>
+    <string name="app_tile_name">Sumrak VPN</string>
     <string name="app_tile_first_use">Первое использование этой функции, пожалуйста, используйте приложение, чтобы добавить профиль</string>
     <string name="navigation_drawer_open">Открыть панель навигации</string>
     <string name="navigation_drawer_close">Закрыть панель навигации</string>
@@ -21,7 +21,7 @@
     <string name="toast_services_failure">Сбой при запуске служб</string>
 
     <!--ServerActivity-->
-    <string name="title_server">SumraX</string>
+    <string name="title_server">Sumrak VPN</string>
     <string name="menu_item_add_config">Добавить профиль</string>
     <string name="menu_item_save_config">Сохранить профиль</string>
     <string name="menu_item_edit_config">Изменить профиль</string>
@@ -289,7 +289,12 @@
     <string name="title_pref_force_global_user_agent">Общий User-Agent для всех</string>
     <string name="summary_pref_force_global_user_agent">Всегда использовать глобальный User-Agent при загрузке подписок (игнорировать UA у подписки)</string>
     <string name="title_pref_auto_check_update">Автопроверка обновлений приложения</string>
-    <string name="summary_pref_auto_check_update">Проверять новый APK SumraX при запуске (нужен URL API обновлений)</string>
+    <string name="summary_pref_auto_check_update">Проверка обновлений в фоне каждые 6 ч и при запуске (GitHub Releases API)</string>
+    <string name="title_pref_auto_download_app_update">Автозагрузка обновлений</string>
+    <string name="summary_pref_auto_download_app_update">Скачивать новый APK в фоне и показывать уведомление для установки</string>
+    <string name="notification_app_update_ready_title">Доступен Sumrak VPN %1$s</string>
+    <string name="notification_app_update_ready_body">Нажмите «Установить», чтобы обновить приложение</string>
+    <string name="notification_app_update_install">Установить</string>
     <string name="title_pref_app_update_api_url">URL API обновлений приложения</string>
     <string name="summary_pref_app_update_api_url">GitHub Releases API, напр. https://api.github.com/repos/YOU/SumraX/releases</string>
     <string name="summary_pref_check_update_now">Скачать последний APK, если доступен</string>
@@ -410,7 +415,7 @@
     <string name="sumrax_settings_tab_about">О программе</string>
     <string name="title_core_dns">Core DNS</string>
     <string name="title_pref_send_hwid_header">Отправлять HWID</string>
-    <string name="summary_pref_send_hwid_header">Добавляет X-hwid к запросам подписки (как в Happ).</string>
+    <string name="summary_pref_send_hwid_header">Добавляет X-hwid к запросам подписки.</string>
     <string name="title_pref_hwid_custom_value">Свой HWID</string>
     <string name="summary_pref_hwid_custom_value">Пусто — использовать хеш ID устройства.</string>
     <string name="sumrax_connection_mode_smart">Smart</string>
@@ -449,7 +454,7 @@
     <string name="sumrax_onboarding_done">Начать</string>
     <string name="sumrax_onboarding_step">%1$d / %2$d</string>
     <string name="sumrax_onboarding_title_1">Добавьте подписку</string>
-    <string name="sumrax_onboarding_body_1">Откройте карточку сервера, вставьте ссылку подписки или QR. SumraX не продаёт VPN — используйте свои серверы.</string>
+    <string name="sumrax_onboarding_body_1">Откройте карточку сервера, вставьте ссылку подписки или QR. Sumrak VPN не продаёт VPN — используйте свои серверы.</string>
     <string name="sumrax_onboarding_title_2">Smart Connect</string>
     <string name="sumrax_onboarding_body_2">Оставьте режим Smart. Нажмите на Mac: приложение проверит пинг, выберет лучший сервер и подключится. Manual — чтобы зафиксировать сервер вручную.</string>
     <string name="sumrax_onboarding_title_3">Готово</string>
@@ -463,13 +468,11 @@
     <string name="sumrax_nav_system">[ SYSTEM ]</string>
     <string name="sumrax_nav_home">Главная</string>
     <string name="sumrax_nav_protection">Защита</string>
-    <string name="sumrax_nav_ai_label">SumraX AI</string>
+    <string name="sumrax_nav_ai_label">Sumrak AI</string>
     <string name="sumrax_nav_settings">Настройки</string>
-    <string name="sumrax_nav_coder">// CODER</string>
-    <string name="sumrax_coder_name">Sumrak</string>
     <string name="sumrax_mode_badge_vpn">TUN // ПОЛНЫЙ ТУННЕЛЬ</string>
     <string name="sumrax_mode_badge_proxy">PROXY // ЛОКАЛЬНЫЙ</string>
-    <string name="sumrax_nav_ai_coming_soon">SumraX AI — скоро</string>
+    <string name="sumrax_nav_ai_coming_soon">Sumrak AI — скоро</string>
 
     <string name="sumrax_settings_general">Общие</string>
     <string name="sumrax_settings_advanced">Дополнительно</string>
@@ -513,8 +516,8 @@
     <string name="sumrax_diagnostics_need_connection">Сначала подключитесь для теста</string>
     <string name="sumrax_diagnostics_ping_hint">Результат задержки появится на главном экране после успешного теста.</string>
     <string name="sumrax_faq_title">FAQ</string>
-    <string name="sumrax_faq_body">Smart Connect — нажатие на Mac: пинг серверов, выбор самого быстрого и подключение.\n\nManual — подключение к выбранному в списке серверу.\n\nМаршрутизация — правила Proxy / Direct / Block. Держите выкл., если split не нужен.\n\nFragment + Noise — обход DPI (Advanced). Сначала Fragment, затем Noise при необходимости.\n\nInbound — локальный SOCKS для LAN; только в доверенной сети.\n\nSumraX не продаёт VPN. Используйте свою подписку или серверы.</string>
-    <string name="sumrax_faq_open_web">Документация Happ</string>
+    <string name="sumrax_faq_body">Smart Connect — нажмите подключение: пинг серверов, выбор самого быстрого и подключение.\n\nManual — подключение к выбранному в списке серверу.\n\nМаршрутизация — правила Proxy / Direct / Block. Держите выкл., если split не нужен.\n\nFragment + Noise — обход DPI (Advanced). Сначала Fragment, затем Noise при необходимости.\n\nInbound — локальный SOCKS для LAN; только в доверенной сети.\n\nSumrak VPN не продаёт VPN. Используйте свою подписку или серверы.</string>
+    <string name="sumrax_faq_open_web">Открыть документацию</string>
 
     <string-array name="connection_mode_entries">
         <item>Smart</item>
@@ -569,7 +572,7 @@
     <string name="sumrax_excluded_routes_invalid">Неверный IP или CIDR</string>
     <string name="sumrax_excluded_routes_added">Маршрут добавлен</string>
     <string name="sumrax_about_label">// ABOUT</string>
-    <string name="sumrax_about_app_name">SumraX VPN</string>
+    <string name="sumrax_about_app_name">Sumrak VPN</string>
     <string name="sumrax_about_version">v%1$s · %2$s</string>
 
     <string name="title_tunnel">Настройки туннеля</string>
@@ -735,6 +738,13 @@
     <string name="title_pref_ping_on_launch">Пинг при запуске</string>
     <string name="summary_pref_ping_on_launch">Автоматически пинговать все серверы при запуске приложения</string>
     <string name="action_update_subscription">Обновить подписку</string>
+    <string name="dialog_config_group_actions_settings">Настройки</string>
+    <string name="dialog_config_group_actions_routing">Маршрутизация</string>
+    <string name="dialog_config_group_actions_update_subscription">Обновить подписку</string>
+    <string name="dialog_config_group_actions_ping">Пинг</string>
+    <string name="dialog_config_group_actions_pin">Закрепить</string>
+    <string name="dialog_config_group_actions_unpin">Открепить</string>
+    <string name="dialog_config_group_actions_delete">Удалить</string>
     <string name="action_ping_profiles">Пинг профилей</string>
     <string name="speedometer_download">Загрузка</string>
     <string name="speedometer_upload">Отдача</string>

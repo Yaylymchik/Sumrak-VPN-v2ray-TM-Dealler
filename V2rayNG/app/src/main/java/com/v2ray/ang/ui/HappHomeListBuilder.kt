@@ -2,6 +2,7 @@ package com.v2ray.ang.ui
 
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.dto.entities.ServersCache
+import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.extension.isGroupType
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.util.Utils
@@ -24,8 +25,14 @@ sealed class HappHomeRow {
 object HappHomeListBuilder {
 
     fun build(expandedSubscriptionIds: Set<String>): List<HappHomeRow> {
+        val pinnedIds = loadPinnedSubscriptionIds()
         val subs = MmkvManager.decodeSubscriptions()
             .filter { it.subscription.enabled }
+            .sortedWith(
+                compareByDescending<SubscriptionCache> { it.guid in pinnedIds }
+                    .thenBy { pinnedIds.indexOf(it.guid).takeIf { i -> i >= 0 } ?: Int.MAX_VALUE }
+                    .thenBy { it.subscription.remarks }
+            )
         if (subs.isEmpty()) {
             return flatUncategorized(expandedSubscriptionIds)
         }
@@ -92,6 +99,12 @@ object HappHomeListBuilder {
             if (profile.configType.isGroupType()) return@mapNotNull null
             ServersCache(guid, profile)
         }
+    }
+
+    fun loadPinnedSubscriptionIds(): List<String> {
+        val raw = MmkvManager.decodeSettingsString(AppConfig.PREF_HOME_PINNED_SUBS, "").orEmpty()
+        if (raw.isBlank()) return emptyList()
+        return raw.split(',').filter { it.isNotBlank() }
     }
 
     fun defaultExpandedIds(): Set<String> {

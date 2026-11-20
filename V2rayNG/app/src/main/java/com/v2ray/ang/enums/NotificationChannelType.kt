@@ -18,5 +18,10 @@ enum class NotificationChannelType(
         channelId = "core_test_channel",
         channelName = "Core Test Service",
         notificationId = 12
+    ),
+    APP_UPDATE(
+        channelId = "app_update_channel",
+        channelName = "App updates",
+        notificationId = 14
     )
 }
