@@ -26,7 +26,7 @@ object ProfileRemarkParser {
             val matches = pattern.findAll(normalized).toList()
             if (matches.isEmpty()) continue
             val days = matches.last().groupValues.getOrNull(1)?.toIntOrNull() ?: continue
-            if (days in 1..9999) return days
+            if (days in 1..999) return days
         }
         return null
     }

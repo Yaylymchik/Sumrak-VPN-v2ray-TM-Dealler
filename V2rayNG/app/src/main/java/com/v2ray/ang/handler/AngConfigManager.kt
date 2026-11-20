@@ -21,6 +21,8 @@ import com.v2ray.ang.fmt.TrojanFmt
 import com.v2ray.ang.fmt.VlessFmt
 import com.v2ray.ang.fmt.VmessFmt
 import com.v2ray.ang.fmt.WireguardFmt
+import com.v2ray.ang.AngApplication
+import com.v2ray.ang.util.HwidManager
 import com.v2ray.ang.util.HttpUtil
 import com.v2ray.ang.util.JsonUtil
 import com.v2ray.ang.util.LogUtil
@@ -586,6 +588,7 @@ object AngConfigManager {
             val userAgent = SettingsManager.resolveSubscriptionUserAgent(it.subscription.userAgent)
             val proxyUsername = SettingsManager.getSocksUsername()
             val proxyPassword = SettingsManager.getSocksPassword()
+            val hwidHeaders = HwidManager.subscriptionRequestHeaders(AngApplication.application)
 
             var fetchResult = try {
                 val httpPort = SettingsManager.getHttpPort()
@@ -596,7 +599,8 @@ object AngConfigManager {
                         timeout = 15000,
                         httpPort = httpPort,
                         proxyUsername = proxyUsername,
-                        proxyPassword = proxyPassword
+                        proxyPassword = proxyPassword,
+                        extraHeaders = hwidHeaders,
                     )
                 )
             } catch (e: Exception) {
@@ -608,7 +612,8 @@ object AngConfigManager {
                     HttpUtil.getUrlContentResultWithUserAgent(
                         UrlContentRequest(
                             url = url,
-                            userAgent = userAgent
+                            userAgent = userAgent,
+                            extraHeaders = hwidHeaders,
                         )
                     )
                 } catch (e: Exception) {

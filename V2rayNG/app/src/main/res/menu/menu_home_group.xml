@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home_group_update"
+        android:title="@string/action_update_subscription" />
+    <item
+        android:id="@+id/home_group_sub_settings"
+        android:title="@string/title_subscription" />
+</menu>

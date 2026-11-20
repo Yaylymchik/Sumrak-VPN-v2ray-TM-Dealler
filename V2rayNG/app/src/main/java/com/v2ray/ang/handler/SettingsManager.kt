@@ -635,6 +635,7 @@ object SettingsManager {
 
         ensureDefaultBoolValue(AppConfig.PREF_ROUTING_ENABLED, false)
         ensureDefaultBoolValue(AppConfig.PREF_FORCE_GLOBAL_USER_AGENT, true)
+        ensureDefaultBoolValue(AppConfig.PREF_SEND_HWID_HEADER, true)
         ensureDefaultBoolValue(AppConfig.PREF_SUBSCRIPTION_AUTO_UPDATE_ENABLE, true)
         ensureDefaultBoolValue(AppConfig.PREF_SUBSCRIPTION_UPDATE_ON_LAUNCH, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_CHECK_UPDATE, true)

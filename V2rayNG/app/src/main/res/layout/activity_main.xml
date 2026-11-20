@@ -159,10 +159,6 @@
                     android:src="@drawable/ic_play_24dp"
                     android:visibility="gone" />
 
-                <include
-                    android:id="@+id/server_picker_overlay_include"
-                    layout="@layout/overlay_server_picker" />
-
                 <com.v2ray.ang.ui.ScanlineOverlayView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

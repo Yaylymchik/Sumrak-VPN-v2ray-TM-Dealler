@@ -242,6 +242,9 @@
             android:name=".ui.SubscriptionSettingsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.HwidSettingsActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.AdvancedSettingsActivity"
             android:exported="false" />
         <activity

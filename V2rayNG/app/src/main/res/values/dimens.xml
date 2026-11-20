@@ -2,6 +2,7 @@
 <resources>
     <dimen name="padding_spacing_dp4">4dp</dimen>
     <dimen name="padding_spacing_dp8">8dp</dimen>
+    <dimen name="padding_spacing_dp12">12dp</dimen>
     <dimen name="padding_spacing_dp16">16dp</dimen>
     <dimen name="image_size_dp24">24dp</dimen>
     <dimen name="view_height_dp36">36dp</dimen>
@@ -13,6 +14,12 @@
     <dimen name="sumrax_card_radius">4dp</dimen>
     <dimen name="sumrax_chip_radius">4dp</dimen>
     <dimen name="sumrax_drawer_width">300dp</dimen>
-    <dimen name="jumpjump_power_btn_size">200dp</dimen>
+    <dimen name="jumpjump_power_btn_size">156dp</dimen>
+    <dimen name="happ_toolbar_icon_size">28dp</dimen>
+    <dimen name="happ_power_max_size">217dp</dimen>
+    <dimen name="happ_main_content_padding_secondary">10dp</dimen>
+    <dimen name="happ_main_recycler_margin">40dp</dimen>
+    <dimen name="happ_activity_horizontal_margin">16dp</dimen>
+    <dimen name="happ_settings_divider_height">1dp</dimen>
     <dimen name="sumrax_icon_btn_size">36dp</dimen>
 </resources>

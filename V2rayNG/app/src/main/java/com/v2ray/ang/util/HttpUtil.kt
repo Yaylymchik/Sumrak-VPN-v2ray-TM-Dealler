@@ -175,6 +175,7 @@ object HttpUtil {
             if (request.httpPort != 0 && !request.proxyUsername.isNullOrBlank() && !request.proxyPassword.isNullOrBlank()) {
                 requestBuilder.header("Proxy-Authorization", Credentials.basic(request.proxyUsername, request.proxyPassword))
             }
+            applyExtraHeaders(request, requestBuilder)
 
             client.newCall(requestBuilder.build()).execute().use { response ->
                 when {
@@ -394,6 +395,14 @@ object HttpUtil {
     private fun applyProxyAuth(request: UrlContentRequest, requestBuilder: Request.Builder) {
         if (request.httpPort != 0 && !request.proxyUsername.isNullOrBlank() && !request.proxyPassword.isNullOrBlank()) {
             requestBuilder.header("Proxy-Authorization", Credentials.basic(request.proxyUsername, request.proxyPassword))
+        }
+    }
+
+    private fun applyExtraHeaders(request: UrlContentRequest, requestBuilder: Request.Builder) {
+        request.extraHeaders.forEach { (name, value) ->
+            if (name.isNotBlank() && value.isNotBlank()) {
+                requestBuilder.header(name, value)
+            }
         }
     }
 }

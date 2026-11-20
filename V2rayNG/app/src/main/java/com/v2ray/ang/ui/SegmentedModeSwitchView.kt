@@ -98,7 +98,7 @@ class SegmentedModeSwitchView @JvmOverloads constructor(
     }
 
     private fun updateLabelColors() {
-        val active = ContextCompat.getColor(context, R.color.sumrax_success)
+        val active = ContextCompat.getColor(context, R.color.sumrax_accent)
         val inactive = ContextCompat.getColor(context, R.color.sumrax_text_tertiary)
         proxyLabel.setTextColor(if (isVpnMode) inactive else active)
         vpnLabel.setTextColor(if (isVpnMode) active else inactive)

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scroll_settings"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/happ_settings_bg"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:paddingBottom="100dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/happ_settings_fragment_bg"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/TextAppearance.Happ.SettingsSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/happ_activity_horizontal_margin"
+            android:text="@string/title_ui_settings" />
+
+        <LinearLayout
+            android:id="@+id/section_ui"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            style="@style/TextAppearance.Happ.SettingsSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/happ_activity_horizontal_margin"
+            android:layout_marginTop="24dp"
+            android:text="@string/title_tunnel" />
+
+        <LinearLayout
+            android:id="@+id/section_tunnel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:orientation="vertical" />
+
+        <TextView
+            style="@style/TextAppearance.Happ.SettingsSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/happ_activity_horizontal_margin"
+            android:layout_marginTop="24dp"
+            android:text="@string/title_advanced" />
+
+        <LinearLayout
+            android:id="@+id/section_advanced"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            style="@style/TextAppearance.Happ.SettingsSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/happ_activity_horizontal_margin"
+            android:layout_marginTop="24dp"
+            android:text="@string/title_other" />
+
+        <LinearLayout
+            android:id="@+id/section_other"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <TextView
+            style="@style/TextAppearance.Happ.SettingsSection"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/happ_activity_horizontal_margin"
+            android:layout_marginTop="24dp"
+            android:text="@string/title_about" />
+
+        <LinearLayout
+            android:id="@+id/section_about"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <include
+            android:id="@+id/settings_about_footer"
+            layout="@layout/include_settings_about_footer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginHorizontal="@dimen/happ_activity_horizontal_margin" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -98,7 +98,7 @@ class SegmentedConnectionModeView @JvmOverloads constructor(
     }
 
     private fun updateLabelColors() {
-        val active = ContextCompat.getColor(context, R.color.sumrax_success)
+        val active = ContextCompat.getColor(context, R.color.sumrax_accent)
         val inactive = ContextCompat.getColor(context, R.color.sumrax_text_tertiary)
         smartLabel.setTextColor(if (isSmartMode) active else inactive)
         manualLabel.setTextColor(if (isSmartMode) inactive else active)

@@ -1,82 +1,317 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!-- Happ 4.11.2 activity_main (toolbar + layout_main), split empty vs list zones -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_jumpjump_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="@dimen/padding_spacing_dp16"
-    android:paddingEnd="@dimen/padding_spacing_dp16">
+    android:background="@drawable/bg_sumrax_app"
+    android:clipChildren="false"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:id="@+id/layout_home_center"
-        android:layout_width="0dp"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@id/server_picker_embed"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.5">
+        android:paddingTop="8dp">
 
-        <com.v2ray.ang.ui.LaptopHeroView
-            android:id="@+id/laptop_hero"
-            android:layout_width="220dp"
-            android:layout_height="220dp"
-            android:clickable="true"
-            android:contentDescription="@string/jumpjump_connection_status"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless" />
+        <ImageButton
+            android:id="@+id/toolbar_main_settings"
+            android:layout_width="@dimen/happ_toolbar_icon_size"
+            android:layout_height="@dimen/happ_toolbar_icon_size"
+            android:layout_marginStart="@dimen/padding_spacing_dp16"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/sumrax_nav_settings"
+            android:src="@drawable/ic_settings_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/sumrax_icon_accent" />
 
-        <TextView
-            android:id="@+id/tv_home_status_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_spacing_dp16"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center"
-            android:text="@string/jumpjump_not_connected"
-            android:textColor="@color/sumrax_text_primary"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+        <ImageButton
+            android:id="@+id/toolbar_main_add"
+            android:layout_width="@dimen/happ_toolbar_icon_size"
+            android:layout_height="@dimen/happ_toolbar_icon_size"
+            android:layout_marginEnd="@dimen/happ_activity_horizontal_margin"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/sumrax_import"
+            android:src="@drawable/ic_add_main_24dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="@color/sumrax_icon_accent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/tv_home_status_subtitle"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_spacing_dp8"
-            android:gravity="center"
-            android:text="@string/jumpjump_tap_mac_connect"
-            android:textColor="@color/sumrax_text_secondary"
-            android:textSize="14sp" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_main"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <com.v2ray.ang.ui.SegmentedConnectionModeView
             android:id="@+id/connection_mode_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_spacing_dp16" />
+            android:layout_marginTop="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <com.v2ray.ang.ui.SegmentedModeSwitchView
-            android:id="@+id/mode_switch"
+        <ImageView
+            android:id="@+id/btn_power_circle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:contentDescription="@null"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="@id/guideline_power_height_max"
+            app:layout_constraintDimensionRatio="1:1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_max="@dimen/happ_power_max_size"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/connection_mode_switch"
+            app:layout_constraintVertical_bias="0"
+            app:layout_constraintWidth_max="@dimen/happ_power_max_size"
+            app:srcCompat="@drawable/ic_happ_power_circle" />
+
+        <com.v2ray.ang.ui.HappPowerButtonView
+            android:id="@+id/btn_power"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:clickable="true"
+            android:contentDescription="@string/jumpjump_connection_status"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
+            app:layout_constraintBottom_toBottomOf="@id/btn_power_circle"
+            app:layout_constraintEnd_toEndOf="@id/btn_power_circle"
+            app:layout_constraintStart_toStartOf="@id/btn_power_circle"
+            app:layout_constraintTop_toTopOf="@id/btn_power_circle" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_power_height_max"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_spacing_dp8" />
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.4" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_test_hide_buttons_divisor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.5" />
+
+        <FrameLayout
+            android:id="@+id/fl_geo_progress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/happ_main_content_padding_secondary"
+            android:layout_marginTop="@dimen/happ_main_recycler_margin"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_power_circle" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_below_power"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="guideline_power_height_max,btn_power_circle,fl_geo_progress" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/barrier_below_test_row"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:barrierDirection="bottom"
+            app:constraint_referenced_ids="tv_test_current_config,tv_hide_all" />
+
+        <TextView
+            android:id="@+id/tv_test_current_config"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/happ_main_content_padding_secondary"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="4dp"
+            android:alpha="0.6"
+            android:background="@drawable/bg_happ_text_on_main_rounded"
+            android:clickable="true"
+            android:ellipsize="end"
+            android:focusable="true"
+            android:gravity="start|center_vertical"
+            android:maxLines="2"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="@string/connection_test_pending"
+            android:textColor="@color/happ_hint_gray"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toStartOf="@id/guideline_test_hide_buttons_divisor"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier_below_power"
+            app:layout_constrainedWidth="true"
+            app:layout_constraintHorizontal_bias="0"
+            tools:visibility="visible" />
+
+        <TextView
+            android:id="@+id/tv_hide_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="@dimen/happ_main_content_padding_secondary"
+            android:alpha="0.6"
+            android:background="@drawable/bg_happ_text_on_main_rounded"
+            android:clickable="true"
+            android:focusable="true"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp"
+            android:text="@string/hide_everything"
+            android:textColor="@color/happ_hint_gray"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/guideline_test_hide_buttons_divisor"
+            app:layout_constraintTop_toBottomOf="@id/barrier_below_power"
+            tools:visibility="visible" />
+
+        <RelativeLayout
+            android:id="@+id/rl_config_groups"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginHorizontal="@dimen/happ_activity_horizontal_margin"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/home_author_footer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/barrier_below_test_row"
+            tools:visibility="visible">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_config_groups"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp"
+                android:scrollbars="vertical" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/empty_state_footer"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:paddingHorizontal="@dimen/padding_spacing_dp16"
+            android:paddingBottom="16dp"
+            app:layout_constraintBottom_toTopOf="@id/home_author_footer"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_ai_helper"
+                style="@style/Widget.Happ.MainTextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/btn_ai_helper"
+                app:icon="@drawable/ic_ai_helper"
+                app:iconGravity="textStart"
+                app:iconPadding="8dp" />
+
+            <LinearLayout
+                android:id="@+id/ll_hwid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_happ_text_on_main_rounded"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="12dp"
+                android:paddingVertical="6dp">
+
+                <TextView
+                    android:id="@+id/tv_hwid"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-light"
+                    android:textColor="@color/happ_text_secondary"
+                    android:textSize="13sp"
+                    tools:text="HWID: abc" />
+
+                <ImageView
+                    android:id="@+id/btn_copy_hwid"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@string/about_hwid"
+                    android:src="@drawable/ic_copy"
+                    app:tint="@color/happ_text_primary" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_hint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center"
+                android:text="@string/servers_hint"
+                android:textColor="@color/happ_text_secondary"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:id="@+id/layout_no_configs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_clipboard"
+                    style="@style/Widget.Happ.MainTextButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/btn_import_config_clipboard"
+                    app:icon="@drawable/ic_copy"
+                    app:iconGravity="textStart" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_qr_code"
+                    style="@style/Widget.Happ.MainTextButton"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:text="@string/btn_import_config_qrcode"
+                    app:icon="@drawable/ic_scan_24dp"
+                    app:iconGravity="textStart" />
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/layout_home_traffic"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_spacing_dp16"
             android:gravity="center_horizontal"
             android:orientation="vertical"
-            android:visibility="gone">
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_power">
 
             <TextView
                 android:id="@+id/tv_home_proxy_traffic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="monospace"
-                android:gravity="center"
                 android:textColor="@color/sumrax_accent"
                 android:textSize="13sp" />
 
@@ -84,22 +319,18 @@
                 android:id="@+id/tv_home_direct_traffic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_spacing_dp4"
+                android:layout_marginTop="4dp"
                 android:fontFamily="monospace"
-                android:gravity="center"
-                android:textColor="@color/sumrax_magenta"
+                android:textColor="@color/sumrax_text_secondary"
                 android:textSize="13sp" />
 
             <TextView
                 android:id="@+id/tv_home_connection_test"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_spacing_dp8"
+                android:layout_marginTop="8dp"
                 android:clickable="true"
-                android:contentDescription="@string/connection_test_pending"
                 android:focusable="true"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
                 android:textColor="@color/sumrax_success"
                 android:textSize="13sp"
                 android:visibility="gone" />
@@ -108,35 +339,34 @@
                 android:id="@+id/tv_home_connection_ip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/padding_spacing_dp4"
+                android:layout_marginTop="4dp"
                 android:fontFamily="monospace"
-                android:gravity="center"
                 android:textColor="@color/sumrax_text_secondary"
                 android:textSize="12sp"
                 android:visibility="gone" />
-
         </LinearLayout>
 
         <TextView
             android:id="@+id/tv_connection_error"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/padding_spacing_dp8"
             android:gravity="center"
             android:textColor="@color/sumrax_error"
             android:textSize="13sp"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layout_home_traffic" />
 
-    </LinearLayout>
+        <include
+            android:id="@+id/home_author_footer"
+            layout="@layout/include_home_author_footer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
-    <include
-        android:id="@+id/server_picker_embed"
-        layout="@layout/jumpjump_server_card"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/padding_spacing_dp16"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</LinearLayout>

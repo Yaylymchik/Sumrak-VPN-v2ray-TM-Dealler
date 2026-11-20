@@ -1,22 +1,25 @@
 package com.v2ray.ang.ui
 
 import android.animation.ObjectAnimator
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Intent
+import android.view.View
 import android.net.Uri
 import android.net.VpnService
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
-import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.PopupMenu
 import androidx.appcompat.widget.SearchView
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
@@ -33,11 +36,13 @@ import com.v2ray.ang.databinding.ActivityMainBinding
 import com.v2ray.ang.databinding.ItemNavSumraxBinding
 import com.v2ray.ang.databinding.NavTrafficFooterBinding
 import com.v2ray.ang.enums.EConfigType
+import com.v2ray.ang.extension.isGroupType
 import com.v2ray.ang.extension.toSpeedString
 import com.v2ray.ang.extension.toTrafficString
 import com.v2ray.ang.enums.PermissionType
 import com.v2ray.ang.extension.toast
 import com.v2ray.ang.extension.toastError
+import com.v2ray.ang.dto.entities.SubscriptionCache
 import com.v2ray.ang.handler.AngConfigManager
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.MonthlyTrafficTracker
@@ -49,6 +54,8 @@ import com.v2ray.ang.handler.TrafficStatsHelper
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.ProfileAutoSelector
 import com.v2ray.ang.util.ProfileRemarkParser
+import com.v2ray.ang.util.HwidManager
+import com.v2ray.ang.util.ServerDisplayName
 import com.v2ray.ang.util.ProfileSettingsApplier
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.encrypt.EncryptedCryptResolver
@@ -84,14 +91,11 @@ class MainActivity : HelperBaseActivity() {
     private var isSmartScanning = false
     private var smartConnectGeneration = 0
     private var showingServerScreen = false
-    private var pickerOpen = false
-    private var pickerFilter = PickerFilter.PLACES
-    private lateinit var pickerAdapter: PickerServerAdapter
-
-    private enum class PickerFilter { PLACES, FAVORITES, RECENT }
+    private lateinit var homeServerAdapter: HappHomeConfigAdapter
+    private var serversListHidden = false
+    private var expandedSubscriptionIds: MutableSet<String> = mutableSetOf()
 
     private val homePanel get() = binding.jumpjumpHomeInclude
-    private val serverPicker get() = binding.jumpjumpHomeInclude.serverPickerEmbed
 
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
@@ -131,8 +135,8 @@ class MainActivity : HelperBaseActivity() {
         binding.fabPing.setOnClickListener { handlePingProfiles() }
         binding.layoutTest.setOnClickListener { handleLayoutTestClick() }
 
-        setupHomeControls()
         setupServerPicker()
+        setupHomeControls()
         setupFabBackgrounds()
         setupGroupTab()
         setupViewModel()
@@ -182,34 +186,88 @@ class MainActivity : HelperBaseActivity() {
     }
 
     private fun setupHomeControls() {
-        homePanel.laptopHero.setOnClickListener { handleFabAction() }
-        serverPicker.layoutServerPicker.setOnClickListener { openServerPicker() }
-        homePanel.tvHomeConnectionTest.setOnClickListener { handleLayoutTestClick() }
-
+        homePanel.toolbarMainSettings.setOnClickListener {
+            requestActivityLauncher.launch(Intent(this, SettingsActivity::class.java))
+        }
+        homePanel.toolbarMainAdd.setOnClickListener { showHomeAddMenu(it) }
         homePanel.connectionModeSwitch.isSmartMode = SettingsManager.isSmartConnectionMode()
         homePanel.connectionModeSwitch.onModeChanged = { smart ->
             SettingsManager.setConnectionMode(smart)
-            applyConnectionUi()
+            toast(
+                if (smart) getString(R.string.sumrax_smart_tap_hint)
+                else getString(R.string.sumrax_manual_tap_hint)
+            )
         }
-
-        homePanel.modeSwitch.isVpnMode = SettingsManager.isVpnMode()
-        homePanel.modeSwitch.onModeChanged = { vpn ->
-            val newMode = if (vpn) VPN else PROXY_ONLY
-            val currentMode = MmkvManager.decodeSettingsString(AppConfig.PREF_MODE, VPN)
-            if (currentMode != newMode) {
-                MmkvManager.encodeSettings(AppConfig.PREF_MODE, newMode)
-                updateNavModeBadge()
-                if (mainViewModel.isRunning.value == true) {
-                    SettingsChangeManager.makeRestartService()
-                    toast(getString(R.string.sumrax_mode_changed_restart))
-                    restartV2Ray()
-                }
-            }
+        homePanel.btnPower.setOnClickListener { handleFabAction() }
+        homePanel.btnAiHelper.setOnClickListener {
+            toast(getString(R.string.sumrax_nav_ai_coming_soon))
         }
+        homePanel.btnClipboard.setOnClickListener { importClipboard() }
+        homePanel.btnQrCode.setOnClickListener { importQRcode() }
+        homePanel.tvHomeConnectionTest.setOnClickListener { handleLayoutTestClick() }
+        homePanel.tvTestCurrentConfig.setOnClickListener { handleLayoutTestClick() }
+        homePanel.tvHideAll.setOnClickListener { toggleServersListHidden() }
+        val copyHwid = View.OnClickListener { copyHomeHwid() }
+        homePanel.llHwid.setOnClickListener(copyHwid)
+        homePanel.btnCopyHwid.setOnClickListener(copyHwid)
 
+        refreshHappHomeHwid()
         refreshServerPickerBar()
         applyConnectionUi()
         showHomeScreen()
+    }
+
+    private fun toggleServersListHidden() {
+        if (!hasAnyHomeServers()) return
+        serversListHidden = !serversListHidden
+        homePanel.rlConfigGroups.isVisible = !serversListHidden
+        homePanel.tvHideAll.text = if (serversListHidden) {
+            getString(R.string.sumrax_happ_show_all)
+        } else {
+            getString(R.string.hide_everything)
+        }
+    }
+
+    private fun showHomeAddMenu(anchor: View) {
+        val popup = PopupMenu(this, anchor)
+        popup.menuInflater.inflate(R.menu.menu_home_add, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.home_add_subscription -> {
+                    startActivity(Intent(this, SubSettingActivity::class.java))
+                    true
+                }
+                else -> onOptionsItemSelected(item)
+            }
+        }
+        popup.show()
+    }
+
+    private fun copyHomeHwid() {
+        val hwid = HwidManager.resolveHwid(this)
+        if (hwid.isEmpty()) return
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        clipboard.setPrimaryClip(ClipData.newPlainText("HWID", hwid))
+        toast(getString(R.string.toast_success))
+    }
+
+    private fun refreshHappHomeHwid() {
+        val hwid = HwidManager.resolveHwid(this)
+        homePanel.tvHwid.text = getString(R.string.sumrax_happ_hwid_format, hwid)
+    }
+
+    private fun syncHappHomeLayout() {
+        val hasServers = hasAnyHomeServers()
+        homePanel.emptyStateFooter.isVisible = !hasServers
+        homePanel.rlConfigGroups.isVisible = hasServers && !serversListHidden
+        homePanel.tvHideAll.isVisible = hasServers
+        val testLabel = homePanel.tvTestCurrentConfig.text?.toString().orEmpty()
+        val pending = getString(R.string.connection_test_pending)
+        homePanel.tvTestCurrentConfig.isVisible = hasServers && testLabel != pending
+        if (!hasServers) {
+            serversListHidden = false
+            homePanel.tvHideAll.text = getString(R.string.hide_everything)
+        }
     }
 
     private fun updateNavModeBadge() {
@@ -223,108 +281,125 @@ class MainActivity : HelperBaseActivity() {
     }
 
     private fun setupServerPicker() {
-        val overlay = binding.serverPickerOverlayInclude
-        pickerAdapter = PickerServerAdapter(
-            onSelect = { guid -> selectServerFromPicker(guid) },
-            onFavoriteChanged = { refreshPickerList() }
-        )
-        overlay.rvPickerServers.layoutManager = LinearLayoutManager(this)
-        overlay.rvPickerServers.adapter = pickerAdapter
-
-        overlay.btnClosePicker.setOnClickListener { closeServerPicker() }
-        overlay.overlayBackdrop.setOnClickListener { closeServerPicker() }
-
-        overlay.btnPasteImport.setOnClickListener {
-            val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-            val text = clipboard.primaryClip?.getItemAt(0)?.text?.toString().orEmpty()
-            if (text.isNotBlank()) {
-                overlay.etImportLink.setText(text)
-            } else {
-                toastError(R.string.toast_failure)
+        expandedSubscriptionIds = loadExpandedSubscriptions().toMutableSet()
+        homeServerAdapter = HappHomeConfigAdapter(
+            object : HappHomeConfigAdapter.Callbacks {
+                override fun onSelectServer(guid: String) = selectServerFromPicker(guid)
+                override fun onEditServer(guid: String, subscriptionId: String) =
+                    openHomeServerEditor(guid, subscriptionId)
+                override fun onToggleGroup(subscriptionId: String) = toggleHomeGroup(subscriptionId)
+                override fun onRefreshGroup(subscriptionId: String) =
+                    refreshSubscriptionGroup(subscriptionId)
+                override fun onPingGroup(subscriptionId: String) = pingSubscriptionGroup(subscriptionId)
+                override fun onMoreGroup(subscriptionId: String, anchor: View) =
+                    showHomeGroupMenu(subscriptionId, anchor)
             }
-        }
-        overlay.btnImportLink.setOnClickListener {
-            importBatchConfig(overlay.etImportLink.text?.toString())
-        }
-        overlay.btnImportQr.setOnClickListener {
-            closeServerPicker()
-            importQRcode()
-        }
-        overlay.btnRefreshSubs.setOnClickListener {
-            closeServerPicker()
-            handleUpdateSubscription()
-        }
-        overlay.btnTestAll.setOnClickListener {
-            closeServerPicker()
-            handlePingProfiles()
-        }
-
-        overlay.chipPlaces.setOnClickListener {
-            pickerFilter = PickerFilter.PLACES
-            refreshPickerList()
-        }
-        overlay.chipFavorites.setOnClickListener {
-            pickerFilter = PickerFilter.FAVORITES
-            refreshPickerList()
-        }
-        overlay.chipRecent.setOnClickListener {
-            pickerFilter = PickerFilter.RECENT
-            refreshPickerList()
-        }
-    }
-
-    fun openServerPicker() {
-        val overlay = binding.serverPickerOverlayInclude
-        overlay.root.isVisible = true
-        overlay.root.alpha = 0f
+        )
+        homePanel.rvConfigGroups.layoutManager = LinearLayoutManager(this)
+        homePanel.rvConfigGroups.adapter = homeServerAdapter
+        homePanel.rvConfigGroups.setBackgroundResource(android.R.color.transparent)
         refreshPickerList()
-        overlay.overlaySheet.post {
-            val sheet = overlay.overlaySheet
-            sheet.translationY = sheet.height.toFloat()
-            overlay.root.animate().alpha(1f).setDuration(200).start()
-            sheet.animate()
-                .translationY(0f)
-                .setDuration(280)
-                .setInterpolator(DecelerateInterpolator())
-                .start()
-        }
-        pickerOpen = true
-    }
-
-    fun closeServerPicker() {
-        if (!pickerOpen) return
-        val overlay = binding.serverPickerOverlayInclude
-        val sheet = overlay.overlaySheet
-        sheet.animate()
-            .translationY(sheet.height.toFloat())
-            .setDuration(220)
-            .setInterpolator(DecelerateInterpolator())
-            .start()
-        overlay.root.animate()
-            .alpha(0f)
-            .setDuration(200)
-            .withEndAction { overlay.root.isVisible = false }
-            .start()
-        pickerOpen = false
     }
 
     private fun refreshPickerList() {
-        val favorites = ServerListsManager.getFavoriteGuids()
-        val servers = when (pickerFilter) {
-            PickerFilter.PLACES -> mainViewModel.serversCache.toList()
-            PickerFilter.FAVORITES -> mainViewModel.serversCache.filter { favorites.contains(it.guid) }
-            PickerFilter.RECENT -> {
-                val recent = ServerListsManager.getRecentGuids()
-                val byGuid = mainViewModel.serversCache.associateBy { it.guid }
-                recent.mapNotNull { byGuid[it] }.ifEmpty {
-                    mainViewModel.serversCache.toList().asReversed()
-                }
+        homeServerAdapter.submit(HappHomeListBuilder.build(expandedSubscriptionIds))
+        syncHappHomeLayout()
+    }
+
+    private fun hasAnyHomeServers(): Boolean = countHomeProfiles() > 0
+
+    private fun countHomeProfiles(): Int {
+        val subs = MmkvManager.decodeSubscriptions()
+        var count = 0
+        for (sub in subs) {
+            count += MmkvManager.decodeServerList(sub.guid).count { guid ->
+                val profile = MmkvManager.decodeServerConfig(guid) ?: return@count false
+                !profile.configType.isGroupType()
             }
         }
-        pickerAdapter.submitList(servers)
-        if (servers.isEmpty() && pickerFilter == PickerFilter.FAVORITES) {
-            toast(getString(R.string.sumrax_picker_favorites_empty))
+        if (count > 0) return count
+        return MmkvManager.decodeAllServerList().count { guid ->
+            val profile = MmkvManager.decodeServerConfig(guid) ?: return@count false
+            !profile.configType.isGroupType()
         }
+    }
+
+    private fun loadExpandedSubscriptions(): Set<String> {
+        val raw = MmkvManager.decodeSettingsString(AppConfig.PREF_HAPP_HOME_EXPANDED_SUBS, "").orEmpty()
+        if (raw.isBlank()) return HappHomeListBuilder.defaultExpandedIds()
+        return raw.split(',').filter { it.isNotBlank() }.toSet()
+    }
+
+    private fun saveExpandedSubscriptions() {
+        MmkvManager.encodeSettings(
+            AppConfig.PREF_HAPP_HOME_EXPANDED_SUBS,
+            expandedSubscriptionIds.joinToString(",")
+        )
+    }
+
+    private fun toggleHomeGroup(subscriptionId: String) {
+        if (subscriptionId in expandedSubscriptionIds) {
+            expandedSubscriptionIds.remove(subscriptionId)
+        } else {
+            expandedSubscriptionIds.add(subscriptionId)
+        }
+        saveExpandedSubscriptions()
+        refreshPickerList()
+    }
+
+    private fun refreshSubscriptionGroup(subscriptionId: String) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val sub = MmkvManager.decodeSubscriptions().find { it.guid == subscriptionId }
+                ?: return@launch
+            val result = AngConfigManager.updateConfigViaSub(SubscriptionCache(subscriptionId, sub.subscription))
+            withContext(Dispatchers.Main) {
+                mainViewModel.reloadServerList()
+                refreshPickerList()
+                val msg = if (result.configCount > 0) {
+                    getString(R.string.result_subscription_updated, result.configCount)
+                } else {
+                    getString(R.string.title_update_subscription_no_subscription)
+                }
+                setTestState(msg)
+            }
+        }
+    }
+
+    private fun pingSubscriptionGroup(subscriptionId: String) {
+        mainViewModel.subscriptionId = subscriptionId
+        mainViewModel.reloadServerList()
+        handlePingProfiles(showAnimation = false)
+        refreshPickerList()
+    }
+
+    private fun showHomeGroupMenu(subscriptionId: String, anchor: View) {
+        val popup = PopupMenu(this, anchor)
+        popup.menuInflater.inflate(R.menu.menu_home_group, popup.menu)
+        popup.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.home_group_sub_settings -> {
+                    mainViewModel.subscriptionId = subscriptionId
+                    startActivity(Intent(this, SubSettingActivity::class.java))
+                    true
+                }
+                R.id.home_group_update -> {
+                    refreshSubscriptionGroup(subscriptionId)
+                    true
+                }
+                else -> false
+            }
+        }
+        popup.show()
+    }
+
+    private fun openHomeServerEditor(guid: String, subscriptionId: String) {
+        val profile = MmkvManager.decodeServerConfig(guid) ?: return
+        val intent = Intent(this, ServerActivity::class.java)
+            .putExtra("guid", guid)
+            .putExtra("subscriptionId", subscriptionId)
+            .putExtra("isRunning", mainViewModel.isRunning.value == true)
+            .putExtra("createConfigType", profile.configType.value)
+        startActivity(intent)
     }
 
     fun selectServerFromPicker(guid: String) {
@@ -338,7 +413,6 @@ class MainActivity : HelperBaseActivity() {
         }
         refreshDaysRemaining()
         refreshServerPickerBar()
-        closeServerPicker()
         showHomeScreen()
     }
 
@@ -346,52 +420,28 @@ class MainActivity : HelperBaseActivity() {
         showingServerScreen = false
         binding.layoutServerScreen.isVisible = false
         homePanel.root.isVisible = true
+        setHomeAppBarVisible(false)
+        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         title = getString(R.string.title_server)
+        syncHappHomeLayout()
     }
 
     fun showServerScreen() {
         showingServerScreen = true
         homePanel.root.isVisible = false
         binding.layoutServerScreen.isVisible = true
+        setHomeAppBarVisible(true)
+        binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
         title = getString(R.string.jumpjump_servers_title)
     }
 
+    private fun setHomeAppBarVisible(visible: Boolean) {
+        (binding.toolbar.parent as? android.view.View)?.isVisible = visible
+    }
+
     fun refreshServerPickerBar() {
-        val guid = MmkvManager.getSelectServer()
-        if (guid.isNullOrEmpty()) {
-            serverPicker.tvServerName.text = getString(R.string.sumrax_no_server_selected)
-            serverPicker.tvServerSubtitle.text = ""
-            serverPicker.tvServerPing.isVisible = false
-            serverPicker.tvServerFlag.text = "🌐"
-            return
-        }
-
-        val config = MmkvManager.decodeServerConfig(guid)
-        val remarks = config?.remarks.orEmpty()
-        serverPicker.tvServerName.text = remarks.ifBlank { config?.server.orEmpty() }
-        val address = config?.getServerAddressAndPort().orEmpty()
-        if (address.isNotBlank()) {
-            serverPicker.tvServerSubtitle.isVisible = true
-            serverPicker.tvServerSubtitle.text = address
-        } else {
-            serverPicker.tvServerSubtitle.isVisible = false
-        }
-        serverPicker.tvServerFlag.text = extractLeadingEmoji(remarks) ?: "🌐"
-
-        val delay = MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
-        when {
-            delay > 0L -> {
-                serverPicker.tvServerPing.isVisible = true
-                serverPicker.tvServerPing.text = "${delay}ms"
-                serverPicker.tvServerPing.setTextColor(ContextCompat.getColor(this, R.color.sumrax_success))
-            }
-            delay < 0L -> {
-                serverPicker.tvServerPing.isVisible = true
-                serverPicker.tvServerPing.text = "—"
-                serverPicker.tvServerPing.setTextColor(ContextCompat.getColor(this, R.color.sumrax_error))
-            }
-            else -> serverPicker.tvServerPing.isVisible = false
-        }
+        homeServerAdapter.notifyDataSetChanged()
+        syncHappHomeLayout()
     }
 
     private fun extractLeadingEmoji(text: String): String? {
@@ -494,7 +544,6 @@ class MainActivity : HelperBaseActivity() {
                     binding.drawerLayout.isDrawerOpen(GravityCompat.START) -> {
                         binding.drawerLayout.closeDrawer(GravityCompat.START)
                     }
-                    pickerOpen -> closeServerPicker()
                     showingServerScreen -> showHomeScreen()
                     else -> {
                         isEnabled = false
@@ -553,7 +602,7 @@ class MainActivity : HelperBaseActivity() {
         mainViewModel.updateListAction.observe(this) {
             refreshDaysRemaining()
             refreshServerPickerBar()
-            if (pickerOpen) refreshPickerList()
+            refreshPickerList()
         }
         mainViewModel.isRunning.observe(this) { isRunning ->
             if (isRunning) {
@@ -603,19 +652,7 @@ class MainActivity : HelperBaseActivity() {
             ?: selectedProfile?.subscriptionId
             ?: fallback?.let { MmkvManager.decodeServerConfig(it.first)?.subscriptionId }
 
-        val days = ProfileRemarkParser.resolveLiveRemainingDays(remarks, subscriptionId, guid)
-        if (days != null) {
-            binding.layoutDaysRemaining.isVisible = true
-            binding.tvDaysRemaining.text = ProfileRemarkParser.formatRemainingDays(this, days)
-            val colorRes = when {
-                days <= 3 -> R.color.sumrax_error
-                days <= 7 -> R.color.sumrax_warning
-                else -> R.color.colorPing
-            }
-            binding.tvDaysRemaining.setTextColor(ContextCompat.getColor(this, colorRes))
-        } else {
-            binding.layoutDaysRemaining.isVisible = false
-        }
+        binding.layoutDaysRemaining.isVisible = false
     }
 
     private fun findFirstProfileWithDays(): Pair<String, String>? {
@@ -830,7 +867,7 @@ class MainActivity : HelperBaseActivity() {
         mainViewModel.testAllPingWithSort(
             onStatus = { status ->
                 if (generation != smartConnectGeneration) return@testAllPingWithSort
-                homePanel.tvHomeStatusSubtitle.text = status
+                homePanel.tvTestCurrentConfig.text = status
             },
             onComplete = { message ->
                 if (generation != smartConnectGeneration) return@testAllPingWithSort
@@ -852,11 +889,6 @@ class MainActivity : HelperBaseActivity() {
                 }
 
                 refreshServerPickerBar()
-                homePanel.tvHomeStatusSubtitle.text = getString(
-                    R.string.sumrax_smart_found,
-                    best.remarks,
-                    best.pingMs.toInt()
-                )
                 beginServiceConnect()
             }
         )
@@ -935,37 +967,10 @@ class MainActivity : HelperBaseActivity() {
         val isRunning = connectionUiState == ConnectionUiState.CONNECTED
         val isConnecting = connectionUiState == ConnectionUiState.CONNECTING
 
-        homePanel.laptopHero.heroState = when (connectionUiState) {
-            ConnectionUiState.CONNECTED -> LaptopHeroView.HeroState.CONNECTED
-            ConnectionUiState.CONNECTING -> LaptopHeroView.HeroState.CONNECTING
-            ConnectionUiState.ERROR, ConnectionUiState.DISCONNECTED -> LaptopHeroView.HeroState.IDLE
-        }
-
-        homePanel.tvHomeStatusTitle.text = when {
-            isSmartScanning -> getString(R.string.sumrax_smart_scanning)
-            connectionUiState == ConnectionUiState.CONNECTED -> getString(R.string.jumpjump_connected)
-            connectionUiState == ConnectionUiState.CONNECTING -> getString(R.string.jumpjump_connecting)
-            connectionUiState == ConnectionUiState.ERROR -> getString(R.string.sumrax_connection_failed)
-            else -> getString(R.string.jumpjump_not_connected)
-        }
-
-        homePanel.tvHomeStatusTitle.setTextColor(
-            ContextCompat.getColor(
-                this,
-                when (connectionUiState) {
-                    ConnectionUiState.CONNECTED -> R.color.sumrax_success
-                    ConnectionUiState.CONNECTING -> R.color.sumrax_accent
-                    ConnectionUiState.ERROR, ConnectionUiState.DISCONNECTED -> R.color.sumrax_error
-                }
-            )
-        )
-
-        homePanel.tvHomeStatusSubtitle.text = when {
-            isSmartScanning -> getString(R.string.sumrax_smart_cancel_hint)
-            isRunning -> getString(R.string.jumpjump_tap_mac_disconnect)
-            isConnecting -> getString(R.string.jumpjump_connecting)
-            SettingsManager.isSmartConnectionMode() -> getString(R.string.sumrax_smart_tap_hint)
-            else -> getString(R.string.sumrax_manual_tap_hint)
+        homePanel.btnPower.powerState = when (connectionUiState) {
+            ConnectionUiState.CONNECTED -> HappPowerButtonView.PowerState.CONNECTED
+            ConnectionUiState.CONNECTING -> HappPowerButtonView.PowerState.CONNECTING
+            ConnectionUiState.ERROR, ConnectionUiState.DISCONNECTED -> HappPowerButtonView.PowerState.IDLE
         }
 
         val error = connectionErrorMessage
@@ -983,9 +988,10 @@ class MainActivity : HelperBaseActivity() {
 
     override fun onResume() {
         super.onResume()
+        refreshHappHomeHwid()
+        homePanel.connectionModeSwitch.isSmartMode = SettingsManager.isSmartConnectionMode()
         refreshDaysRemaining()
-        refreshServerPickerBar()
-        homePanel.modeSwitch.isVpnMode = SettingsManager.isVpnMode()
+        refreshPickerList()
         updateNavModeBadge()
         applyConnectionUi()
     }

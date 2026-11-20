@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_send_hwid_header"
+        android:summary="@string/summary_pref_send_hwid_header"
+        android:title="@string/title_pref_send_hwid_header" />
+
+    <EditTextPreference
+        android:key="pref_hwid_custom_value"
+        android:summary="@string/summary_pref_hwid_custom_value"
+        android:title="@string/title_pref_hwid_custom_value" />
+
+</PreferenceScreen>

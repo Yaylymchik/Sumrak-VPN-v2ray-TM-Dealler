@@ -10,6 +10,7 @@ import com.v2ray.ang.databinding.ItemPickerServerBinding
 import com.v2ray.ang.dto.entities.ServersCache
 import com.v2ray.ang.handler.MmkvManager
 import com.v2ray.ang.handler.ServerListsManager
+import com.v2ray.ang.util.ServerDisplayName
 
 class PickerServerAdapter(
     private val onSelect: (String) -> Unit,
@@ -43,9 +44,7 @@ class PickerServerAdapter(
             val guid = item.guid
             val profile = item.profile
             val isSelected = guid == MmkvManager.getSelectServer()
-            val isFavorite = ServerListsManager.isFavorite(guid)
-
-            binding.tvPickerName.text = profile.remarks.ifBlank { profile.server }
+            binding.tvPickerName.text = ServerDisplayName.fromProfile(profile.remarks, profile.server)
             binding.tvPickerSubtitle.isVisible = false
 
             val aff = MmkvManager.decodeServerAffiliationInfo(guid)
@@ -54,39 +53,21 @@ class PickerServerAdapter(
                 delay > 0L -> {
                     binding.tvPickerPing.isVisible = true
                     binding.tvPickerPing.text = context.getString(R.string.sumrax_ping_ms, delay)
-                    binding.tvPickerPing.setTextColor(ContextCompat.getColor(context, R.color.sumrax_success))
+                    binding.tvPickerPing.setTextColor(ContextCompat.getColor(context, R.color.happ_ping_ok))
                 }
                 delay < 0L -> {
                     binding.tvPickerPing.isVisible = true
                     binding.tvPickerPing.text = "—"
-                    binding.tvPickerPing.setTextColor(ContextCompat.getColor(context, R.color.sumrax_error))
+                    binding.tvPickerPing.setTextColor(ContextCompat.getColor(context, R.color.happ_settings_red))
                 }
                 else -> binding.tvPickerPing.isVisible = false
             }
 
-            binding.btnFavorite.setImageResource(
-                if (isFavorite) R.drawable.ic_star_24dp else R.drawable.ic_star_border_24dp
-            )
-            binding.btnFavorite.imageTintList = ContextCompat.getColorStateList(
-                context,
-                if (isFavorite) R.color.sumrax_accent else R.color.sumrax_text_tertiary
-            )
-            binding.btnFavorite.setOnClickListener {
-                ServerListsManager.toggleFavorite(guid)
-                onFavoriteChanged?.invoke()
-                notifyItemChanged(bindingAdapterPosition)
-            }
+            binding.configActivated.isVisible = isSelected
+            binding.btnFavorite.isVisible = false
 
-            binding.itemPickerRoot.setBackgroundResource(
-                if (isSelected) R.drawable.bg_glass_profile_selected else R.drawable.bg_glass_profile_item
-            )
+            binding.btnServerForward.setOnClickListener { onSelect(guid) }
             binding.itemPickerRoot.setOnClickListener { onSelect(guid) }
-            binding.itemPickerRoot.setOnLongClickListener {
-                ServerListsManager.toggleFavorite(guid)
-                onFavoriteChanged?.invoke()
-                notifyItemChanged(bindingAdapterPosition)
-                true
-            }
         }
     }
 }
