@@ -28,6 +28,9 @@ V2rayNG/local.properties
 
 # Ignore signing properties
 signing.properties
+V2rayNG/gradle.properties
+fastlane/play-store-credentials.json
+fastlane/report.xml
 
 # Ignore shared object files (keep bundled jni if present)
 *.so

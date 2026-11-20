@@ -1,0 +1,46 @@
+default_platform(:android)
+
+platform :android do
+  PROJECT_DIR = File.expand_path("../V2rayNG", __dir__)
+  AAB_PATH = File.join(
+    PROJECT_DIR,
+    "app/build/outputs/bundle/playstoreRelease/app-playstore-release.aab"
+  )
+
+  desc "Build signed Play Store App Bundle (playstoreRelease)"
+  lane :build_bundle do
+    gradle(
+      project_dir: PROJECT_DIR,
+      task: "bundle",
+      build_type: "Release",
+      flavor: "playstore",
+    )
+    UI.success("AAB: #{AAB_PATH}")
+  end
+
+  desc "Upload AAB + metadata to Internal testing track"
+  lane :upload_internal do
+    build_bundle unless File.exist?(AAB_PATH)
+    upload_to_play_store(
+      track: "internal",
+      aab: AAB_PATH,
+      skip_upload_apk: true,
+      skip_upload_metadata: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+
+  desc "Upload AAB to Production (use after review)"
+  lane :upload_production do
+    build_bundle unless File.exist?(AAB_PATH)
+    upload_to_play_store(
+      track: "production",
+      aab: AAB_PATH,
+      skip_upload_apk: true,
+      skip_upload_metadata: false,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+    )
+  end
+end

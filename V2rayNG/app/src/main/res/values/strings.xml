@@ -299,6 +299,8 @@
     <string name="notification_app_update_ready_title">Sumrak VPN %1$s is ready</string>
     <string name="notification_app_update_ready_body">Tap Install to update the app</string>
     <string name="notification_app_update_install">Install</string>
+    <string name="notification_push_open">Open</string>
+    <string name="notification_channel_push_messages">Push messages</string>
     <string name="title_pref_app_update_api_url">App update API URL</string>
     <string name="summary_pref_app_update_api_url">GitHub releases API, e.g. https://api.github.com/repos/YOU/SumraX/releases</string>
     <string name="summary_pref_check_update_now">Download the latest APK if available</string>

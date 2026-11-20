@@ -8,6 +8,7 @@ plugins {
 buildscript {
     dependencies {
         classpath(libs.gradle.license.plugin)
+        classpath(libs.google.services)
     }
 }
 

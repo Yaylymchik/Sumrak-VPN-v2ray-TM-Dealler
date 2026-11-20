@@ -23,5 +23,10 @@ enum class NotificationChannelType(
         channelId = "app_update_channel",
         channelName = "App updates",
         notificationId = 14
-    )
+    ),
+    PUSH_MESSAGE(
+        channelId = "push_message_channel",
+        channelName = "Push messages",
+        notificationId = 15
+    ),
 }

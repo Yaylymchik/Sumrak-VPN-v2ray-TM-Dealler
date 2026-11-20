@@ -162,6 +162,12 @@ android {
         }
     }
 
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
 }
 
 dependencies {
@@ -221,4 +227,11 @@ dependencies {
     testImplementation(libs.org.mockito.mockito.inline)
     testImplementation(libs.mockito.kotlin)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.messaging)
+}
+
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
 }

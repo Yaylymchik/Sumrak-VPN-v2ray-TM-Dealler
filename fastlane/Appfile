@@ -1,0 +1,2 @@
+json_key_file(ENV["PLAY_STORE_JSON"] || File.join(__dir__, "play-store-credentials.json"))
+package_name("com.sumrax.app")

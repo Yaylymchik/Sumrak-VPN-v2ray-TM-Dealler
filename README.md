@@ -10,6 +10,18 @@ Repository: [Yaylymchik/Sumrak-VPN-v2ray-TM-Dealler](https://github.com/Yaylymch
 2. Sync Gradle and build the `playstoreDebug` / release variant.
 3. Core library: `V2rayNG/app/libs/libv2ray.aar` (rebuild from [AndroidLibXrayLite](https://github.com/2dust/AndroidLibXrayLite) if needed).
 
+## Google Play
+
+Package **`com.sumrax.app`**. Release bundle:
+
+```bash
+cd V2rayNG && ./gradlew :app:bundlePlaystoreRelease
+```
+
+Output: `app/build/outputs/bundle/playstoreRelease/app-playstore-release.aab`. Signing: see `V2rayNG/gradle.properties.example`.
+
+Step-by-step (RU): [docs/PLAYSTORE.md](docs/PLAYSTORE.md). Store listing texts: `fastlane/metadata/android/`. Privacy: [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
+
 ## App updates
 
 In-app update checks use GitHub Releases API:

@@ -1,0 +1,10 @@
+# Copy to gradle.properties (do not commit secrets)
+
+# Release signing for Play Store / production APK
+SUMRAX_STORE_FILE=D:/path/to/sumrak-release.jks
+SUMRAX_STORE_PASSWORD=change-me
+SUMRAX_KEY_ALIAS=sumrax
+SUMRAX_KEY_PASSWORD=change-me
+
+# Optional: build single ABI
+# ABI_FILTERS=arm64-v8a

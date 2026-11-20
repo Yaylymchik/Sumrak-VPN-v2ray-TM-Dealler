@@ -144,7 +144,8 @@ object NotificationHelper {
         if (notificationManager.getNotificationChannel(channelType.channelId) != null) return
 
         val importance = when (channelType) {
-            NotificationChannelType.APP_UPDATE -> NotificationManager.IMPORTANCE_DEFAULT
+            NotificationChannelType.APP_UPDATE,
+            NotificationChannelType.PUSH_MESSAGE -> NotificationManager.IMPORTANCE_DEFAULT
             else -> NotificationManager.IMPORTANCE_LOW
         }
         val channel = NotificationChannel(
@@ -170,14 +171,23 @@ object NotificationHelper {
         }
 
         val displayTitle = title.ifEmpty { context.getString(R.string.app_name) }
+        val priority = when (channelType) {
+            NotificationChannelType.APP_UPDATE,
+            NotificationChannelType.PUSH_MESSAGE -> NotificationCompat.PRIORITY_DEFAULT
+            else -> NotificationCompat.PRIORITY_LOW
+        }
+        val category = when (channelType) {
+            NotificationChannelType.PUSH_MESSAGE -> NotificationCompat.CATEGORY_MESSAGE
+            else -> NotificationCompat.CATEGORY_SERVICE
+        }
         return NotificationCompat.Builder(context, channelId)
             .setSmallIcon(SumraXNotificationIcons.smallIcon(context))
             .setContentTitle(displayTitle)
             .setContentText(content)
             .setOngoing(false)
             .setOnlyAlertOnce(true)
-            .setPriority(NotificationCompat.PRIORITY_LOW)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(priority)
+            .setCategory(category)
     }
 }
 
