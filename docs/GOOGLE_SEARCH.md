@@ -6,7 +6,12 @@
 2. Через несколько минут сайт: `https://yaylymchik.github.io/Sumrak-VPN-v2ray-TM-Dealler/`
 3. Файлы: `docs/index.html`, `docs/robots.txt`, `docs/sitemap.xml`.
 
-## Google Search Console
+## Статус
+
+- **GitHub Pages:** https://yaylymchik.github.io/Sumrak-VPN-v2ray-TM-Dealler/ (включён, деплой через Actions)
+- **IndexNow:** после каждого деплоя workflow шлёт URL в Bing / Yandex (см. `.github/workflows/pages.yml`)
+
+## Google Search Console (нужен ваш Google-аккаунт)
 
 1. [Google Search Console](https://search.google.com/search-console)
 2. Добавьте ресурс (URL префикс): `https://yaylymchik.github.io/Sumrak-VPN-v2ray-TM-Dealler/`
