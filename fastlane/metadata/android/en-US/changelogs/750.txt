@@ -1,0 +1,1 @@
+Sumrak VPN 2.2.20: default Proxy (GET) ping, mux and fragment off by default, home remaining-days watch widget, profile tunnel settings on connect.
