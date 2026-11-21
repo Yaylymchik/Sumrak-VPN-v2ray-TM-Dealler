@@ -72,24 +72,29 @@ jobs:
           cp -r libs V2rayNG/app/
 
       - name: Decode signing keystore
-        if: ${{ secrets.APP_KEYSTORE_BASE64 != '' }}
         uses: timheuer/base64-to-file@v2.0.0
         id: android_keystore
+        continue-on-error: true
         with:
           fileName: android_keystore.jks
           encodedString: ${{ secrets.APP_KEYSTORE_BASE64 }}
 
       - name: Build Play Store AAB
+        env:
+          KS_PATH: ${{ steps.android_keystore.outputs.filePath }}
+          KS_PASS: ${{ secrets.APP_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.APP_KEYSTORE_ALIAS }}
+          KEY_PASS: ${{ secrets.APP_KEY_PASSWORD }}
         run: |
           cd "${{ github.workspace }}/V2rayNG"
           echo "sdk.dir=${ANDROID_HOME}" > local.properties
           chmod +x gradlew
-          if [ -n "${{ secrets.APP_KEYSTORE_BASE64 }}" ]; then
+          if [ -n "${KS_PATH}" ] && [ -f "${KS_PATH}" ]; then
             ./gradlew :app:bundlePlaystoreRelease \
-              -Pandroid.injected.signing.store.file="${{ steps.android_keystore.outputs.filePath }}" \
-              -Pandroid.injected.signing.store.password="${{ secrets.APP_KEYSTORE_PASSWORD }}" \
-              -Pandroid.injected.signing.key.alias="${{ secrets.APP_KEYSTORE_ALIAS }}" \
-              -Pandroid.injected.signing.key.password="${{ secrets.APP_KEY_PASSWORD }}"
+              -Pandroid.injected.signing.store.file="${KS_PATH}" \
+              -Pandroid.injected.signing.store.password="${KS_PASS}" \
+              -Pandroid.injected.signing.key.alias="${KEY_ALIAS}" \
+              -Pandroid.injected.signing.key.password="${KEY_PASS}"
           else
             ./gradlew :app:bundlePlaystoreRelease
           fi
@@ -101,37 +106,24 @@ jobs:
           path: V2rayNG/app/build/outputs/bundle/playstoreRelease/*.aab
           if-no-files-found: error
 
-      - name: Write Play service account
-        if: ${{ secrets.PLAY_STORE_JSON_BASE64 != '' }}
-        run: |
-          echo "${{ secrets.PLAY_STORE_JSON_BASE64 }}" | base64 -d > "${{ github.workspace }}/fastlane/play-store-credentials.json"
-
-      - name: Setup Ruby + Fastlane
-        if: ${{ secrets.PLAY_STORE_JSON_BASE64 != '' }}
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.3'
-
-      - name: Fastlane supply
-        if: ${{ secrets.PLAY_STORE_JSON_BASE64 != '' }}
+      - name: Upload to Play (fastlane)
         env:
-          PLAY_STORE_JSON: ${{ github.workspace }}/fastlane/play-store-credentials.json
+          PLAY_JSON_B64: ${{ secrets.PLAY_STORE_JSON_BASE64 }}
           SUPPLY_TRACK: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.track || 'internal' }}
         run: |
+          if [ -z "${PLAY_JSON_B64}" ]; then
+            echo "PLAY_STORE_JSON_BASE64 is not set — AAB saved as artifact only."
+            exit 0
+          fi
+          echo "${PLAY_JSON_B64}" | base64 -d > "${{ github.workspace }}/fastlane/play-store-credentials.json"
           gem install fastlane -N --no-document
           fastlane run upload_to_play_store \
             track:"${SUPPLY_TRACK}" \
             aab:"${{ github.workspace }}/V2rayNG/app/build/outputs/bundle/playstoreRelease/app-playstore-release.aab" \
             package_name:"com.sumrax.app" \
-            json_key:"${PLAY_STORE_JSON}" \
+            json_key:"${{ github.workspace }}/fastlane/play-store-credentials.json" \
             metadata_path:"${{ github.workspace }}/fastlane/metadata/android" \
             skip_upload_apk:true \
             skip_upload_metadata:false \
             skip_upload_images:true \
             skip_upload_screenshots:true
-
-      - name: Play API skipped
-        if: ${{ secrets.PLAY_STORE_JSON_BASE64 == '' }}
-        run: |
-          echo "PLAY_STORE_JSON_BASE64 is not set — AAB saved as artifact only."
-          echo "After Play Console setup, add the service account JSON secret and re-run workflow."
