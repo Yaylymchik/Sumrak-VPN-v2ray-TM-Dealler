@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings switch track, SumraX accent -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="#61FFD600" android:state_checked="true" android:state_enabled="false" />
+    <item android:color="@color/sumrax_accent_alpha_33" android:state_checked="true" />
+    <item android:color="#618996A2" android:state_checked="false" android:state_enabled="false" />
+    <item android:color="#FF8996A2" android:state_checked="false" />
+</selector>

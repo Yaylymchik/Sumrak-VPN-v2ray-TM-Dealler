@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net8.0-windows10.0.19041.0;net6.0-windows7.0</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <RootNamespace>SumraX.App</RootNamespace>
+    <AssemblyName>Sumrak VPN</AssemblyName>
+    <ApplicationIcon>Assets\sumrax.ico</ApplicationIcon>
+    <Description>Premium VPN client powered by Xray-core</Description>
+    <Version>2.2.21</Version>
+    <AssemblyVersion>2.2.21.0</AssemblyVersion>
+    <FileVersion>2.2.21.0</FileVersion>
+    <InformationalVersion>2.2.21</InformationalVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net6.0-windows7.0'">
+    <ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
+  </PropertyGroup>
+  <!-- Self-contained single-file publish (Win10+ builds only; Win7 uses framework-dependent) -->
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != '' AND '$(TargetFramework)' == 'net8.0-windows10.0.19041.0'">
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(RuntimeIdentifier)' != '' AND '$(TargetFramework)' == 'net6.0-windows7.0'">
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+    <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+    <PackageReference Include="NLog" Version="5.3.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SumraX.Infrastructure\SumraX.Infrastructure.csproj" />
+    <ProjectReference Include="..\SumraX.Localization\SumraX.Localization.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Assets\sumrax-icon.png" />
+    <Resource Include="Assets\sumrax-icon-32.png" />
+    <Resource Include="Assets\sumrax-icon-48.png" />
+    <Resource Include="Assets\sumrax-icon-64.png" />
+    <Resource Include="Assets\sumrax-logo.png" CopyToOutputDirectory="Never" />
+  </ItemGroup>
+  <!-- Bundled cores (offline) -->
+  <ItemGroup>
+    <Content Include="..\..\runtime\xray\**\*" Condition="Exists('..\..\runtime\xray\xray.exe')">
+      <Link>bin\xray\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\..\runtime\sing-box\**\*" Condition="Exists('..\..\runtime\sing-box\sing-box.exe')">
+      <Link>bin\sing-box\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="..\..\runtime\tun2\**\*" Condition="Exists('..\..\runtime\tun2\tun2proxy-bin.exe')">
+      <Link>bin\tun2\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+</Project>

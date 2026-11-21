@@ -1,0 +1,74 @@
+<UserControl x:Class="SumraX.App.Views.SecurityView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrl="clr-namespace:SumraX.App.Views.Controls"
+             xmlns:conv="clr-namespace:SumraX.App.Converters">
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolVis"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolVis"/>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20,16">
+        <StackPanel MaxWidth="520" HorizontalAlignment="Center">
+
+            <TextBlock Text="{Binding PageTitle}" FontFamily="{StaticResource MonoFont}" FontSize="13" FontWeight="Bold"
+                       Foreground="{DynamicResource NeonBlueBrush}" Margin="0,0,0,4"/>
+            <TextBlock Text="{Binding PageSubtitle}" FontFamily="{StaticResource PrimaryFont}" FontSize="12"
+                       Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" Margin="0,0,0,14"/>
+
+            <!-- Status card -->
+            <Border Style="{StaticResource HudCard}" Padding="14,12" Margin="0,0,0,12">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <ctrl:GlowIcon Kind="Shield" Tone="Green" Width="28" Height="28" Margin="0,0,12,0"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding IsProtected, Converter={StaticResource BoolVis}}"/>
+                    <ctrl:GlowIcon Kind="Shield" Tone="Amber" Width="28" Height="28" Margin="0,0,12,0"
+                                   VerticalAlignment="Center"
+                                   Visibility="{Binding IsProtected, Converter={StaticResource InverseBoolVis}}"/>
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding StatusTitle}" FontFamily="{StaticResource MonoFont}" FontSize="12" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding StatusDetail}" FontFamily="{StaticResource PrimaryFont}" FontSize="12"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,3,0,0"/>
+                        <TextBlock FontFamily="{StaticResource MonoFont}" FontSize="10"
+                                   Foreground="{DynamicResource NeonBlueBrush}" Margin="0,6,0,0">
+                            <Run Text="{Binding ModeLabel}"/>
+                            <Run Text="  ·  "/>
+                            <Run Text="{Binding ServerLabel}"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Protection toggles -->
+            <Border Style="{StaticResource GlassCard}" Padding="4,2" Margin="0,0,0,12">
+                <StackPanel>
+                    <ctrl:SettingsToggleRow Title="{Binding KillSwitchLabel}"
+                                            Description="{Binding KillSwitchDesc}"
+                                            IsChecked="{Binding KillSwitchEnabled, Mode=TwoWay}"/>
+                    <TextBlock Text="{Binding KillSwitchDesc}" FontFamily="{StaticResource PrimaryFont}" FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"
+                               Margin="12,0,12,8"/>
+                    <ctrl:SettingsToggleRow Title="{Binding DnsLeakLabel}"
+                                            IsChecked="{Binding DnsLeakProtection, Mode=TwoWay}"/>
+                    <TextBlock Text="{Binding DnsLeakDesc}" FontFamily="{StaticResource PrimaryFont}" FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"
+                               Margin="12,0,12,8"/>
+                    <ctrl:SettingsToggleRow Title="{Binding AutoReconnectLabel}"
+                                            IsChecked="{Binding AutoReconnect, Mode=TwoWay}"/>
+                    <TextBlock Text="{Binding AutoReconnectDesc}" FontFamily="{StaticResource PrimaryFont}" FontSize="11"
+                               Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap"
+                               Margin="12,0,12,10"/>
+                </StackPanel>
+            </Border>
+
+            <Button Content="{Binding OpenSpeedLabel}" Style="{StaticResource SecondaryButton}"
+                    Command="{Binding OpenSpeedTestCommand}"
+                    HorizontalAlignment="Stretch" Padding="12,10" FontSize="12"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

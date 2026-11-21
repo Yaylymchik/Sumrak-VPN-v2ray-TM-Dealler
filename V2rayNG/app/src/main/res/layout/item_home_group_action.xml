@@ -10,7 +10,7 @@
     android:gravity="center_vertical"
     android:minHeight="52dp"
     android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/happ_activity_horizontal_margin"
+    android:paddingHorizontal="@dimen/sumrax_ui_activity_horizontal_margin"
     android:paddingVertical="12dp">
 
     <ImageView
@@ -18,7 +18,7 @@
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:importantForAccessibility="no"
-        app:tint="@color/happ_icon_primary"
+        app:tint="@color/sumrax_ui_icon_primary"
         tools:src="@drawable/ic_settings_24dp" />
 
     <TextView
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_weight="1"
-        android:textColor="@color/happ_text_primary"
+        android:textColor="@color/sumrax_ui_text_primary"
         android:textSize="16sp"
         android:textStyle="bold"
         tools:text="Settings" />

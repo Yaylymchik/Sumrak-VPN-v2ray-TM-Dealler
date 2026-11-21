@@ -53,12 +53,12 @@ class PickerServerAdapter(
                 delay > 0L -> {
                     binding.tvPickerPing.isVisible = true
                     binding.tvPickerPing.text = context.getString(R.string.sumrax_ping_ms, delay)
-                    binding.tvPickerPing.setTextColor(ContextCompat.getColor(context, R.color.happ_ping_ok))
+                    binding.tvPickerPing.setTextColor(ContextCompat.getColor(context, R.color.sumrax_ui_ping_ok))
                 }
                 delay < 0L -> {
                     binding.tvPickerPing.isVisible = true
                     binding.tvPickerPing.text = "—"
-                    binding.tvPickerPing.setTextColor(ContextCompat.getColor(context, R.color.happ_settings_red))
+                    binding.tvPickerPing.setTextColor(ContextCompat.getColor(context, R.color.sumrax_ui_settings_red))
                 }
                 else -> binding.tvPickerPing.isVisible = false
             }

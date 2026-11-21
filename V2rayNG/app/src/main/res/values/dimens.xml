@@ -15,12 +15,12 @@
     <dimen name="sumrax_chip_radius">4dp</dimen>
     <dimen name="sumrax_drawer_width">300dp</dimen>
     <dimen name="jumpjump_power_btn_size">156dp</dimen>
-    <dimen name="happ_toolbar_icon_size">28dp</dimen>
-    <dimen name="happ_power_max_size">217dp</dimen>
+    <dimen name="sumrax_ui_toolbar_icon_size">28dp</dimen>
+    <dimen name="sumrax_ui_power_max_size">217dp</dimen>
     <dimen name="watch_days_size">52dp</dimen>
-    <dimen name="happ_main_content_padding_secondary">10dp</dimen>
-    <dimen name="happ_main_recycler_margin">40dp</dimen>
-    <dimen name="happ_activity_horizontal_margin">16dp</dimen>
-    <dimen name="happ_settings_divider_height">1dp</dimen>
+    <dimen name="sumrax_ui_main_content_padding_secondary">10dp</dimen>
+    <dimen name="sumrax_ui_main_recycler_margin">40dp</dimen>
+    <dimen name="sumrax_ui_activity_horizontal_margin">16dp</dimen>
+    <dimen name="sumrax_ui_settings_divider_height">1dp</dimen>
     <dimen name="sumrax_icon_btn_size">36dp</dimen>
 </resources>

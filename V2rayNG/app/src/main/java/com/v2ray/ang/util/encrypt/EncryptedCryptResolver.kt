@@ -28,7 +28,7 @@ object EncryptedCryptResolver {
     }
 
     /**
-     * Decrypts happ/sumrax crypt deeplinks. Returns the original [value] when it is not encrypted.
+     * Decrypts encrypted crypt deeplinks (`happ://`, `sumrax://`, …). Returns the original [value] when it is not encrypted.
      * Returns null when decryption fails.
      */
     fun resolve(value: String?): String? {
@@ -53,7 +53,7 @@ object EncryptedCryptResolver {
         return null
     }
 
-    /** Normalizes clipboard / intent deeplinks (Happ uses plain prefix stripping, not Uri). */
+    /** Normalizes clipboard / intent deeplinks (plain prefix stripping, not Uri). */
     fun canonicalize(value: String): String {
         var trimmed = value.trim()
         if (trimmed.contains('#')) {

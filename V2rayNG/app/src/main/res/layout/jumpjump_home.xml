@@ -18,8 +18,8 @@
 
         <ImageButton
             android:id="@+id/toolbar_main_settings"
-            android:layout_width="@dimen/happ_toolbar_icon_size"
-            android:layout_height="@dimen/happ_toolbar_icon_size"
+            android:layout_width="@dimen/sumrax_ui_toolbar_icon_size"
+            android:layout_height="@dimen/sumrax_ui_toolbar_icon_size"
             android:layout_marginStart="@dimen/padding_spacing_dp16"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/sumrax_nav_settings"
@@ -31,9 +31,9 @@
 
         <ImageButton
             android:id="@+id/toolbar_main_add"
-            android:layout_width="@dimen/happ_toolbar_icon_size"
-            android:layout_height="@dimen/happ_toolbar_icon_size"
-            android:layout_marginEnd="@dimen/happ_activity_horizontal_margin"
+            android:layout_width="@dimen/sumrax_ui_toolbar_icon_size"
+            android:layout_height="@dimen/sumrax_ui_toolbar_icon_size"
+            android:layout_marginEnd="@dimen/sumrax_ui_activity_horizontal_margin"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:contentDescription="@string/sumrax_import"
             android:src="@drawable/ic_add_main_24dp"
@@ -110,7 +110,7 @@
             android:layout_width="@dimen/watch_days_size"
             android:layout_height="@dimen/watch_days_size"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="@dimen/happ_activity_horizontal_margin"
+            android:layout_marginEnd="@dimen/sumrax_ui_activity_horizontal_margin"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?attr/selectableItemBackgroundBorderless"
@@ -137,14 +137,14 @@
             app:layout_constraintBottom_toBottomOf="@id/guideline_power_height_max"
             app:layout_constraintDimensionRatio="1:1"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHeight_max="@dimen/happ_power_max_size"
+            app:layout_constraintHeight_max="@dimen/sumrax_ui_power_max_size"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/barrier_below_mode"
             app:layout_constraintVertical_bias="0"
-            app:layout_constraintWidth_max="@dimen/happ_power_max_size"
-            app:srcCompat="@drawable/ic_happ_power_circle" />
+            app:layout_constraintWidth_max="@dimen/sumrax_ui_power_max_size"
+            app:srcCompat="@drawable/ic_sumrax_power_circle" />
 
-        <com.v2ray.ang.ui.HappPowerButtonView
+        <com.v2ray.ang.ui.SumrakPowerButtonView
             android:id="@+id/btn_power"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -175,8 +175,8 @@
             android:id="@+id/fl_geo_progress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/happ_main_content_padding_secondary"
-            android:layout_marginTop="@dimen/happ_main_recycler_margin"
+            android:layout_marginHorizontal="@dimen/sumrax_ui_main_content_padding_secondary"
+            android:layout_marginTop="@dimen/sumrax_ui_main_recycler_margin"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -194,15 +194,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginEnd="@dimen/happ_main_content_padding_secondary"
+            android:layout_marginEnd="@dimen/sumrax_ui_main_content_padding_secondary"
             android:alpha="0.6"
-            android:background="@drawable/bg_happ_text_on_main_rounded"
+            android:background="@drawable/bg_sumrax_text_on_main_rounded"
             android:clickable="true"
             android:focusable="true"
             android:paddingHorizontal="12dp"
             android:paddingVertical="6dp"
             android:text="@string/hide_everything"
-            android:textColor="@color/happ_hint_gray"
+            android:textColor="@color/sumrax_ui_hint_gray"
             android:textSize="12sp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
@@ -214,7 +214,7 @@
             android:id="@+id/rl_config_groups"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginHorizontal="@dimen/happ_activity_horizontal_margin"
+            android:layout_marginHorizontal="@dimen/sumrax_ui_activity_horizontal_margin"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
             android:visibility="gone"
@@ -247,7 +247,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_ai_helper"
-                style="@style/Widget.Happ.MainTextButton"
+                style="@style/Widget.Sumrax.MainTextButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
@@ -261,7 +261,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
-                android:background="@drawable/bg_happ_text_on_main_rounded"
+                android:background="@drawable/bg_sumrax_text_on_main_rounded"
                 android:clickable="true"
                 android:focusable="true"
                 android:gravity="center_vertical"
@@ -274,7 +274,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-light"
-                    android:textColor="@color/happ_text_secondary"
+                    android:textColor="@color/sumrax_ui_text_secondary"
                     android:textSize="13sp"
                     tools:text="HWID: abc" />
 
@@ -285,7 +285,7 @@
                     android:layout_marginStart="8dp"
                     android:contentDescription="@string/about_hwid"
                     android:src="@drawable/ic_copy"
-                    app:tint="@color/happ_text_primary" />
+                    app:tint="@color/sumrax_ui_text_primary" />
             </LinearLayout>
 
             <TextView
@@ -296,7 +296,7 @@
                 android:fontFamily="sans-serif-light"
                 android:gravity="center"
                 android:text="@string/servers_hint"
-                android:textColor="@color/happ_text_secondary"
+                android:textColor="@color/sumrax_ui_text_secondary"
                 android:textSize="14sp" />
 
             <LinearLayout
@@ -309,7 +309,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_clipboard"
-                    style="@style/Widget.Happ.MainTextButton"
+                    style="@style/Widget.Sumrax.MainTextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
@@ -320,7 +320,7 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btn_qr_code"
-                    style="@style/Widget.Happ.MainTextButton"
+                    style="@style/Widget.Sumrax.MainTextButton"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"

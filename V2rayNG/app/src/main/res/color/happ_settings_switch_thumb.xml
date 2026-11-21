@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Happ settings_switch_thumb shape, SumraX accent -->
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:color="#80FFEB99" android:state_checked="true" android:state_enabled="false" />
-    <item android:color="@color/sumrax_accent" android:state_checked="true" />
-    <item android:color="#FFFFFFFF" android:state_checked="false" android:state_enabled="false" />
-    <item android:color="#FFFFFFFF" android:state_checked="false" />
-</selector>

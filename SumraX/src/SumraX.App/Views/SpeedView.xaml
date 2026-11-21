@@ -1,0 +1,143 @@
+<UserControl x:Class="SumraX.App.Views.SpeedView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctrl="clr-namespace:SumraX.App.Views.Controls"
+             xmlns:conv="clr-namespace:SumraX.App.Converters">
+    <UserControl.Resources>
+        <conv:BoolToVisibilityConverter x:Key="BoolVis"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolVis"/>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="28,20">
+        <StackPanel MaxWidth="560" HorizontalAlignment="Center">
+
+            <!-- Download / Upload -->
+            <Grid Margin="0,0,0,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="24"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Style="{StaticResource HudCard}" Padding="14,12">
+                    <StackPanel>
+                        <TextBlock Text="{Binding DownloadTabLabel}" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="Bold"
+                                   Foreground="{DynamicResource NeonBlueBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding DownloadDisplay}" FontFamily="{StaticResource PrimaryFont}" FontSize="22" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Style="{StaticResource HudCard}" Padding="14,12">
+                    <StackPanel>
+                        <TextBlock Text="{Binding UploadTabLabel}" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="Bold"
+                                   Foreground="{DynamicResource CyberPurpleBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding UploadDisplay}" FontFamily="{StaticResource PrimaryFont}" FontSize="22" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+
+            <!-- Ping row -->
+            <Border Style="{StaticResource GlassCard}" Padding="12,10" Margin="0,0,0,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding IdlePingLabel}" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding IdlePingDisplay}" FontFamily="{StaticResource PrimaryFont}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding DownloadPingLabel}" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding DownloadPingDisplay}" FontFamily="{StaticResource PrimaryFont}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding UploadPingLabel}" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding UploadPingDisplay}" FontFamily="{StaticResource PrimaryFont}" FontSize="14" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Gauge / GO -->
+            <Grid MinHeight="260" Margin="0,8,0,16">
+                <ctrl:SpeedGaugeControl SpeedMbps="{Binding GaugeSpeed}" UnitLabel="{Binding GaugeUnit}"
+                                        Visibility="{Binding ShowGauge, Converter={StaticResource BoolVis}}"/>
+                <Button Command="{Binding RunSpeedTestCommand}"
+                        IsEnabled="{Binding IsConnected}"
+                        Visibility="{Binding ShowGoButton, Converter={StaticResource BoolVis}}"
+                        HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Width="168" Height="168" Cursor="Hand">
+                    <Button.Style>
+                        <Style TargetType="Button">
+                            <Setter Property="Opacity" Value="1"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.45"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Grid>
+                                <Ellipse Width="168" Height="168" StrokeThickness="3" Fill="{DynamicResource SurfaceInsetBrush}">
+                                    <Ellipse.Stroke>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="{DynamicResource NeonBlue}" Offset="0"/>
+                                            <GradientStop Color="{DynamicResource CyberPurple}" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Ellipse.Stroke>
+                                </Ellipse>
+                                <TextBlock Text="{Binding DataContext.GoLabel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                           FontFamily="{StaticResource PrimaryFont}" FontSize="42" FontWeight="Bold"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+
+            <TextBlock Text="{Binding StatusHint}" FontFamily="{StaticResource PrimaryFont}" FontSize="14" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" TextAlignment="Center" TextWrapping="Wrap"
+                       Margin="0,0,0,28" MaxWidth="420"/>
+
+            <!-- Footer -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Ellipse Width="36" Height="36" Fill="{DynamicResource SurfaceInsetBrush}"
+                             Stroke="{DynamicResource BorderSubtleBrush}" StrokeThickness="1" Margin="0,0,10,0"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="VPN" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}"/>
+                        <TextBlock Text="{Binding ClientInfo}" FontFamily="{StaticResource MonoFont}" FontSize="11"
+                                   Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,10,0">
+                        <TextBlock Text="{Binding ServerInfo}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" MaxWidth="180"/>
+                        <TextBlock Text="Sumrak VPN" FontFamily="{StaticResource MonoFont}" FontSize="11"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Right"/>
+                    </StackPanel>
+                    <Ellipse Width="36" Height="36" Fill="{DynamicResource SurfaceInsetBrush}"
+                             Stroke="{DynamicResource BorderSubtleBrush}" StrokeThickness="1"/>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

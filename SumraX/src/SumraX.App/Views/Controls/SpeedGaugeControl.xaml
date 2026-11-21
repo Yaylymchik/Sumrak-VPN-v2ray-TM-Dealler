@@ -1,0 +1,53 @@
+<UserControl x:Class="SumraX.App.Views.Controls.SpeedGaugeControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="320" Height="220">
+    <Grid>
+        <Path Data="M 40,170 A 120,120 0 1 1 280,170" Stroke="#1E1E20" StrokeThickness="10"
+              StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"/>
+        <Path x:Name="ValueArc" Data="M 40,170 A 120,120 0 1 1 280,170" StrokeThickness="10"
+              StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"
+              StrokeDashCap="Round" StrokeDashArray="0 100">
+            <Path.Stroke>
+                <LinearGradientBrush StartPoint="0,1" EndPoint="1,0">
+                    <GradientStop Color="#FFD400" Offset="0"/>
+                    <GradientStop Color="#FFC400" Offset="1"/>
+                </LinearGradientBrush>
+            </Path.Stroke>
+            <Path.Effect>
+                <DropShadowEffect Color="#FFC400" BlurRadius="12" ShadowDepth="0" Opacity="0.55"/>
+            </Path.Effect>
+        </Path>
+
+        <Canvas Width="320" Height="220">
+            <TextBlock Canvas.Left="28" Canvas.Top="148" Text="0" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+            <TextBlock Canvas.Left="58" Canvas.Top="108" Text="5" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+            <TextBlock Canvas.Left="98" Canvas.Top="78" Text="10" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+            <TextBlock Canvas.Left="148" Canvas.Top="58" Text="50" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+            <TextBlock Canvas.Left="198" Canvas.Top="58" Text="100" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+            <TextBlock Canvas.Left="248" Canvas.Top="78" Text="250" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+            <TextBlock Canvas.Left="278" Canvas.Top="108" Text="500" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+            <TextBlock Canvas.Left="292" Canvas.Top="148" Text="1000" Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontFamily="{StaticResource MonoFont}"/>
+        </Canvas>
+
+        <Line X1="160" Y1="170" X2="160" Y2="78" Stroke="{DynamicResource TextPrimaryBrush}" StrokeThickness="2.5" StrokeEndLineCap="Round"
+              RenderTransformOrigin="0.5,1">
+            <Line.RenderTransform>
+                <RotateTransform x:Name="NeedleRotate" Angle="-135"/>
+            </Line.RenderTransform>
+            <Line.Effect>
+                <DropShadowEffect Color="#FFFFFF" BlurRadius="8" ShadowDepth="0" Opacity="0.7"/>
+            </Line.Effect>
+        </Line>
+        <Ellipse Width="14" Height="14" Fill="{DynamicResource SurfaceInsetBrush}" Stroke="{DynamicResource NeonBlueBrush}" StrokeThickness="2"
+                 HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,42"/>
+
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,28,0,0">
+            <TextBlock x:Name="SpeedText" Text="—" FontFamily="{StaticResource PrimaryFont}" FontSize="42" FontWeight="Bold"
+                       Foreground="{DynamicResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding UnitLabel, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                       FontFamily="{StaticResource PrimaryFont}" FontSize="14" FontWeight="SemiBold"
+                       Foreground="{DynamicResource TextSecondaryBrush}" HorizontalAlignment="Center" Margin="0,2,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

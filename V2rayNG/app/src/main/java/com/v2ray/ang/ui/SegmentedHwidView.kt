@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import com.v2ray.ang.R
 
-/** Compact Off / On toggle (Happ-style), used for HWID. */
+/** Compact Off / On toggle for HWID. */
 class SegmentedHwidView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null

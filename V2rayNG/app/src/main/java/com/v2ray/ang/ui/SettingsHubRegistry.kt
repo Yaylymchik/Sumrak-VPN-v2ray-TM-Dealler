@@ -18,7 +18,7 @@ object SettingsHubRegistry {
         val tab: Tab
     )
 
-    /** Row order mirrors Happ 4.11.2 `fragment_*_settings.xml` (forwards only where Happ uses sub-screens). */
+    /** Row order matches `fragment_*_settings.xml` (forwards only where sub-screens are used). */
     private val catalog: List<Entry> = listOf(
         Entry(R.string.title_language, LanguageActivitySettings::class.java, Tab.UI),
         Entry(R.string.title_pref_ui_mode_night, UiModeSettingsActivity::class.java, Tab.UI),
@@ -50,7 +50,7 @@ object SettingsHubRegistry {
         Entry(R.string.title_about, AboutActivity::class.java, Tab.ABOUT),
     )
 
-    /** Happ section order (fixed; not A–Z). */
+    /** Settings section order (fixed; not A–Z). */
     fun entriesForTab(tab: Tab): List<Entry> = catalog.filter { it.tab == tab }
 
     fun entriesFor(tab: Tab, titleOf: (Int) -> String, collator: Collator): List<Entry> {

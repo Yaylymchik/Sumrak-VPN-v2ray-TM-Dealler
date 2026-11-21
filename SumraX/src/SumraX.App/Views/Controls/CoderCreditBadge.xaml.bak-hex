@@ -1,0 +1,45 @@
+<UserControl x:Class="SumraX.App.Views.Controls.CoderCreditBadge"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root"
+             Height="22"
+             Cursor="Hand"
+             ToolTip="{x:Null}">
+    <UserControl.Resources>
+        <Storyboard x:Key="RevealStoryboard">
+            <DoubleAnimation Storyboard.TargetName="AliasName" Storyboard.TargetProperty="Opacity"
+                             To="0" Duration="0:0:0.35">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="RealName" Storyboard.TargetProperty="Opacity"
+                             To="1" Duration="0:0:0.35">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="RealGlow" Storyboard.TargetProperty="Opacity"
+                             To="1" Duration="0:0:0.35"/>
+        </Storyboard>
+        <Storyboard x:Key="HideStoryboard">
+            <DoubleAnimation Storyboard.TargetName="AliasName" Storyboard.TargetProperty="Opacity"
+                             To="1" Duration="0:0:0.3"/>
+            <DoubleAnimation Storyboard.TargetName="RealName" Storyboard.TargetProperty="Opacity"
+                             To="0.42" Duration="0:0:0.3"/>
+            <DoubleAnimation Storyboard.TargetName="RealGlow" Storyboard.TargetProperty="Opacity"
+                             To="0" Duration="0:0:0.3"/>
+        </Storyboard>
+    </UserControl.Resources>
+
+    <Grid Background="Transparent" MouseEnter="OnMouseEnter" MouseLeave="OnMouseLeave">
+        <TextBlock x:Name="RealName" Text="Yaylym"
+                   FontFamily="{StaticResource MonoFont}" FontSize="12" FontWeight="Bold"
+                   Foreground="{DynamicResource NeonBlueBrush}" Opacity="0.42"
+                   VerticalAlignment="Center">
+            <TextBlock.Effect>
+                <DropShadowEffect x:Name="RealGlow" Color="#FFD400" BlurRadius="14" ShadowDepth="0" Opacity="0"/>
+            </TextBlock.Effect>
+        </TextBlock>
+        <TextBlock x:Name="AliasName" Text="Sumrak"
+                   FontFamily="{StaticResource MonoFont}" FontSize="12" FontWeight="Bold"
+                   Foreground="{DynamicResource NeonGreenBrush}" Opacity="1"
+                   VerticalAlignment="Center"/>
+    </Grid>
+</UserControl>

@@ -496,7 +496,7 @@ object SettingsManager {
     }
 
     /**
-     * Resolved HTTP User-Agent for subscription fetches (Happ-style global UA).
+     * Resolved HTTP User-Agent for subscription fetches.
      */
     fun resolveSubscriptionUserAgent(subscriptionUserAgent: String? = null): String {
         val forceGlobal = MmkvManager.decodeSettingsBool(AppConfig.PREF_FORCE_GLOBAL_USER_AGENT, true)

@@ -3,7 +3,7 @@
     android:id="@+id/about_block"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/bg_happ_text_on_main"
+    android:background="@drawable/bg_sumrax_text_on_main"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground"

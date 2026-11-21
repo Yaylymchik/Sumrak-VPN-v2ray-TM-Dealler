@@ -1,0 +1,64 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SumraX.App.Desktop.ViewModels"
+        x:Class="SumraX.App.Desktop.MainWindow"
+        x:DataType="vm:DesktopMainViewModel"
+        Title="{Binding Title}"
+        Width="920" Height="620"
+        MinWidth="760" MinHeight="520"
+        WindowStartupLocation="CenterScreen">
+  <Grid ColumnDefinitions="220,*" Margin="0">
+    <Border Grid.Column="0" Background="#0D1218" BorderBrush="#00A8FF" BorderThickness="0,0,1,0" Padding="20,24">
+      <StackPanel Spacing="18">
+        <StackPanel Spacing="4">
+          <TextBlock Text="SumraX" FontSize="24" FontWeight="Bold" Foreground="#00E676"/>
+          <TextBlock Text="VPN // macOS" FontFamily="Consolas,Courier New,monospace" FontSize="11" Foreground="#00A8FF"/>
+        </StackPanel>
+        <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" Foreground="#9FB3C8"/>
+        <TextBlock Text="{Binding ServerName}" FontWeight="SemiBold"/>
+        <Button Classes="primary" Content="{Binding ConnectLabel}" Command="{Binding ToggleConnectionCommand}" IsEnabled="{Binding !IsBusy}" HorizontalAlignment="Stretch"/>
+        <Button Content="Refresh servers" Command="{Binding RefreshServersCommand}" HorizontalAlignment="Stretch"/>
+      </StackPanel>
+    </Border>
+
+    <ScrollViewer Grid.Column="1" Padding="24">
+      <StackPanel Spacing="16">
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Import server" FontSize="18" FontWeight="SemiBold"/>
+            <TextBox Watermark="vmess:// ... vless:// ... trojan:// ..." Text="{Binding ImportLink}" AcceptsReturn="True" MinHeight="72"/>
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Button Classes="primary" Content="Import" Command="{Binding ImportLinkCommand}" IsEnabled="{Binding !IsBusy}"/>
+              <TextBlock Text="{Binding ImportStatus}" VerticalAlignment="Center" Foreground="#00A8FF"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Servers" FontSize="18" FontWeight="SemiBold"/>
+            <ListBox ItemsSource="{Binding Servers}" SelectedItem="{Binding SelectedServer}" MinHeight="220">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel>
+                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding Address}" FontSize="11" Foreground="#9FB3C8"/>
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+          </StackPanel>
+        </Border>
+
+        <Border Classes="card">
+          <StackPanel Spacing="10">
+            <TextBlock Text="Settings" FontSize="18" FontWeight="SemiBold"/>
+            <CheckBox Content="Use system proxy" IsChecked="{Binding UseSystemProxy}"/>
+            <TextBlock Text="TUN mode is Windows-only in this build. macOS uses system proxy + Xray/sing-box." TextWrapping="Wrap" Foreground="#9FB3C8" FontSize="12"/>
+            <Button Content="Save settings" Command="{Binding SaveSettingsCommand}" HorizontalAlignment="Left"/>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</Window>

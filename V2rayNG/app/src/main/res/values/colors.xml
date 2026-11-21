@@ -9,7 +9,7 @@
     <color name="divider_color_light">#1A121212</color>
     <color name="colorIndicator">@color/sumrax_accent</color>
 
-    <!-- Default app palette: black & yellow (Happ-inspired) -->
+    <!-- Default app palette: black & yellow -->
     <color name="sumrax_bg">#0A0A0A</color>
     <color name="sumrax_bg_secondary">#121212</color>
     <color name="sumrax_bg_deep">#000000</color>

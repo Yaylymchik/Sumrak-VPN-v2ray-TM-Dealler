@@ -1,0 +1,16 @@
+<UserControl x:Class="SumraX.App.Views.Controls.ScanlineOverlay"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             IsHitTestVisible="False">
+    <Grid Opacity="0.04">
+        <Rectangle Fill="#FFC400">
+            <Rectangle.OpacityMask>
+                <VisualBrush TileMode="Tile" Viewport="0,0,1,4" ViewportUnits="Absolute">
+                    <VisualBrush.Visual>
+                        <Rectangle Height="1" Fill="White"/>
+                    </VisualBrush.Visual>
+                </VisualBrush>
+            </Rectangle.OpacityMask>
+        </Rectangle>
+    </Grid>
+</UserControl>

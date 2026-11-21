@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <style name="TextAppearance.Sumrax.SettingsSection" parent="TextAppearance.Material3.TitleSmall">
+    <item name="android:textSize">14sp</item>
+    <item name="android:textStyle">bold</item>
+    <item name="android:textColor">@color/sumrax_accent</item>
+    <item name="android:paddingTop">8dp</item>
+    <item name="android:paddingBottom">4dp</item>
+  </style>
+
+  <style name="Widget.Sumrax.SettingsForwardRow" parent="">
+    <item name="android:minHeight">52dp</item>
+    <item name="android:background">@drawable/bg_sumrax_text_on_main</item>
+    <item name="android:clickable">true</item>
+    <item name="android:focusable">true</item>
+  </style>
+
+  <style name="Widget.Sumrax.MainTextButton" parent="Widget.Material3.Button.TextButton">
+    <item name="android:textColor">@color/sumrax_ui_text_primary</item>
+    <item name="iconTint">@color/sumrax_ui_icon_primary</item>
+    <item name="backgroundTint">@android:color/transparent</item>
+    <item name="rippleColor">@color/sumrax_ui_hover_main</item>
+  </style>
+
+  <style name="SumrakBottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+    <item name="bottomSheetStyle">@style/SumrakBottomSheetStyle</item>
+    <item name="android:navigationBarColor">@color/sumrax_ui_card_surface</item>
+  </style>
+
+  <style name="SumrakBottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
+    <item name="backgroundTint">@color/sumrax_ui_card_surface</item>
+    <item name="shapeAppearanceOverlay">@style/SumrakBottomSheetShape</item>
+  </style>
+
+  <style name="SumrakBottomSheetShape">
+    <item name="cornerFamily">rounded</item>
+    <item name="cornerSizeTopLeft">16dp</item>
+    <item name="cornerSizeTopRight">16dp</item>
+  </style>
+</resources>

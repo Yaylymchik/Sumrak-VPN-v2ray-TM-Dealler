@@ -6,7 +6,7 @@ import androidx.preference.PreferenceFragmentCompat
 import com.v2ray.ang.R
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
 
-class HwidSettingsActivity : HappSingleSettingsActivity() {
+class HwidSettingsActivity : SumraxSingleSettingsActivity() {
     override fun screenTitleRes() = R.string.title_pref_send_hwid_header
     override fun createSettingsFragment() = HwidSettingsFragment()
 }

@@ -1,7 +1,7 @@
 package com.v2ray.ang.util
 
 /**
- * Resolves Happ-style User-Agent presets (e.g. chrome-android) to real HTTP UA strings.
+ * Resolves User-Agent presets (e.g. chrome-android) to real HTTP UA strings.
  */
 object UserAgentPresets {
     fun resolve(raw: String?): String {

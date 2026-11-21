@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# Sumrak VPN CLI — MacOS/core/xray or legacy bin/xray layout
+set -e
+
+ROOT="$(cd "$(dirname "$0")" && pwd)"
+if [[ ! -d "$ROOT/core/xray" && ! -d "$ROOT/bin/xray" ]]; then
+  if [[ -d "$ROOT/../Resources/bin/xray" ]]; then
+    ROOT="$(cd "$ROOT/../Resources" && pwd)"
+  elif [[ -d "$(dirname "$0")/../Resources/bin/xray" ]]; then
+    ROOT="$(cd "$(dirname "$0")/../Resources" && pwd)"
+  fi
+fi
+
+if [[ -f "$ROOT/core/xray/xray" ]]; then
+  XRAY="$ROOT/core/xray/xray"
+  XRAYDIR="$ROOT/core/xray"
+elif [[ -f "$ROOT/bin/xray/xray" ]]; then
+  XRAY="$ROOT/bin/xray/xray"
+  XRAYDIR="$ROOT/bin/xray"
+else
+  echo "xray not found under $ROOT" >&2
+  exit 1
+fi
+
+CONFIG="$ROOT/config/config.json"
+PIDFILE="$ROOT/data/xray.pid"
+LOG="$ROOT/data/sumrax.log"
+HTTP_PORT=10809
+SOCKS_PORT=10808
+
+mkdir -p "$ROOT/data" "$ROOT/config"
+
+proxy_on() {
+  local script="$ROOT/scripts/proxy_set_osx.sh"
+  [[ -x "$script" ]] || chmod +x "$script" 2>/dev/null || true
+  bash "$script" set 127.0.0.1 "$HTTP_PORT" localhost 127.0.0.1 10.0.0.0/8 192.168.0.0/16
+}
+
+proxy_off() {
+  bash "$ROOT/scripts/proxy_set_osx.sh" clear
+}
+
+xray_stop() {
+  if [[ -f "$PIDFILE" ]]; then
+    local pid
+    pid=$(cat "$PIDFILE" 2>/dev/null || true)
+    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+      kill "$pid" 2>/dev/null || true
+      sleep 1
+      kill -9 "$pid" 2>/dev/null || true
+    fi
+    rm -f "$PIDFILE"
+  fi
+  pkill -f "$XRAY run" 2>/dev/null || true
+}
+
+cmd="${1:-help}"
+
+case "$cmd" in
+  start)
+    if [[ ! -f "$CONFIG" ]]; then
+      echo "No config: $CONFIG"
+      exit 1
+    fi
+    chmod +x "$XRAY" 2>/dev/null || true
+    xray_stop
+    cd "$XRAYDIR"
+    nohup "$XRAY" run -c "$CONFIG" >>"$LOG" 2>&1 &
+    echo $! >"$PIDFILE"
+    sleep 2
+    if ! kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+      echo "Xray failed. Log:"
+      tail -20 "$LOG"
+      exit 1
+    fi
+    proxy_on
+    echo "Sumrak VPN started"
+    echo "HTTP 127.0.0.1:$HTTP_PORT | SOCKS $SOCKS_PORT"
+    ;;
+  stop)
+    xray_stop
+    proxy_off
+    echo "Stopped."
+    ;;
+  status)
+    if [[ -f "$PIDFILE" ]] && kill -0 "$(cat "$PIDFILE")" 2>/dev/null; then
+      echo "Running (pid $(cat "$PIDFILE"))"
+    else
+      echo "Stopped"
+    fi
+    ;;
+  import)
+    src="${2:-}"
+    if [[ -z "$src" || ! -f "$src" ]]; then
+      echo "Usage: $0 import /path/to/config.json"
+      exit 1
+    fi
+    cp "$src" "$CONFIG"
+    echo "Imported: $CONFIG"
+    ;;
+  log)
+    tail -f "$LOG"
+    ;;
+  *)
+    cat <<EOF
+Sumrak VPN CLI (standard Mac bundle layout)
+
+  $0 start | stop | status | import FILE | log
+EOF
+    ;;
+esac

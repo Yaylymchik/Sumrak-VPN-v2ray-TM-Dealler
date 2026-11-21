@@ -1,0 +1,15 @@
+<UserControl x:Class="SumraX.App.Views.Controls.CyberLogo"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Width="44" Height="44">
+    <Grid>
+        <Border CornerRadius="8" BorderBrush="#FFD400" BorderThickness="1" Background="#0A0A0B" ClipToBounds="True">
+            <Border.Effect>
+                <DropShadowEffect Color="#FFD400" BlurRadius="10" ShadowDepth="0" Opacity="0.45"/>
+            </Border.Effect>
+            <Image Source="/Assets/sumrax-icon.png"
+                   Stretch="UniformToFill"
+                   RenderOptions.BitmapScalingMode="HighQuality"/>
+        </Border>
+    </Grid>
+</UserControl>

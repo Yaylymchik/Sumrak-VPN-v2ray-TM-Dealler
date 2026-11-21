@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-/** Minimal Happ compat shims for crypt5 native callbacks. */
+/** Minimal compat shims for crypt5 native callbacks. */
 public final class p40 {
     private p40() {
     }

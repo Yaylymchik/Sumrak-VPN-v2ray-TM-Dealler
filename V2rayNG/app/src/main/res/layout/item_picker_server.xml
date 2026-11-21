@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="4dp"
-    android:background="@drawable/bg_happ_text_on_main"
+    android:background="@drawable/bg_sumrax_text_on_main"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -15,7 +15,7 @@
         android:id="@+id/config_activated"
         android:layout_width="4dp"
         android:layout_height="0dp"
-        android:background="@drawable/bg_happ_selected_server"
+        android:background="@drawable/bg_sumrax_selected_server"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,7 +29,7 @@
         android:ellipsize="end"
         android:maxLines="2"
         android:paddingVertical="12dp"
-        android:textColor="@color/happ_text_primary"
+        android:textColor="@color/sumrax_ui_text_primary"
         android:textSize="15sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -46,7 +46,7 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/happ_text_tertiary"
+        android:textColor="@color/sumrax_ui_text_tertiary"
         android:textSize="12sp"
         android:visibility="gone"
         app:layout_constraintEnd_toEndOf="@id/tv_picker_name"
@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
         android:paddingEnd="8dp"
-        android:textColor="@color/happ_ping_ok"
+        android:textColor="@color/sumrax_ui_ping_ok"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btn_favorite"
@@ -78,7 +78,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btn_server_forward"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="@color/happ_icon_primary" />
+        app:tint="@color/sumrax_ui_icon_primary" />
 
     <ImageView
         android:id="@+id/btn_server_forward"
@@ -86,7 +86,7 @@
         android:layout_height="0dp"
         android:contentDescription="@null"
         android:padding="8dp"
-        android:src="@drawable/ic_happ_arrow_forward"
+        android:src="@drawable/ic_sumrax_arrow_forward"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

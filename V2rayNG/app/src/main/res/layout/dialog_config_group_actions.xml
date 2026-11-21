@@ -3,7 +3,7 @@
     android:id="@+id/config_group_actions_root"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/happ_card_surface"
+    android:background="@color/sumrax_ui_card_surface"
     android:orientation="vertical"
     android:paddingBottom="8dp">
 

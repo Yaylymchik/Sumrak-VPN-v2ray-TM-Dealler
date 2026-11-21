@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <Version>1.0.1</Version>
+    <Authors>Sumrak</Authors>
+    <Company>Sumrak VPN</Company>
+    <Product>Sumrak VPN</Product>
+    <Description>Secure VPN client with TUN tunnel, kill-switch, and Xray/sing-box cores</Description>
+    <Copyright>Copyright © 2026 Sumrak VPN · Coder: Sumrak (Yaylym)</Copyright>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+</Project>

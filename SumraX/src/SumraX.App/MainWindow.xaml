@@ -1,0 +1,181 @@
+<Window x:Class="SumraX.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:SumraX.App.ViewModels"
+        xmlns:views="clr-namespace:SumraX.App.Views"
+        xmlns:ctrl="clr-namespace:SumraX.App.Views.Controls"
+        xmlns:conv="clr-namespace:SumraX.App.Converters"
+        Title="{Binding AppTitle}"
+        Icon="/Assets/sumrax-icon.png"
+        Width="420" Height="820"
+        MinWidth="380" MinHeight="680"
+        MaxWidth="520" MaxHeight="950"
+        ResizeMode="CanResize"
+        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:HomeViewModel}"><views:HomeView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SpeedViewModel}"><views:SpeedView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SecurityViewModel}"><views:SecurityView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:AiViewModel}"><views:AiView/></DataTemplate>
+        <DataTemplate DataType="{x:Type vm:SettingsViewModel}"><views:SettingsView/></DataTemplate>
+        <BooleanToVisibilityConverter x:Key="BoolVis"/>
+        <conv:InverseBoolToVisibilityConverter x:Key="InverseBoolVis"/>
+        <conv:InverseBoolConverter x:Key="InverseBool"/>
+    </Window.Resources>
+
+    <Grid Background="{DynamicResource WindowBackground}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Curtain sidebar: collapsed icon rail → expands like a drawer -->
+        <Border x:Name="SidebarBorder"
+                Grid.Column="0"
+                Width="56"
+                Visibility="{Binding ShowSidebarRail, Converter={StaticResource BoolVis}}"
+                Background="{DynamicResource SidebarBackground}"
+                BorderBrush="#55FFD400"
+                BorderThickness="0,0,1,0"
+                Opacity="0.98"
+                ClipToBounds="True"
+                MouseLeave="Sidebar_MouseLeave">
+            <DockPanel Margin="0,8,0,8">
+                <!-- Brand + pin -->
+                <StackPanel DockPanel.Dock="Top" Margin="0,0,0,8">
+                    <Grid Margin="6,0,6,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                            <ctrl:CyberLogo Width="32" Height="32" Margin="4,0,0,0"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <StackPanel VerticalAlignment="Center" Margin="8,0,0,0"
+                                        Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}">
+                                <TextBlock Text="Sumrak" FontFamily="{StaticResource PrimaryFont}" FontSize="15" FontWeight="Bold"
+                                           Foreground="{DynamicResource NeonGreenBrush}"/>
+                                <TextBlock Text="{Binding ModeBadgeLabel}" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource NeonBlueBrush}" Margin="0,1,0,0"
+                                           TextTrimming="CharacterEllipsis" MaxWidth="100"/>
+                            </StackPanel>
+                        </StackPanel>
+                        <Button Grid.Column="1"
+                                Style="{StaticResource SecondaryButton}"
+                                Command="{Binding ToggleSidebarCommand}"
+                                ToolTip="{Binding SidebarCollapse}"
+                                ToolTipService.InitialShowDelay="600"
+                                Padding="4" MinWidth="24" MinHeight="24"
+                                VerticalAlignment="Top"
+                                Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}">
+                            <TextBlock Text="‹" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource NeonBlueBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Button>
+                    </Grid>
+                    <!-- Expand affordance when collapsed -->
+                    <Button Style="{StaticResource SecondaryButton}"
+                            Command="{Binding ToggleSidebarCommand}"
+                            ToolTip="{Binding SidebarExpand}"
+                            ToolTipService.InitialShowDelay="600"
+                            Margin="8,6,8,0" Padding="4" MinHeight="24"
+                            Visibility="{Binding IsSidebarExpanded, Converter={StaticResource InverseBoolVis}}">
+                        <TextBlock Text="›" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource NeonBlueBrush}"
+                                   HorizontalAlignment="Center"/>
+                    </Button>
+                </StackPanel>
+
+                <StackPanel DockPanel.Dock="Bottom" Margin="8,0"
+                            Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}">
+                    <TextBlock Text="// CODER" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="Bold"
+                               Foreground="{DynamicResource TextSecondaryBrush}" Margin="0,0,0,3"/>
+                    <ctrl:CoderCreditBadge Margin="0,0,0,8"/>
+                    <TextBlock Text="{Binding VersionText}" FontFamily="{StaticResource MonoFont}"
+                               Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontWeight="SemiBold"/>
+                    <TextBlock Text="{Binding CoreLabel}" FontFamily="{StaticResource MonoFont}"
+                               Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" FontWeight="SemiBold" Margin="0,1,0,0"/>
+                </StackPanel>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,4,0,0">
+                    <StackPanel Margin="0,0,0,8">
+                        <TextBlock Text="{Binding SectionCore}" Style="{StaticResource SectionHeader}" Margin="10,4,10,6"
+                                   Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                        <RadioButton Style="{StaticResource SidebarNav}" GroupName="Nav" Checked="Nav_Checked" Tag="0" AutomationProperties.Name="{Binding NavHome}"
+                                     ToolTip="{Binding NavHome}"
+                                     ToolTipService.IsEnabled="{Binding IsSidebarExpanded, Converter={StaticResource InverseBool}}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <ctrl:GlowIcon Kind="Home" Tone="Amber" Width="16" Height="16" Margin="2,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding NavHome}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                            </StackPanel>
+                        </RadioButton>
+                        <RadioButton Style="{StaticResource SidebarNav}" GroupName="Nav" Checked="Nav_Checked" Tag="1" AutomationProperties.Name="{Binding NavSpeed}"
+                                     ToolTip="{Binding NavSpeed}"
+                                     ToolTipService.IsEnabled="{Binding IsSidebarExpanded, Converter={StaticResource InverseBool}}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <ctrl:GlowIcon Kind="Pulse" Tone="Cyan" Width="16" Height="16" Margin="2,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding NavSpeed}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <TextBlock Text="{Binding SectionSecurity}" Style="{StaticResource SectionHeader}"
+                                   Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                        <RadioButton Style="{StaticResource SidebarNav}" GroupName="Nav" Checked="Nav_Checked" Tag="2" AutomationProperties.Name="{Binding NavSecurity}"
+                                     ToolTip="{Binding NavSecurity}"
+                                     ToolTipService.IsEnabled="{Binding IsSidebarExpanded, Converter={StaticResource InverseBool}}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <ctrl:GlowIcon Kind="Shield" Tone="Amber" Width="16" Height="16" Margin="2,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding NavSecurity}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <TextBlock Text="{Binding SectionAi}" Style="{StaticResource SectionHeader}"
+                                   Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                        <RadioButton Style="{StaticResource SidebarNav}" GroupName="Nav" Checked="Nav_Checked" Tag="3" AutomationProperties.Name="{Binding NavAi}"
+                                     ToolTip="{Binding NavAi}"
+                                     ToolTipService.IsEnabled="{Binding IsSidebarExpanded, Converter={StaticResource InverseBool}}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <ctrl:GlowIcon Kind="Ai" Tone="Amber" Width="16" Height="16" Margin="2,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding NavAi}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                            </StackPanel>
+                        </RadioButton>
+
+                        <TextBlock Text="{Binding SectionSystem}" Style="{StaticResource SectionHeader}"
+                                   Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                        <RadioButton Style="{StaticResource SidebarNav}" GroupName="Nav" Checked="Nav_Checked" Tag="4" AutomationProperties.Name="{Binding NavSettings}"
+                                     ToolTip="{Binding NavSettings}"
+                                     ToolTipService.IsEnabled="{Binding IsSidebarExpanded, Converter={StaticResource InverseBool}}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                                <ctrl:GlowIcon Kind="Settings" Tone="Amber" Width="16" Height="16" Margin="2,0,0,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding NavSettings}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"
+                                           Foreground="{DynamicResource TextPrimaryBrush}"
+                                           Visibility="{Binding IsSidebarExpanded, Converter={StaticResource BoolVis}}"/>
+                            </StackPanel>
+                        </RadioButton>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <Grid Grid.Column="1">
+            <ContentControl Content="{Binding CurrentPage}" Margin="0"/>
+            <ctrl:ScanlineOverlay Visibility="{Binding ShowSidebarRail, Converter={StaticResource BoolVis}}"/>
+            <views:ServerPickerOverlay DataContext="{Binding}"/>
+        </Grid>
+    </Grid>
+</Window>

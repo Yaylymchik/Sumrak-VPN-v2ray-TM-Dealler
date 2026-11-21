@@ -56,7 +56,7 @@ import com.v2ray.ang.handler.TrafficStatsHelper
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.ProfileAutoSelector
 import com.v2ray.ang.util.ProfileRemarkParser
-import com.v2ray.ang.util.HappServerProtocol
+import com.v2ray.ang.util.SumrakServerProtocol
 import com.v2ray.ang.util.HwidManager
 import com.v2ray.ang.util.ServerDisplayName
 import com.v2ray.ang.util.ProfileSettingsApplier
@@ -96,7 +96,7 @@ class MainActivity : HelperBaseActivity() {
     private var isSmartScanning = false
     private var smartConnectGeneration = 0
     private var showingServerScreen = false
-    private lateinit var homeServerAdapter: HappHomeConfigAdapter
+    private lateinit var homeServerAdapter: SumrakHomeConfigAdapter
     private var serversListHidden = false
     private var expandedSubscriptionIds: MutableSet<String> = mutableSetOf()
 
@@ -210,7 +210,7 @@ class MainActivity : HelperBaseActivity() {
         homePanel.llHwid.setOnClickListener(copyHwid)
         homePanel.btnCopyHwid.setOnClickListener(copyHwid)
 
-        refreshHappHomeHwid()
+        refreshHomeHwid()
         refreshServerPickerBar()
         applyConnectionUi()
         showHomeScreen()
@@ -221,7 +221,7 @@ class MainActivity : HelperBaseActivity() {
         serversListHidden = !serversListHidden
         homePanel.rlConfigGroups.isVisible = !serversListHidden
         homePanel.tvHideAll.text = if (serversListHidden) {
-            getString(R.string.sumrax_happ_show_all)
+            getString(R.string.sumrax_home_show_all)
         } else {
             getString(R.string.hide_everything)
         }
@@ -250,12 +250,12 @@ class MainActivity : HelperBaseActivity() {
         toast(getString(R.string.toast_success))
     }
 
-    private fun refreshHappHomeHwid() {
+    private fun refreshHomeHwid() {
         val hwid = HwidManager.resolveHwid(this)
-        homePanel.tvHwid.text = getString(R.string.sumrax_happ_hwid_format, hwid)
+        homePanel.tvHwid.text = getString(R.string.sumrax_home_hwid_format, hwid)
     }
 
-    private fun syncHappHomeLayout() {
+    private fun syncHomeLayout() {
         val hasServers = hasAnyHomeServers()
         homePanel.emptyStateFooter.isVisible = !hasServers
         homePanel.rlConfigGroups.isVisible = hasServers && !serversListHidden
@@ -278,8 +278,8 @@ class MainActivity : HelperBaseActivity() {
 
     private fun setupServerPicker() {
         expandedSubscriptionIds = loadExpandedSubscriptions().toMutableSet()
-        homeServerAdapter = HappHomeConfigAdapter(
-            object : HappHomeConfigAdapter.Callbacks {
+        homeServerAdapter = SumrakHomeConfigAdapter(
+            object : SumrakHomeConfigAdapter.Callbacks {
                 override fun onSelectServer(guid: String) = selectServerFromPicker(guid)
                 override fun onEditServer(guid: String, subscriptionId: String) =
                     openHomeServerEditor(guid, subscriptionId)
@@ -302,8 +302,8 @@ class MainActivity : HelperBaseActivity() {
     }
 
     private fun refreshPickerList() {
-        homeServerAdapter.submit(HappHomeListBuilder.build(expandedSubscriptionIds))
-        syncHappHomeLayout()
+        homeServerAdapter.submit(SumrakHomeListBuilder.build(expandedSubscriptionIds))
+        syncHomeLayout()
     }
 
     private fun hasAnyHomeServers(): Boolean = countHomeProfiles() > 0
@@ -325,14 +325,17 @@ class MainActivity : HelperBaseActivity() {
     }
 
     private fun loadExpandedSubscriptions(): Set<String> {
-        val raw = MmkvManager.decodeSettingsString(AppConfig.PREF_HAPP_HOME_EXPANDED_SUBS, "").orEmpty()
-        if (raw.isBlank()) return HappHomeListBuilder.defaultExpandedIds()
+        var raw = MmkvManager.decodeSettingsString(AppConfig.PREF_HOME_EXPANDED_SUBS, "").orEmpty()
+        if (raw.isBlank()) {
+            raw = MmkvManager.decodeSettingsString(AppConfig.PREF_HOME_EXPANDED_SUBS_LEGACY, "").orEmpty()
+        }
+        if (raw.isBlank()) return SumrakHomeListBuilder.defaultExpandedIds()
         return raw.split(',').filter { it.isNotBlank() }.toSet()
     }
 
     private fun saveExpandedSubscriptions() {
         MmkvManager.encodeSettings(
-            AppConfig.PREF_HAPP_HOME_EXPANDED_SUBS,
+            AppConfig.PREF_HOME_EXPANDED_SUBS,
             expandedSubscriptionIds.joinToString(",")
         )
     }
@@ -383,7 +386,7 @@ class MainActivity : HelperBaseActivity() {
                 measuredDelay < 0L -> getString(R.string.sumrax_server_detail_ping_fail)
                 else -> getString(R.string.sumrax_server_detail_ping_unknown)
             }
-            val protocol = HappServerProtocol.format(profile)
+            val protocol = SumrakServerProtocol.format(profile)
             val days = ProfileRemarkParser.resolveLiveRemainingDays(
                 profile.remarks,
                 subscriptionId,
@@ -477,14 +480,14 @@ class MainActivity : HelperBaseActivity() {
     }
 
     private fun loadPinnedSubscriptionIds(): Set<String> =
-        HappHomeListBuilder.loadPinnedSubscriptionIds().toSet()
+        SumrakHomeListBuilder.loadPinnedSubscriptionIds().toSet()
 
     private fun savePinnedSubscriptionIds(ids: List<String>) {
         MmkvManager.encodeSettings(AppConfig.PREF_HOME_PINNED_SUBS, ids.joinToString(","))
     }
 
     private fun togglePinnedSubscription(subscriptionId: String) {
-        val pinned = HappHomeListBuilder.loadPinnedSubscriptionIds().toMutableList()
+        val pinned = SumrakHomeListBuilder.loadPinnedSubscriptionIds().toMutableList()
         if (subscriptionId in pinned) {
             pinned.remove(subscriptionId)
         } else {
@@ -549,7 +552,7 @@ class MainActivity : HelperBaseActivity() {
         setHomeAppBarVisible(false)
         binding.drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         title = getString(R.string.title_server)
-        syncHappHomeLayout()
+        syncHomeLayout()
     }
 
     fun showServerScreen() {
@@ -567,7 +570,7 @@ class MainActivity : HelperBaseActivity() {
 
     fun refreshServerPickerBar() {
         homeServerAdapter.notifyDataSetChanged()
-        syncHappHomeLayout()
+        syncHomeLayout()
     }
 
     private fun extractLeadingEmoji(text: String): String? {
@@ -1194,9 +1197,9 @@ class MainActivity : HelperBaseActivity() {
         val isConnecting = connectionUiState == ConnectionUiState.CONNECTING
 
         homePanel.btnPower.powerState = when (connectionUiState) {
-            ConnectionUiState.CONNECTED -> HappPowerButtonView.PowerState.CONNECTED
-            ConnectionUiState.CONNECTING -> HappPowerButtonView.PowerState.CONNECTING
-            ConnectionUiState.ERROR, ConnectionUiState.DISCONNECTED -> HappPowerButtonView.PowerState.IDLE
+            ConnectionUiState.CONNECTED -> SumrakPowerButtonView.PowerState.CONNECTED
+            ConnectionUiState.CONNECTING -> SumrakPowerButtonView.PowerState.CONNECTING
+            ConnectionUiState.ERROR, ConnectionUiState.DISCONNECTED -> SumrakPowerButtonView.PowerState.IDLE
         }
 
         val error = connectionErrorMessage
@@ -1215,7 +1218,7 @@ class MainActivity : HelperBaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        refreshHappHomeHwid()
+        refreshHomeHwid()
         homePanel.connectionModeSwitch.isSmartMode = SettingsManager.isSmartConnectionMode()
         refreshDaysRemaining()
         refreshPickerList()

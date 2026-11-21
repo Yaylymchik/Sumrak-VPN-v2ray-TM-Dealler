@@ -66,7 +66,7 @@ class UrlSchemeActivity : BaseActivity() {
         return host in CRYPT_HOSTS
     }
 
-    /** Rebuilds happ://crypt5/{payload} without Uri.toString() mangling + or /. */
+    /** Rebuilds crypt5 deeplinks without Uri.toString() mangling + or /. */
     private fun deeplinkToImportString(uri: Uri): String {
         val host = uri.host?.lowercase().orEmpty()
         if (host in CRYPT_HOSTS) {

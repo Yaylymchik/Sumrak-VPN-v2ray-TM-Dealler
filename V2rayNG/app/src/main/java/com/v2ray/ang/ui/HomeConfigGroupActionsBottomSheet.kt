@@ -12,7 +12,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.v2ray.ang.R
 
 /**
- * Bottom sheet for subscription group actions (main home), matching Happ UX.
+ * Bottom sheet for subscription group actions on the home screen.
  */
 class HomeConfigGroupActionsBottomSheet : BottomSheetDialogFragment() {
 

@@ -1,6 +1,6 @@
 package defpackage;
 
-/** Minimal Happ compat shims for crypt5 native callbacks. */
+/** Minimal compat shims for crypt5 native callbacks. */
 public final class o40 {
     private o40() {
     }

@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/home_add_subscription"
-        android:title="@string/sumrax_happ_add_subscription" />
+        android:title="@string/sumrax_home_add_subscription" />
     <item
         android:id="@+id/import_clipboard"
         android:title="@string/menu_item_import_config_clipboard" />
@@ -11,7 +11,7 @@
         android:title="@string/menu_item_import_config_qrcode" />
     <item
         android:id="@+id/home_manual_input"
-        android:title="@string/sumrax_happ_manual_input">
+        android:title="@string/sumrax_home_manual_input">
         <menu>
             <item
                 android:id="@+id/import_manually_vmess"

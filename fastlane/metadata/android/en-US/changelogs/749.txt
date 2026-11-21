@@ -1,1 +1,1 @@
-Sumrak VPN 2.2.19: SumraX branding, custom icons, subscription actions sheet, background app updates, Firebase push (optional), Happ-style home UI.
+Sumrak VPN 2.2.19: SumraX branding, custom icons, subscription actions sheet, background app updates, Firebase push (optional), Redesigned home UI.

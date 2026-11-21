@@ -2,7 +2,7 @@ package defpackage;
 
 import java.util.ArrayList;
 
-/** Minimal Happ compat shims for crypt5 native callbacks. */
+/** Minimal compat shims for crypt5 native callbacks. */
 public final class df {
     private df() {
     }

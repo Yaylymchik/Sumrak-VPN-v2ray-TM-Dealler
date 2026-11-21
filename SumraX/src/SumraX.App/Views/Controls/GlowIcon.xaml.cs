@@ -1,0 +1,257 @@
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
+
+namespace SumraX.App.Views.Controls;
+
+public enum GlowIconKind
+{
+    Home,
+    Shield,
+    Ai,
+    Settings,
+    Paste,
+    Import,
+    Qr,
+    File,
+    Edit,
+    Refresh,
+    Pulse,
+    Places,
+    Star,
+    Clock,
+    Globe,
+    Close,
+    More
+}
+
+public enum GlowIconTone
+{
+    Blue,
+    Green,
+    Purple,
+    White,
+    Cyan,
+    Amber,
+    Magenta,
+    Auto
+}
+
+public partial class GlowIcon : UserControl
+{
+    public static readonly DependencyProperty KindProperty =
+        DependencyProperty.Register(nameof(Kind), typeof(GlowIconKind), typeof(GlowIcon),
+            new PropertyMetadata(GlowIconKind.Home, OnVisualChanged));
+
+    public static readonly DependencyProperty ToneProperty =
+        DependencyProperty.Register(nameof(Tone), typeof(GlowIconTone), typeof(GlowIcon),
+            new PropertyMetadata(GlowIconTone.Auto, OnVisualChanged));
+
+    private Button? _hostButton;
+    private DependencyPropertyDescriptor? _pressedDesc;
+    private DependencyPropertyDescriptor? _hoverDesc;
+    private bool _boosted;
+
+    public GlowIcon()
+    {
+        InitializeComponent();
+        Loaded += OnLoaded;
+        Unloaded += OnUnloaded;
+    }
+
+    public GlowIconKind Kind
+    {
+        get => (GlowIconKind)GetValue(KindProperty);
+        set => SetValue(KindProperty, value);
+    }
+
+    public GlowIconTone Tone
+    {
+        get => (GlowIconTone)GetValue(ToneProperty);
+        set => SetValue(ToneProperty, value);
+    }
+
+    private static void OnVisualChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is GlowIcon icon && icon.IsLoaded)
+            icon.ApplyVisual();
+    }
+
+    private void OnLoaded(object sender, RoutedEventArgs e)
+    {
+        AttachHostButton();
+        ApplyVisual();
+    }
+
+    private void OnUnloaded(object sender, RoutedEventArgs e) => DetachHostButton();
+
+    private void AttachHostButton()
+    {
+        DetachHostButton();
+        _hostButton = FindAncestorButton(this);
+        if (_hostButton == null)
+        {
+            return;
+        }
+
+        _pressedDesc = DependencyPropertyDescriptor.FromProperty(Button.IsPressedProperty, typeof(Button));
+        _hoverDesc = DependencyPropertyDescriptor.FromProperty(UIElement.IsMouseOverProperty, typeof(Button));
+        _pressedDesc?.AddValueChanged(_hostButton, OnHostVisualStateChanged);
+        _hoverDesc?.AddValueChanged(_hostButton, OnHostVisualStateChanged);
+        UpdateBoostFromHost();
+    }
+
+    private void DetachHostButton()
+    {
+        if (_hostButton != null)
+        {
+            _pressedDesc?.RemoveValueChanged(_hostButton, OnHostVisualStateChanged);
+            _hoverDesc?.RemoveValueChanged(_hostButton, OnHostVisualStateChanged);
+        }
+
+        _hostButton = null;
+        _pressedDesc = null;
+        _hoverDesc = null;
+        _boosted = false;
+    }
+
+    private void OnHostVisualStateChanged(object? sender, EventArgs e) => UpdateBoostFromHost();
+
+    private void UpdateBoostFromHost()
+    {
+        var boost = _hostButton is { IsPressed: true } or { IsMouseOver: true, IsEnabled: true };
+        if (boost == _boosted && IsLoaded)
+        {
+            ApplyVisual();
+            return;
+        }
+
+        _boosted = boost;
+        if (IsLoaded)
+        {
+            ApplyVisual();
+        }
+    }
+
+    private void ApplyVisual()
+    {
+        var color = ResolveColor();
+        var brush = new SolidColorBrush(color);
+        brush.Freeze();
+
+        IconPath.Data = Geometry.Parse(GetPathData(Kind));
+        IconPath.Stroke = brush;
+        IconPath.Fill = Kind is GlowIconKind.Star or GlowIconKind.Pulse
+            ? new SolidColorBrush(Color.FromArgb(_boosted ? (byte)72 : (byte)28, color.R, color.G, color.B))
+            : Brushes.Transparent;
+
+        // Crisp glyphs at 16–18px: no permanent drop-shadow (blur made toolbar icons muddy).
+    }
+
+    private Color ResolveColor()
+    {
+        var tone = Tone;
+        if (tone == GlowIconTone.Auto)
+        {
+            tone = Kind switch
+            {
+                GlowIconKind.Shield => GlowIconTone.Green,
+                GlowIconKind.Ai => GlowIconTone.Purple,
+                GlowIconKind.Import => GlowIconTone.White,
+                GlowIconKind.Star => GlowIconTone.Green,
+                GlowIconKind.Pulse => GlowIconTone.Cyan,
+                GlowIconKind.Paste => GlowIconTone.Cyan,
+                GlowIconKind.Qr => GlowIconTone.Purple,
+                GlowIconKind.File => GlowIconTone.Amber,
+                GlowIconKind.Edit => GlowIconTone.Magenta,
+                GlowIconKind.Refresh => GlowIconTone.Green,
+                GlowIconKind.Settings => GlowIconTone.Blue,
+                _ => GlowIconTone.Blue
+            };
+        }
+
+        return tone switch
+        {
+            GlowIconTone.Green => BrushColor("NeonGreen", Color.FromRgb(0xA8, 0xE0, 0x5F)),
+            GlowIconTone.Purple => BrushColor("CyberPurple", Color.FromRgb(0xFF, 0xB8, 0x00)),
+            GlowIconTone.White => Colors.White,
+            GlowIconTone.Cyan => BrushColor("NeonBlue", Color.FromRgb(0xFF, 0xD4, 0x00)),
+            GlowIconTone.Amber => BrushColor("CyberPurple", Color.FromRgb(0xFF, 0xB8, 0x00)),
+            GlowIconTone.Magenta => BrushColor("CyberPurple", Color.FromRgb(0xFF, 0xB8, 0x00)),
+            _ => BrushColor("NeonBlue", Color.FromRgb(0xFF, 0xD4, 0x00))
+        };
+    }
+
+    private Color BrushColor(string key, Color fallback)
+    {
+        try
+        {
+            if (FindResource(key) is Color c)
+                return c;
+            if (FindResource(key + "Brush") is SolidColorBrush b)
+                return b.Color;
+        }
+        catch
+        {
+            // theme resource may be missing during design-time
+        }
+
+        return fallback;
+    }
+
+    private static Button? FindAncestorButton(DependencyObject? node)
+    {
+        while (node != null)
+        {
+            if (node is Button button)
+            {
+                return button;
+            }
+
+            node = VisualTreeHelper.GetParent(node);
+        }
+
+        return null;
+    }
+
+    private static string GetPathData(GlowIconKind kind) => kind switch
+    {
+        GlowIconKind.Home =>
+            "M4,8 L12,3 L20,8 L20,19 A1,1 0 0 1 19,20 L5,20 A1,1 0 0 1 4,19 Z M9,20 L9,13 L15,13 L15,20",
+        GlowIconKind.Shield =>
+            "M12,3 L19,6 L19,12 C19,16.5 15.8,20.2 12,21.5 C8.2,20.2 5,16.5 5,12 L5,6 Z M9.2,12.2 L11.1,14.1 L15.2,9.6",
+        GlowIconKind.Ai =>
+            "M12,5 A7,7 0 1 1 11.99,5 M12,8.5 A3.5,3.5 0 1 1 11.99,8.5 M12,11.5 A1.2,1.2 0 1 1 11.99,11.5 M12,2 L12,4 M12,20 L12,22 M2,12 L4,12 M20,12 L22,12",
+        GlowIconKind.Settings =>
+            "M12,8.2 A3.8,3.8 0 1 1 11.99,8.2 M12,2.8 L12,5.2 M12,18.8 L12,21.2 M2.8,12 L5.2,12 M18.8,12 L21.2,12 M5.4,5.4 L7.1,7.1 M16.9,16.9 L18.6,18.6 M18.6,5.4 L16.9,7.1 M7.1,16.9 L5.4,18.6",
+        GlowIconKind.Paste =>
+            "M8,5 L10,5 L10,3.8 A1.2,1.2 0 0 1 11.2,2.6 L12.8,2.6 A1.2,1.2 0 0 1 14,3.8 L14,5 L16,5 A1.5,1.5 0 0 1 17.5,6.5 L17.5,19 A1.5,1.5 0 0 1 16,20.5 L8,20.5 A1.5,1.5 0 0 1 6.5,19 L6.5,6.5 A1.5,1.5 0 0 1 8,5 Z M9.5,10.5 L14.5,10.5 M9.5,13.5 L14.5,13.5 M9.5,16.5 L13,16.5",
+        GlowIconKind.Import =>
+            "M12,4 L12,14 M8.5,10.5 L12,14 L15.5,10.5 M6,17.5 L6,19 A1.5,1.5 0 0 0 7.5,20.5 L16.5,20.5 A1.5,1.5 0 0 0 18,19 L18,17.5",
+        GlowIconKind.Qr =>
+            "M4,4 L9,4 L9,9 L4,9 Z M15,4 L20,4 L20,9 L15,9 Z M4,15 L9,15 L9,20 L4,20 Z M11.5,11.5 L13.5,11.5 M15,13.5 L15,15.5 L17,15.5 M18.5,17 L20,17 L20,20 L17,20 L17,18.5 M13,17 L13,20 L15.5,20",
+        GlowIconKind.File =>
+            "M7,3.5 L14,3.5 L18.5,8 L18.5,20 A1,1 0 0 1 17.5,21 L7,21 A1,1 0 0 1 6,20 L6,4.5 A1,1 0 0 1 7,3.5 Z M14,3.5 L14,8 L18.5,8 M9,12 L15,12 M9,15.5 L15,15.5",
+        GlowIconKind.Edit =>
+            "M14.2,4.8 L19.2,9.8 L9.5,19.5 L4.5,20.5 L5.5,15.5 Z M12.8,6.2 L17.8,11.2",
+        GlowIconKind.Refresh =>
+            "M18.5,8.5 A7,7 0 0 0 7.2,7.8 M5.5,15.5 A7,7 0 0 0 16.8,16.2 M18.5,8.5 L18.5,4.2 M18.5,8.5 L14.8,8.5 M5.5,15.5 L5.5,19.8 M5.5,15.5 L9.2,15.5",
+        GlowIconKind.Pulse =>
+            "M12,4 A8,8 0 1 1 11.99,4 M12,7.5 A4.5,4.5 0 1 1 11.99,7.5 M12,11 A1.4,1.4 0 1 1 11.99,11 M12,12 L18.5,5.5",
+        GlowIconKind.Places =>
+            "M5,5 L10,5 L10,10 L5,10 Z M14,5 L19,5 L19,10 L14,10 Z M5,14 L10,14 L10,19 L5,19 Z M14,14 L19,14 L19,19 L14,19 Z",
+        GlowIconKind.Star =>
+            "M12,3.5 L14.2,9.2 L20.2,9.5 L15.5,13.5 L17,19.5 L12,16.2 L7,19.5 L8.5,13.5 L3.8,9.5 L9.8,9.2 Z",
+        GlowIconKind.Clock =>
+            "M12,4 A8,8 0 1 1 11.99,4 M12,8 L12,12.5 L15.5,14.5",
+        GlowIconKind.Globe =>
+            "M12,3.5 A8.5,8.5 0 1 1 11.99,3.5 M4.5,12 L19.5,12 M12,3.5 C15,7 15,17 12,20.5 M12,3.5 C9,7 9,17 12,20.5",
+        GlowIconKind.Close =>
+            "M7,7 L17,17 M17,7 L7,17",
+        GlowIconKind.More =>
+            "M12,5.5 A1.4,1.4 0 1 1 11.99,5.5 M12,12 A1.4,1.4 0 1 1 11.99,12 M12,18.5 A1.4,1.4 0 1 1 11.99,18.5",
+        _ => "M12,4 A8,8 0 1 1 11.99,4"
+    };
+}

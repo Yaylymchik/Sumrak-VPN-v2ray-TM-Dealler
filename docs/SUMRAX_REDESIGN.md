@@ -1,6 +1,6 @@
-# SumraX — полный редизайн (Happ)
+# SumraX — полный редизайн
 
-Версия спека: **2.2.18-happ**. Референс: Happ (тёмный UI, жёлтые акценты). Ядро: v2rayNG без смены VPN/Xray логики.
+Версия спека: **2.2.18+**. Референс: тёмный UI, жёлтые акценты. Ядро: v2rayNG без смены VPN/Xray логики.
 
 ## Принципы
 
@@ -14,11 +14,11 @@
 
 | Экран | Файлы | Статус |
 |-------|--------|--------|
-| Home | `jumpjump_home.xml`, `MainActivity.kt`, `HappPowerButtonView.kt` | Редизайн v2 |
-| Импорт (шторка) | `overlay_server_picker.xml` | Happ sheet |
+| Home | `jumpjump_home.xml`, `MainActivity.kt`, `SumrakPowerButtonView.kt` | Редизайн v2 |
+| Импорт (шторка) | `overlay_server_picker.xml` | sheet |
 | Меню | `nav_sumrax_*.xml` | Glass drawer |
 | Онбординг | `activity_onboarding.xml` | Стилизация |
-| Настройки | `fragment_happ_settings_host.xml`, `pref_settings.xml` | HWID здесь |
+| Настройки | `fragment_sumrax_settings_host.xml`, `pref_settings.xml` | HWID здесь |
 | Legacy списки | `activity_main` ViewPager | Скрыт, через drawer при необходимости |
 
 ## Home (wireframe)

@@ -97,7 +97,7 @@ class FaqActivity : BaseActivity() {
             showHomeAsUp = true,
             title = getString(R.string.sumrax_settings_faq)
         )
-        findViewById<MaterialButton>(R.id.btn_open_happ_faq).setOnClickListener {
+        findViewById<MaterialButton>(R.id.btn_open_web_faq).setOnClickListener {
             val uri = Uri.parse(AppConfig.APP_URL)
             startActivity(Intent(Intent.ACTION_VIEW, uri))
         }

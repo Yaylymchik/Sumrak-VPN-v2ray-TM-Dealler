@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- Home layout tokens → SumraX yellow/dark brand -->
+  <color name="sumrax_ui_bg_main">@color/sumrax_bg</color>
+  <color name="sumrax_ui_card_surface">@color/sumrax_surface</color>
+  <color name="sumrax_ui_settings_bg">@color/sumrax_bg_secondary</color>
+  <color name="sumrax_ui_settings_fragment_bg">@android:color/transparent</color>
+  <color name="sumrax_ui_text_primary">@color/sumrax_text_primary</color>
+  <color name="sumrax_ui_text_secondary">@color/sumrax_text_secondary</color>
+  <color name="sumrax_ui_text_tertiary">@color/sumrax_text_tertiary</color>
+  <color name="sumrax_ui_hint_gray">@color/sumrax_text_tertiary</color>
+  <color name="sumrax_ui_icon_primary">@color/sumrax_icon_primary</color>
+  <color name="sumrax_ui_settings_border">@color/sumrax_glass_stroke</color>
+  <color name="sumrax_ui_hover_main">@color/sumrax_accent_alpha_20</color>
+  <color name="sumrax_ui_chip_on_main">@color/sumrax_glass_fill</color>
+  <color name="sumrax_ui_accent">@color/sumrax_accent</color>
+  <color name="sumrax_ui_power_ring_idle">@color/sumrax_accent</color>
+  <color name="sumrax_ui_power_fill_idle">@color/sumrax_surface</color>
+  <color name="sumrax_ui_ping_ok">@color/sumrax_success</color>
+  <color name="sumrax_ui_settings_red">@color/sumrax_error</color>
+</resources>

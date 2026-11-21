@@ -41,11 +41,11 @@
 
         <include
             android:id="@+id/sheet_header"
-            layout="@layout/happ_servers_sheet_header" />
+            layout="@layout/sumrax_servers_sheet_header" />
 
         <include
             android:id="@+id/import_strip"
-            layout="@layout/happ_servers_import_strip" />
+            layout="@layout/sumrax_servers_import_strip" />
 
         <com.google.android.material.chip.ChipGroup
             android:id="@+id/chip_filter"

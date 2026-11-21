@@ -78,6 +78,40 @@ hiddify-app-main.zip
 Thumbs.db
 .DS_Store
 
-# Local analysis dumps (jadx / happ APK unpack) — not for publish
+# Local UI compare captures (may reference third-party packages in dumps)
+compare_full_*/
+compare_ui_*/
+compare_ui_desktop_apk_*/
+compare_ui_recheck_*/
+
+# Local analysis dumps (jadx / reference APK unpack) — not for publish
 tools/
+
+# Local build cache and credentials (never commit)
+.build-cache/
+.git-cred-temp.txt
+**/play-signing.local.txt
+
+# UI compare / audit captures at repo root
+ui_audit*.png
+ui_audit*.xml
+ui_test_*.png
+ui_test_*.xml
+ui_live_*.png
+ui_live_*.xml
+ui_happ*.png
+ui_happ*.xml
+ui_sumrax*.png
+ui_sumrax*.xml
+ui_buttons_live.xml
+ui_post_install.xml
+ui_hwid_find*.xml
+ui_servers_*.png
+ui_phone_now.png
+compare_ui_*/
+compare_ui_sumrax_happ_layout_*.png
+ui_redesign_audit/
+ui_redesign_tour/
+ui_sumrak_*.png
+sumrak_home_speed_*.png
 

@@ -1,0 +1,45 @@
+# Build & publish outputs
+publish/
+publish-lite/
+publish-win7/
+publish-win7-x86/
+publish-x86/
+publish-mac/
+dist/
+_build_log.txt
+test-capture-settings/
+dist-*/
+**/bin/
+**/obj/
+*.user
+*.suo
+*.userprefs
+.vs/
+.idea/
+
+# Logs & local data
+logs/
+*.log
+*.db
+*.db-shm
+*.db-wal
+
+# Large third-party / reference bundles
+tools/happ-desktop/
+tools/**/bin/
+tools/**/obj/
+
+# Runtimes (download via scripts/download-*.ps1) — keep folder docs only
+runtime/**/*.exe
+runtime/**/*.dll
+runtime/**/*.dat
+runtime/mac-arm64/
+runtime/mac-x64/
+runtime/sing-box/sing-box-*/
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.zip
+gradle-*.zip

@@ -1,0 +1,34 @@
+<UserControl x:Class="SumraX.App.Views.Controls.SegmentedModeSwitch"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root">
+    <Border Background="{DynamicResource SurfaceInsetBrush}" BorderBrush="{DynamicResource BorderSubtleBrush}"
+            BorderThickness="1" CornerRadius="8" Padding="3" HorizontalAlignment="Center">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Border x:Name="Highlight" Grid.Column="0" Width="88" Height="32" CornerRadius="6"
+                    Background="{DynamicResource SurfaceHoverBrush}" BorderBrush="{DynamicResource NeonGreenBrush}"
+                    BorderThickness="1.5" HorizontalAlignment="Left">
+                <Border.Effect>
+                    <DropShadowEffect Color="#A8E05F" BlurRadius="10" ShadowDepth="0" Opacity="0.55"/>
+                </Border.Effect>
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="HighlightShift"/>
+                </Border.RenderTransform>
+            </Border>
+            <Button Grid.Column="0" Width="88" Height="32" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                    Click="OnProxyClick">
+                <TextBlock x:Name="ProxyText" Text="{Binding LeftLabel, ElementName=Root}" FontFamily="{StaticResource PrimaryFont}"
+                           FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            </Button>
+            <Button Grid.Column="1" Width="88" Height="32" Background="Transparent" BorderThickness="0" Cursor="Hand"
+                    Click="OnTunClick">
+                <TextBlock x:Name="TunText" Text="{Binding RightLabel, ElementName=Root}" FontFamily="{StaticResource PrimaryFont}"
+                           FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimaryBrush}"/>
+            </Button>
+        </Grid>
+    </Border>
+</UserControl>

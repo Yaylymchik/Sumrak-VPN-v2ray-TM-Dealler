@@ -2,13 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/settings_row_root"
-    style="@style/Widget.Happ.SettingsForwardRow"
+    style="@style/Widget.Sumrax.SettingsForwardRow"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:foreground="?attr/selectableItemBackground"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingHorizontal="@dimen/happ_activity_horizontal_margin"
+    android:paddingHorizontal="@dimen/sumrax_ui_activity_horizontal_margin"
     android:paddingVertical="@dimen/padding_spacing_dp12">
 
     <TextView
@@ -18,7 +18,7 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textColor="@color/happ_text_primary"
+        android:textColor="@color/sumrax_ui_text_primary"
         android:textSize="16sp"
         tools:text="Язык" />
 
@@ -27,6 +27,6 @@
         android:layout_height="wrap_content"
         android:contentDescription="@null"
         android:padding="@dimen/padding_spacing_dp8"
-        android:src="@drawable/ic_happ_arrow_forward" />
+        android:src="@drawable/ic_sumrax_arrow_forward" />
 
 </LinearLayout>

@@ -1,7 +1,7 @@
 package com.v2ray.ang.util
 
 /**
- * Short labels for home / picker (Happ-style), not full subscription remarks.
+ * Short labels for home / picker, not full subscription remarks.
  */
 object ServerDisplayName {
 

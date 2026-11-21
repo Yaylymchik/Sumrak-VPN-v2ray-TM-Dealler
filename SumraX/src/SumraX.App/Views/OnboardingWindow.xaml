@@ -1,0 +1,53 @@
+<Window x:Class="SumraX.App.Views.OnboardingWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sumrak VPN"
+        Width="480" Height="640"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        Background="{DynamicResource BgPrimaryBrush}">
+    <Window.Resources>
+        <Storyboard x:Key="SlideIn">
+            <DoubleAnimation Storyboard.TargetName="ContentHost" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.X)"
+                             From="40" To="0" Duration="0:0:0.35">
+                <DoubleAnimation.EasingFunction><CubicEase EasingMode="EaseOut"/></DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetName="ContentHost" Storyboard.TargetProperty="Opacity"
+                             From="0" To="1" Duration="0:0:0.35"/>
+        </Storyboard>
+    </Window.Resources>
+    <Border BorderBrush="{DynamicResource NeonBlueBrush}" BorderThickness="1" Background="{DynamicResource BgSecondaryBrush}" Margin="8">
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,0,0,16">
+                <TextBlock x:Name="StepTitle" FontFamily="{StaticResource PrimaryFont}" FontSize="24" FontWeight="Bold"
+                           Foreground="{DynamicResource NeonGreenBrush}" TextAlignment="Center"/>
+                <TextBlock x:Name="StepSubtitle" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondaryBrush}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"/>
+                <UniformGrid x:Name="DotsPanel" Columns="4" Margin="0,16,0,0" HorizontalAlignment="Center" Width="96"/>
+            </StackPanel>
+
+            <Border x:Name="ContentHost" Grid.Row="1" Opacity="1" RenderTransformOrigin="0.5,0.5">
+                <Border.RenderTransform><TranslateTransform/></Border.RenderTransform>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="StepContent"/>
+                </ScrollViewer>
+            </Border>
+
+            <Grid Grid.Row="2" Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="BackButton" Content="←" Style="{StaticResource GhostButton}" Click="Back_Click" Visibility="Collapsed"/>
+                <Button x:Name="NextButton" Grid.Column="1" Style="{StaticResource ConnectButton}" Click="Next_Click" MinWidth="140" Padding="20,10"/>
+            </Grid>
+        </Grid>
+    </Border>
+</Window>

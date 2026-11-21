@@ -7,7 +7,7 @@ import com.v2ray.ang.handler.MmkvManager
 import java.security.MessageDigest
 
 /**
- * Happ-style HWID header for subscription HTTP requests (X-hwid).
+ * HWID header for subscription HTTP requests (X-hwid).
  */
 object HwidManager {
 

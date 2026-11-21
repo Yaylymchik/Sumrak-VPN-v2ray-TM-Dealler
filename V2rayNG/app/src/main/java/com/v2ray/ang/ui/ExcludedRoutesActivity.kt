@@ -100,7 +100,7 @@ class ReportActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         val intent = Intent(Intent.ACTION_SENDTO).apply {
             data = android.net.Uri.parse("mailto:")
-            putExtra(Intent.EXTRA_EMAIL, arrayOf("support@happ.su"))
+            putExtra(Intent.EXTRA_EMAIL, arrayOf("support@sumrax.app"))
             putExtra(Intent.EXTRA_SUBJECT, "${getString(R.string.app_name)} report")
         }
         if (intent.resolveActivity(packageManager) != null) {

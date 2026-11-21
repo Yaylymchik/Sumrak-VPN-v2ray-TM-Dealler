@@ -1,0 +1,23 @@
+Sumrak VPN — установка как (High Sierra)
+
+На флешке E:\SumraX-HighSierra:
+
+  Sumrak VPN.app   <-- перетащи в Программы
+
+1. Открой флешку на Mac
+2. Перетащи Sumrak VPN.app в Applications (Программы)
+3. Первый запуск: правый клик -> Открыть
+4. Кнопка ПОДКЛЮЧИТЬ
+
+config.json уже внутри приложения.
+
+DMG (если есть Mac для сборки):
+  ./scripts/build-hsierra-app.sh
+  open dist-hsierra/SumraX-VPN-HighSierra.dmg
+
+Отличие от новых клиентов (macOS 12+ в App Store):
+  требует macOS 12+ (App Store)
+  Sumrak VPN.app работает на High Sierra 10.13
+
+Собрать .app на Windows (флешка E:):
+  .\scripts\build-hsierra-app.ps1

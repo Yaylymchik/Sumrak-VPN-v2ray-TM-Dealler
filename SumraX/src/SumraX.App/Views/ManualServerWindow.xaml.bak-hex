@@ -1,0 +1,61 @@
+<Window x:Class="SumraX.App.Views.ManualServerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Name="Root"
+        Width="480" Height="620"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{DynamicResource BgPrimaryBrush}"
+        Foreground="{DynamicResource TextPrimaryBrush}">
+    <ScrollViewer Margin="20" VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+            <TextBlock x:Name="TitleLabel" Style="{StaticResource PageTitle}" Margin="0,0,0,16"/>
+
+            <TextBlock x:Name="NameLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="NameBox" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="ProtocolLabel" Style="{StaticResource StatLabel}"/>
+            <ComboBox x:Name="ProtocolBox" SelectedIndex="0" Style="{StaticResource ComboPremium}" Margin="0,0,0,10">
+                <ComboBoxItem Content="VMess"/>
+                <ComboBoxItem Content="VLESS"/>
+                <ComboBoxItem Content="Trojan"/>
+                <ComboBoxItem Content="Shadowsocks"/>
+            </ComboBox>
+
+            <TextBlock x:Name="AddressLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="AddressBox" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="PortLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="PortBox" Text="443" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="UserIdLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="UserIdBox" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="PasswordLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="PasswordBox" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="EncryptionLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="EncryptionBox" Text="auto" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="NetworkLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="NetworkBox" Text="tcp" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="SecurityLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="SecurityBox" Text="tls" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="SniLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="SniBox" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="HostLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="HostBox" Style="{StaticResource SearchBox}" Margin="0,0,0,10"/>
+
+            <TextBlock x:Name="PathLabel" Style="{StaticResource StatLabel}"/>
+            <TextBox x:Name="PathBox" Style="{StaticResource SearchBox}" Margin="0,0,0,16"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="CancelButton" Style="{StaticResource SecondaryButton}" Click="Cancel_Click" Margin="0,0,8,0" Padding="16,8"/>
+                <Button x:Name="SaveButton" Style="{StaticResource PrimaryButton}" Click="Save_Click" Padding="16,8"/>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</Window>
