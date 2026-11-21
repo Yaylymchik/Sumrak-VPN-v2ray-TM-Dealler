@@ -43,9 +43,29 @@ jobs:
       - name: IndexNow (Bing, Yandex, Naver)
         if: success()
         run: |
+          set -euo pipefail
           BASE="https://yaylymchik.github.io/Sumrak-VPN-v2ray-TM-Dealler"
           KEY="a7f3c9e2b8416d50sumrakVpnIndexNow2026"
-          curl -fsS -X POST "https://api.indexnow.org/indexnow" \
+          KEY_URL="${BASE}/sumrak-indexnow-key.txt"
+          for i in 1 2 3 4 5 6; do
+            if curl -fsS "$KEY_URL" | grep -qxF "$KEY"; then
+              echo "IndexNow key file is live"
+              break
+            fi
+            echo "Waiting for key file on Pages ($i/6)..."
+            sleep 15
+          done
+          curl -fsS "$KEY_URL" | grep -qxF "$KEY"
+          BODY=$(jq -n \
+            --arg host "yaylymchik.github.io" \
+            --arg key "$KEY" \
+            --arg keyLocation "$KEY_URL" \
+            --arg u1 "${BASE}/" \
+            --arg u2 "${BASE}/sitemap.xml" \
+            '{host: $host, key: $key, keyLocation: $keyLocation, urlList: [$u1, $u2]}')
+          HTTP=$(curl -sS -o /tmp/indexnow-resp.txt -w "%{http_code}" -X POST "https://api.indexnow.org/indexnow" \
             -H "Content-Type: application/json; charset=utf-8" \
-            -d "{\"host\":\"yaylymchik.github.io\",\"key\":\"${KEY}\",\"keyLocation\":\"${BASE}/sumrak-indexnow-key.txt\",\"urlList\":[\"${BASE}/\",\"${BASE}/sitemap.xml\"]}" \
-            || true
+            -d "$BODY")
+          echo "IndexNow HTTP ${HTTP}"
+          cat /tmp/indexnow-resp.txt || true
+          test "$HTTP" = "200" -o "$HTTP" = "202"
