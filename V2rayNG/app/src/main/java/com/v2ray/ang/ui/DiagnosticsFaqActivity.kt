@@ -80,7 +80,7 @@ class DiagnosticsActivity : BaseActivity() {
             appendLine("Running: $running")
             appendLine("Server: ${profile?.remarks ?: "—"}")
             appendLine("Address: ${profile?.server ?: "—"}:${profile?.serverPort ?: "—"}")
-            appendLine("Ping type: ${MmkvManager.decodeSettingsString(AppConfig.PREF_PING_TYPE, "tcp")}")
+            appendLine("Ping type: ${MmkvManager.decodeSettingsString(AppConfig.PREF_PING_TYPE, AppConfig.PING_TYPE_PROXY)}")
             appendLine("Routing: ${SettingsManager.isRoutingEnabled()}")
             appendLine("Hev TUN: ${SettingsManager.isUsingHevTun()}")
             appendLine("Fragment: ${MmkvManager.decodeSettingsBool(AppConfig.PREF_FRAGMENT_ENABLED, false)}")

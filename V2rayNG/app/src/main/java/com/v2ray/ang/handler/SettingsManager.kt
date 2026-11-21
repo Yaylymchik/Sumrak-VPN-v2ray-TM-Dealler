@@ -42,6 +42,7 @@ object SettingsManager {
 
     fun initApp(context: Context) {
         ensureDefaultSettings()
+        applySumrakTunnelDefaultsV2()
         applyAppUpdatePolicyDefaults()
         //ensureDefaultSubscription()
         initRoutingRulesets(context)
@@ -588,8 +589,20 @@ object SettingsManager {
                 ?.takeIf { it.isNotBlank() }
                 ?.let { return it }
         }
-        return MmkvManager.decodeSettingsString(AppConfig.PREF_PING_TYPE, AppConfig.PING_TYPE_TCP)
-            ?: AppConfig.PING_TYPE_TCP
+        return MmkvManager.decodeSettingsString(AppConfig.PREF_PING_TYPE, AppConfig.PING_TYPE_PROXY)
+            ?: AppConfig.PING_TYPE_PROXY
+    }
+
+    /**
+     * One-time migration: Sumrak defaults (proxy ping, mux/fragment off).
+     */
+    private fun applySumrakTunnelDefaultsV2() {
+        val key = "pref_sumrak_tunnel_defaults_v2"
+        if (MmkvManager.decodeSettingsBool(key, false)) return
+        MmkvManager.encodeSettings(AppConfig.PREF_PING_TYPE, AppConfig.PING_TYPE_PROXY)
+        MmkvManager.encodeSettings(AppConfig.PREF_MUX_ENABLED, false)
+        MmkvManager.encodeSettings(AppConfig.PREF_FRAGMENT_ENABLED, false)
+        MmkvManager.encodeSettings(key, true)
     }
 
     fun resetUserSettings() {
@@ -642,7 +655,9 @@ object SettingsManager {
         ensureDefaultValue(AppConfig.PREF_MUX_XUDP_CONCURRENCY, "8")
         ensureDefaultValue(AppConfig.PREF_LANGUAGE, Language.RUSSIAN.code)
         ensureDefaultValue(AppConfig.PREF_UI_MODE_NIGHT, "2")
-        ensureDefaultValue(AppConfig.PREF_PING_TYPE, "tcp")
+        ensureDefaultValue(AppConfig.PREF_PING_TYPE, AppConfig.PING_TYPE_PROXY)
+        ensureDefaultBoolValue(AppConfig.PREF_MUX_ENABLED, false)
+        ensureDefaultBoolValue(AppConfig.PREF_FRAGMENT_ENABLED, false)
         ensureDefaultValue(AppConfig.PREF_FONT_SIZE, "2")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_LENGTH, "50-100")
         ensureDefaultValue(AppConfig.PREF_FRAGMENT_INTERVAL, "10-20")

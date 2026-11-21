@@ -775,6 +775,8 @@
     <string name="monthly_traffic_reset_body">%1$s usage: %2$s↑  %3$s↓  (total %4$s). Counter reset for the new month.</string>
     <string name="drawer_block_service">BLOCK SERVICE</string>
     <string name="profile_days_remaining">%d days left</string>
+    <string name="sumrax_watch_days_unit">DAYS</string>
+    <string name="sumrax_watch_days_content_description">Subscription time remaining</string>
     <string name="result_subscription_updated">Subscription updated: %d profiles</string>
     <string name="result_ping_complete">Ping complete, sorted by latency</string>
     <string name="result_ping_testing">Pinging %d profiles…</string>

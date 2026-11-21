@@ -702,7 +702,14 @@ class MainActivity : HelperBaseActivity() {
             ?: selectedProfile?.subscriptionId
             ?: fallback?.let { MmkvManager.decodeServerConfig(it.first)?.subscriptionId }
 
+        val days = remarks?.let {
+            ProfileRemarkParser.resolveLiveRemainingDays(it, subscriptionId, guid)
+        }
+        homePanel.watchDaysRemaining.setRemainingDays(days)
         binding.layoutDaysRemaining.isVisible = false
+        if (days != null) {
+            binding.tvDaysRemaining.text = ProfileRemarkParser.formatRemainingDays(this, days)
+        }
     }
 
     private fun findFirstProfileWithDays(): Pair<String, String>? {
@@ -948,6 +955,7 @@ class MainActivity : HelperBaseActivity() {
         connectionErrorMessage = null
         connectionUiState = ConnectionUiState.CONNECTING
         applyConnectionUi()
+        ProfileSettingsApplier.applyForCurrentSelection()
 
         if (SettingsManager.isVpnMode()) {
             val intent = VpnService.prepare(this)

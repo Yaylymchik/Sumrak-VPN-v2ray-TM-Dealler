@@ -51,7 +51,7 @@
             android:title="@string/title_pref_hwid_custom_value" />
 
         <ListPreference
-            android:defaultValue="tcp"
+            android:defaultValue="proxy"
             android:entries="@array/ping_type_entries"
             android:entryValues="@array/ping_type_value"
             android:key="pref_ping_type"

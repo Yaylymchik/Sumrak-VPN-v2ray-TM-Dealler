@@ -16,9 +16,15 @@ object ProfileSettingsApplier {
 
         ProfileFinalMaskApplier.applyOnSelect(guid)
 
-        val subId = profile.subscriptionId?.takeIf { it.isNotBlank() } ?: return
-        val sub = MmkvManager.decodeSubscription(subId) ?: return
-        applySubscriptionSettings(sub)
+        val subId = profile.subscriptionId?.takeIf { it.isNotBlank() }
+        if (subId != null) {
+            val sub = MmkvManager.decodeSubscription(subId) ?: return
+            applySubscriptionSettings(sub)
+        }
+
+        ProfileFinalMaskApplier.extract(profile, guid)?.let { extracted ->
+            applyExtractedTunnelSettings(extracted)
+        }
     }
 
     fun applyForCurrentSelection() {
@@ -67,6 +73,30 @@ object ProfileSettingsApplier {
         }
         sub.autoConnectType?.takeIf { it.isNotBlank() }?.let {
             MmkvManager.encodeSettings(AppConfig.PREF_AUTO_CONNECT_TYPE, it)
+        }
+    }
+
+    private fun applyExtractedTunnelSettings(extracted: ProfileFinalMaskApplier.ExtractedSettings) {
+        if (extracted.fragmentEnabled) {
+            MmkvManager.encodeSettings(AppConfig.PREF_FRAGMENT_ENABLED, true)
+            extracted.fragmentPackets?.takeIf { it.isNotBlank() }?.let {
+                MmkvManager.encodeSettings(AppConfig.PREF_FRAGMENT_PACKETS, it)
+            }
+            extracted.fragmentLength?.takeIf { it.isNotBlank() }?.let {
+                MmkvManager.encodeSettings(AppConfig.PREF_FRAGMENT_LENGTH, it)
+            }
+            extracted.fragmentDelay?.takeIf { it.isNotBlank() }?.let {
+                MmkvManager.encodeSettings(AppConfig.PREF_FRAGMENT_INTERVAL, it)
+            }
+        }
+        if (extracted.noiseEnabled) {
+            MmkvManager.encodeSettings(AppConfig.PREF_NOISE_ENABLED, true)
+            extracted.noiseRand?.takeIf { it.isNotBlank() }?.let {
+                MmkvManager.encodeSettings(AppConfig.PREF_NOISE_RAND, it)
+            }
+            extracted.noiseDelay?.takeIf { it.isNotBlank() }?.let {
+                MmkvManager.encodeSettings(AppConfig.PREF_NOISE_DELAY, it)
+            }
         }
     }
 }

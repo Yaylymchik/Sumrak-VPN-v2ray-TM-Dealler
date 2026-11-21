@@ -768,6 +768,8 @@
     <string name="monthly_traffic_reset_body">За %1$s использовано: %2$s↑  %3$s↓  (всего %4$s). Счётчик сброшен.</string>
     <string name="drawer_block_service">BLOCK SERVICE</string>
     <string name="profile_days_remaining">Осталось: %d дн.</string>
+    <string name="sumrax_watch_days_unit">ДН</string>
+    <string name="sumrax_watch_days_content_description">Остаток времени подписки</string>
     <string name="result_subscription_updated">Подписка обновлена: %d профилей</string>
     <string name="result_ping_complete">Пинг завершён, сортировка по задержке</string>
     <string name="result_ping_testing">Пинг %d профилей…</string>

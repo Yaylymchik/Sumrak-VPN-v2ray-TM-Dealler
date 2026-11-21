@@ -58,6 +58,18 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <com.v2ray.ang.ui.WatchDaysRemainingView
+            android:id="@+id/watch_days_remaining"
+            android:layout_width="@dimen/watch_days_size"
+            android:layout_height="@dimen/watch_days_size"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="@dimen/happ_activity_horizontal_margin"
+            android:contentDescription="@string/sumrax_watch_days_content_description"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/connection_mode_switch"
+            tools:visibility="visible" />
+
         <ImageView
             android:id="@+id/btn_power_circle"
             android:layout_width="0dp"
