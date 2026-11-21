@@ -90,3 +90,7 @@ bundle exec fastlane upload_internal
 Рекомендуемый порядок: **Internal testing** → **Closed testing** → **Production**.
 
 После первой публикации смените стратегию обновлений: можно оставить GitHub-releases для sideload и дублировать релизы в Play.
+
+## 10. Google Search (вне Play)
+
+SEO-лендинг и инструкция: [GOOGLE_SEARCH.md](GOOGLE_SEARCH.md). Включите **GitHub Pages** из папки `/docs`, затем добавьте сайт в **Search Console** и отправьте `sitemap.xml`.

@@ -22,6 +22,8 @@ Output: `app/build/outputs/bundle/playstoreRelease/app-playstore-release.aab`. S
 
 Step-by-step (RU): [docs/PLAYSTORE.md](docs/PLAYSTORE.md). Store listing texts: `fastlane/metadata/android/`. Privacy: [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 
+**Google Search / landing page** (enable GitHub Pages from `/docs`): [docs/index.html](docs/index.html) · [GOOGLE_SEARCH.md](docs/GOOGLE_SEARCH.md)
+
 ## App updates
 
 In-app update checks use GitHub Releases API:

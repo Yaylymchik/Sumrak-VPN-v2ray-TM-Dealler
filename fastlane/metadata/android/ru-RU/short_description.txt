@@ -1,1 +1,1 @@
-VPN-клиент для своих серверов V2Ray/Xray и подписок. Интерфейс SumraX.
+Sumrak VPN — V2Ray/Xray, Smart Connect, пинг, автообновление подписок каждые 30 мин.

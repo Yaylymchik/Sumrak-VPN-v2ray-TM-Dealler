@@ -1,0 +1,1 @@
+2.2.21: clearer app update checks; home footer ping/status; renew-subscription reminder; 30-min subscription auto-update default; server ping tap; Google Search landing page.

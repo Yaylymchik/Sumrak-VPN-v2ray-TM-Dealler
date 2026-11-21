@@ -1,1 +1,1 @@
-VPN client for your own V2Ray/Xray servers and subscriptions. Yellow-black SumraX UI.
+Sumrak VPN — V2Ray/Xray client, Smart Connect, ping, 30-min subscription auto-refresh.

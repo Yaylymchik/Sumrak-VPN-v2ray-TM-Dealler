@@ -12,8 +12,8 @@ android {
         applicationId = "com.sumrax.app"
         minSdk = 24
         targetSdk = 37
-        versionCode = 750
-        versionName = "2.2.20"
+        versionCode = 751
+        versionName = "2.2.21"
         multiDexEnabled = true
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')

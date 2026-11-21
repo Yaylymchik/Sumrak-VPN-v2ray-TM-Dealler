@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://yaylymchik.github.io/Sumrak-VPN-v2ray-TM-Dealler/sitemap.xml
