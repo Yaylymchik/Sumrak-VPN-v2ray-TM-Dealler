@@ -24,6 +24,7 @@ V2rayNG/local.properties
 # Ignore APK and AAR files (keep app native/core libs)
 *.apk
 *.aar
+!V2rayNG/app/src/main/assets/bundled/vpn-hotspot-3.0.8.apk
 !V2rayNG/app/libs/**
 
 # Ignore signing properties

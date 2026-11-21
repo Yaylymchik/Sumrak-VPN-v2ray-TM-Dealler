@@ -28,6 +28,7 @@ object SettingsHubRegistry {
         Entry(R.string.title_pref_per_app_proxy, PerAppProxyActivity::class.java, Tab.TUNNEL),
         Entry(R.string.inbound_authorization_title, InboundAuthActivity::class.java, Tab.TUNNEL),
         Entry(R.string.title_tunnel, TunnelOptionsActivity::class.java, Tab.TUNNEL),
+        Entry(R.string.title_vpn_hotspot, VpnHotspotActivity::class.java, Tab.TUNNEL),
 
         Entry(R.string.title_vpn_settings, VpnSettingsActivity::class.java, Tab.ADVANCED),
         Entry(R.string.title_subscription, SubscriptionSettingsActivity::class.java, Tab.ADVANCED),

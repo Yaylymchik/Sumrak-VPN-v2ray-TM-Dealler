@@ -96,6 +96,10 @@ object AppConfig {
     const val PREF_MODE = "pref_mode"
     const val PREF_ROOT_MODE_ENABLE = "pref_root_mode_enabled"
     const val PREF_ROOT_LAN_SHARING = "pref_root_lan_sharing"
+
+    /** Mygod VPN Hotspot companion (GPL-3.0), bundled optional installer asset. */
+    const val VPN_HOTSPOT_PACKAGE = "be.mygod.vpnhotspot"
+    const val VPN_HOTSPOT_ASSET_APK = "bundled/vpn-hotspot-3.0.8.apk"
     const val PREF_CONNECTION_MODE = "pref_connection_mode"
     const val CONNECTION_MODE_SMART = "smart"
     const val CONNECTION_MODE_MANUAL = "manual"

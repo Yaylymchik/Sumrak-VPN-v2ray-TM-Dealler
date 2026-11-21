@@ -23,6 +23,17 @@ object RootLanSharing {
      * The cheap, usually-false preference is checked first so the common path
      * short-circuits before touching root state.
      */
+    /** Apply LAN-sharing pref and refresh iptables rules if VPN is active. */
+    fun setEnabled(context: Context, enabled: Boolean) {
+        val was = MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING)
+        MmkvManager.encodeSettings(AppConfig.PREF_ROOT_LAN_SHARING, enabled)
+        if (was == enabled) return
+        stopClientSharing(context)
+        if (enabled) {
+            startClientSharing(context)
+        }
+    }
+
     fun startClientSharing(context: Context): Boolean {
         if (MmkvManager.decodeSettingsBool(AppConfig.PREF_ROOT_LAN_SHARING) && RootManager.cachedRoot()) {
             if (lanShareJob != null) return false

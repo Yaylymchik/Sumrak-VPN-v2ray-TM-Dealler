@@ -43,4 +43,4 @@ bundle exec fastlane upload_internal
 
 Добавьте ссылку на карточку приложения в `docs/index.html` и в `full_description.txt`:
 
-`https://play.google.com/store/apps/details?id=com.sumrax.app`
+`https://play.google.com/store/apps/details?id=com.sumrax.app` (ссылка на лендинге `docs/index.html` уже добавлена; заработает после публикации в Play)

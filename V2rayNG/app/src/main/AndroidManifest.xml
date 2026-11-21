@@ -234,6 +234,9 @@
             android:name=".ui.LanPortsSettingsActivity"
             android:exported="false" />
         <activity
+            android:name=".ui.VpnHotspotActivity"
+            android:exported="false" />
+        <activity
             android:name=".ui.AutoStartSettingsActivity"
             android:exported="false" />
         <activity
