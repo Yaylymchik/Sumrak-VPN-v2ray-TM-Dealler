@@ -636,6 +636,8 @@
 
     <string name="update_check_for_update">Проверить обновление</string>
     <string name="update_already_latest_version">Установлена последняя версия</string>
+    <string name="update_already_latest_version_detail">Установлено: %1$s — на сервере: %2$s</string>
+    <string name="update_check_failed">Не удалось проверить обновление. Проверьте интернет или подключите VPN и повторите.</string>
     <string name="update_new_version_found">Найдена новая версия: %s</string>
     <string name="update_now">Обновить</string>
     <string name="update_check_pre_release">Искать предварительный выпуск</string>
@@ -770,6 +772,18 @@
     <string name="profile_days_remaining">Осталось: %d дн.</string>
     <string name="sumrax_watch_days_unit">ДН</string>
     <string name="sumrax_watch_days_content_description">Остаток времени подписки</string>
+    <string name="sumrax_renew_subscription_toggle">Продли подписку</string>
+    <string name="sumrax_renew_subscription_toggle_days">Продлите · осталось %1$d дн.</string>
+    <string name="sumrax_renew_subscription_daily">Подписка скоро закончится (осталось %1$d дн.). Продлите.</string>
+    <string name="sumrax_server_detail_ping">Пинг: %1$d мс</string>
+    <string name="sumrax_server_detail_ping_fail">Пинг: ошибка</string>
+    <string name="sumrax_server_detail_ping_unknown">Пинг: н/д</string>
+    <string name="sumrax_server_detail_protocol">Протокол: %1$s</string>
+    <string name="sumrax_server_detail_days">Остаток: %1$s</string>
+    <string name="sumrax_server_detail_host">Хост: %1$s</string>
+    <string name="sumrax_server_detail_remark">Профиль: %1$s</string>
+    <string name="sumrax_ping_retest">Проверить пинг</string>
+    <string name="sumrax_home_speed_compact">↑ %1$s  ↓ %2$s</string>
     <string name="result_subscription_updated">Подписка обновлена: %d профилей</string>
     <string name="result_ping_complete">Пинг завершён, сортировка по задержке</string>
     <string name="result_ping_testing">Пинг %d профилей…</string>

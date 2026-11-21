@@ -8,6 +8,7 @@
     android:paddingVertical="8dp">
 
     <TextView
+        android:id="@+id/tv_home_author_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="monospace"
@@ -15,6 +16,20 @@
         android:textColor="@color/sumrax_text_tertiary"
         android:textSize="9sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_home_footer_ping"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:fontFamily="sans-serif-light"
+        android:gravity="center"
+        android:maxLines="2"
+        android:paddingHorizontal="8dp"
+        android:textColor="@color/sumrax_success"
+        android:textSize="11sp"
+        android:visibility="gone" />
 
     <TextView
         android:id="@+id/tv_home_author_name"
@@ -25,4 +40,15 @@
         android:textColor="@color/sumrax_accent"
         android:textSize="13sp"
         android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_home_footer_ping_extra"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="monospace"
+        android:gravity="center"
+        android:maxLines="1"
+        android:textColor="@color/sumrax_text_secondary"
+        android:textSize="10sp"
+        android:visibility="gone" />
 </LinearLayout>

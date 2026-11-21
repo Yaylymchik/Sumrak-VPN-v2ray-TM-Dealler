@@ -40,14 +40,16 @@ object SettingsManager {
     @Volatile
     private var runtimeSocksPort: Int? = null
 
-    fun initApp(context: Context) {
+    fun initApp(context: Context): Boolean {
         ensureDefaultSettings()
         applySumrakTunnelDefaultsV2()
         applyAppUpdatePolicyDefaults()
+        val subscriptionPolicyApplied = applySubscriptionAutoUpdatePolicyDefaults()
         //ensureDefaultSubscription()
         initRoutingRulesets(context)
         migrateServerListToSubscriptions()
         migrateHysteria2PinSHA256()
+        return subscriptionPolicyApplied
     }
 
     /**
@@ -524,6 +526,35 @@ object SettingsManager {
 
     fun isAutoInstallAppUpdateEnabled(): Boolean {
         return MmkvManager.decodeSettingsBool(AppConfig.PREF_AUTO_INSTALL_APP_UPDATE, true)
+    }
+
+    /**
+     * One-time: enable global auto-update every 30 minutes for all subscriptions.
+     */
+    fun applySubscriptionAutoUpdatePolicyDefaults(): Boolean {
+        if (MmkvManager.decodeSettingsBool(AppConfig.PREF_SUBSCRIPTION_AUTO_UPDATE_POLICY_V1, false)) {
+            return false
+        }
+        MmkvManager.encodeSettings(AppConfig.PREF_SUBSCRIPTION_AUTO_UPDATE_ENABLE, true)
+        MmkvManager.encodeSettings(AppConfig.PREF_SUBSCRIPTION_UPDATE_ON_LAUNCH, true)
+        val interval = AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL_MINUTES
+        MmkvManager.decodeSubscriptions().forEach { cache ->
+            val sub = cache.subscription
+            var changed = false
+            if (!sub.autoUpdate) {
+                sub.autoUpdate = true
+                changed = true
+            }
+            if (sub.updateInterval < interval) {
+                sub.updateInterval = interval
+                changed = true
+            }
+            if (changed) {
+                encodeSubscription(cache.guid, sub)
+            }
+        }
+        MmkvManager.encodeSettings(AppConfig.PREF_SUBSCRIPTION_AUTO_UPDATE_POLICY_V1, true)
+        return true
     }
 
     /** One-time: enable check, download and install prompts for app updates. */

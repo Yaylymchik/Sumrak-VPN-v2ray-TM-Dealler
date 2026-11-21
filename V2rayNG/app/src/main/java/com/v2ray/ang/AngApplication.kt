@@ -43,10 +43,10 @@ class AngApplication : MultiDexApplication() {
         WorkManager.initialize(this, workManagerConfiguration)
 
         // Ensure critical preference defaults are present in MMKV early
-        SettingsManager.initApp(this)
+        val subscriptionPolicyApplied = SettingsManager.initApp(this)
         SettingsManager.setNightMode()
         MonthlyTrafficTracker.checkPeriodOnLaunch(this)
-        SubscriptionUpdater.sync(this)
+        SubscriptionUpdater.sync(this, forceReschedule = subscriptionPolicyApplied)
         AppUpdateScheduler.sync(this)
         PushMessaging.syncToken()
 

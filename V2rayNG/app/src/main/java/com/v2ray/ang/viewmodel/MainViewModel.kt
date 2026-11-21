@@ -51,6 +51,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val updateTestResultAction by lazy { MutableLiveData<String>() }
     private val tcpingTestScope by lazy { CoroutineScope(Dispatchers.IO) }
     private var pendingPingOnComplete: ((String) -> Unit)? = null
+    private var pendingSinglePingGuid: String? = null
+    private var pendingSinglePingCallback: ((Long) -> Unit)? = null
     private var pingBatchJob: Job? = null
 
     companion object {
@@ -384,6 +386,63 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     /**
+     * Measures latency for one server (TCP/ICMP/proxy per subscription ping type).
+     */
+    fun testSingleServerPing(guid: String, onComplete: (Long) -> Unit) {
+        val profile = MmkvManager.decodeServerConfig(guid) ?: run {
+            onComplete(-1L)
+            return
+        }
+        val subId = profile.subscriptionId.orEmpty()
+        val pingType = SettingsManager.getPingType(subId)
+        when (pingType) {
+            AppConfig.PING_TYPE_PROXY, AppConfig.PING_TYPE_PROXY_HEAD -> {
+                pendingSinglePingGuid = guid
+                pendingSinglePingCallback = onComplete
+                MessageUtil.sendMsg2TestService(
+                    getApplication(),
+                    TestServiceMessage(
+                        key = AppConfig.MSG_MEASURE_CONFIG_START,
+                        subscriptionId = subId,
+                        serverGuids = listOf(guid),
+                    ),
+                )
+            }
+            AppConfig.PING_TYPE_ICMP -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    val host = profile.server
+                    val result = if (!host.isNullOrBlank()) {
+                        SpeedtestManager.icmpPing(host)
+                    } else {
+                        -1L
+                    }
+                    MmkvManager.encodeServerTestDelayMillis(guid, result)
+                    withContext(Dispatchers.Main) {
+                        updateListAction.value = getPosition(guid)
+                        onComplete(result)
+                    }
+                }
+            }
+            else -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    val host = profile.server
+                    val port = profile.serverPort?.toIntOrNull()
+                    val result = if (host != null && port != null) {
+                        SpeedtestManager.tcping(host, port)
+                    } else {
+                        -1L
+                    }
+                    MmkvManager.encodeServerTestDelayMillis(guid, result)
+                    withContext(Dispatchers.Main) {
+                        updateListAction.value = getPosition(guid)
+                        onComplete(result)
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Changes the subscription ID.
      * @param id The new subscription ID.
      */
@@ -652,10 +711,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     val content = intent.getStringExtra("content")
                     if (content == "0") {
                         onTestsFinished()
+                        pendingSinglePingGuid?.let { guid ->
+                            val delay =
+                                MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: -1L
+                            pendingSinglePingCallback?.invoke(delay)
+                            pendingSinglePingCallback = null
+                            pendingSinglePingGuid = null
+                        }
                     } else {
                         val callback = pendingPingOnComplete
                         pendingPingOnComplete = null
                         callback?.invoke(PING_CANCELLED)
+                        pendingSinglePingGuid?.let { guid ->
+                            val delay =
+                                MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: -1L
+                            pendingSinglePingCallback?.invoke(delay)
+                            pendingSinglePingCallback = null
+                            pendingSinglePingGuid = null
+                        }
                     }
                 }
             }

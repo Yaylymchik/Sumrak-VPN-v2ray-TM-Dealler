@@ -35,8 +35,8 @@ object AppUpdateRunner {
     }
     val includePre = MmkvManager.decodeSettingsBool(AppConfig.PREF_CHECK_UPDATE_PRE_RELEASE, false)
     val result = UpdateCheckerManager.checkForUpdate(includePre)
-    if (!result.hasUpdate) {
-      return RunResult(checked = true, updateAvailable = false)
+    if (!result.checkSucceeded || !result.hasUpdate) {
+      return RunResult(checked = result.checkSucceeded, updateAvailable = false)
     }
     if (!SettingsManager.isAutoDownloadAppUpdateEnabled()) {
       notifyUpdateAvailable(context, result)

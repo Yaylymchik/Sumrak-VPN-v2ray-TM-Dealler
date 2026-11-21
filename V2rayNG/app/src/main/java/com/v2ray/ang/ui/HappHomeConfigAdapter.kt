@@ -24,6 +24,7 @@ class HappHomeConfigAdapter(
         fun onRefreshGroup(subscriptionId: String)
         fun onPingGroup(subscriptionId: String)
         fun onMoreGroup(subscriptionId: String, anchor: View)
+        fun onServerPingTap(guid: String)
     }
 
     private var rows: List<HappHomeRow> = emptyList()

@@ -122,7 +122,9 @@ class SubEditActivity : BaseActivity() {
         binding.etUrl.text = null
         binding.etFilter.text = null
         binding.chkEnable.isChecked = true
-        binding.etUpdateInterval.text = null
+        binding.autoUpdateCheck.isChecked = true
+        binding.etUpdateInterval.text =
+            Utils.getEditable(AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL_MINUTES.toString())
         binding.etPreProfile.text = null
         binding.etNextProfile.text = null
         setDropdownValue(binding.spPingType, pingTypeEntries, pingTypeValues, "")

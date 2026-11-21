@@ -643,6 +643,8 @@
 
     <string name="update_check_for_update">Check for update</string>
     <string name="update_already_latest_version">Already on the latest version</string>
+    <string name="update_already_latest_version_detail">Installed: %1$s — latest release: %2$s</string>
+    <string name="update_check_failed">Could not reach the update server. Check your network or connect VPN and try again.</string>
     <string name="update_new_version_found">New version found: %s</string>
     <string name="update_now">Update now</string>
     <string name="update_check_pre_release">Check Pre-release</string>
@@ -777,6 +779,18 @@
     <string name="profile_days_remaining">%d days left</string>
     <string name="sumrax_watch_days_unit">DAYS</string>
     <string name="sumrax_watch_days_content_description">Subscription time remaining</string>
+    <string name="sumrax_renew_subscription_toggle">Renew subscription</string>
+    <string name="sumrax_renew_subscription_toggle_days">Renew · %1$d days left</string>
+    <string name="sumrax_renew_subscription_daily">Subscription expires soon (%1$d days left). Please renew.</string>
+    <string name="sumrax_server_detail_ping">Ping: %1$d ms</string>
+    <string name="sumrax_server_detail_ping_fail">Ping: failed</string>
+    <string name="sumrax_server_detail_ping_unknown">Ping: n/a</string>
+    <string name="sumrax_server_detail_protocol">Protocol: %1$s</string>
+    <string name="sumrax_server_detail_days">Remaining: %1$s</string>
+    <string name="sumrax_server_detail_host">Host: %1$s</string>
+    <string name="sumrax_server_detail_remark">Profile: %1$s</string>
+    <string name="sumrax_ping_retest">Test ping</string>
+    <string name="sumrax_home_speed_compact">↑ %1$s  ↓ %2$s</string>
     <string name="result_subscription_updated">Subscription updated: %d profiles</string>
     <string name="result_ping_complete">Ping complete, sorted by latency</string>
     <string name="result_ping_testing">Pinging %d profiles…</string>

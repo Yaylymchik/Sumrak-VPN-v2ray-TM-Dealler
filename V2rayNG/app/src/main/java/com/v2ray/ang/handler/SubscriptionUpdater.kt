@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit
 object SubscriptionUpdater {
 
     private const val GLOBAL_TASK_NAME = "${AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME}_all"
-    private const val GLOBAL_INTERVAL_MINUTES = 30L
+    private val GLOBAL_INTERVAL_MINUTES = AppConfig.SUBSCRIPTION_AUTO_UPDATE_INTERVAL_MINUTES
     private const val KEY_SUB_ID = "subId"
     private const val KEY_UPDATE_ALL = "updateAll"
 
@@ -61,7 +61,7 @@ object SubscriptionUpdater {
                     .build()
             )
             .setInputData(workDataOf(KEY_UPDATE_ALL to true))
-            .setInitialDelay(GLOBAL_INTERVAL_MINUTES, TimeUnit.MINUTES)
+            .setInitialDelay(1, TimeUnit.MINUTES)
             .addTag(AppConfig.SUBSCRIPTION_UPDATE_TASK_NAME)
             .build()
 

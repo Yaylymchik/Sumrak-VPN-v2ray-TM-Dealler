@@ -25,6 +25,7 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.AppConfig.PROXY_ONLY
@@ -49,11 +50,13 @@ import com.v2ray.ang.handler.MonthlyTrafficTracker
 import com.v2ray.ang.handler.SettingsChangeManager
 import com.v2ray.ang.handler.SettingsManager
 import com.v2ray.ang.handler.ServerListsManager
+import com.v2ray.ang.handler.SubscriptionRenewalReminder
 import com.v2ray.ang.handler.SubscriptionUpdater
 import com.v2ray.ang.handler.TrafficStatsHelper
 import com.v2ray.ang.util.LogUtil
 import com.v2ray.ang.util.ProfileAutoSelector
 import com.v2ray.ang.util.ProfileRemarkParser
+import com.v2ray.ang.util.HappServerProtocol
 import com.v2ray.ang.util.HwidManager
 import com.v2ray.ang.util.ServerDisplayName
 import com.v2ray.ang.util.ProfileSettingsApplier
@@ -80,6 +83,8 @@ class MainActivity : HelperBaseActivity() {
     private lateinit var groupPagerAdapter: GroupPagerAdapter
     private var tabMediator: TabLayoutMediator? = null
     private var speedometerJob: Job? = null
+    private var subscriptionRenewHourlyJob: Job? = null
+    private var pendingRenewSubscriptionId: String? = null
     private var navTrafficBinding: NavTrafficFooterBinding? = null
     private var lastQueryTime = 0L
     private var sessionProxyDownBytes = 0L
@@ -96,6 +101,7 @@ class MainActivity : HelperBaseActivity() {
     private var expandedSubscriptionIds: MutableSet<String> = mutableSetOf()
 
     private val homePanel get() = binding.jumpjumpHomeInclude
+    private val homeAuthorFooter get() = homePanel.homeAuthorFooter
 
     private val requestVpnPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         if (it.resultCode == RESULT_OK) {
@@ -188,14 +194,17 @@ class MainActivity : HelperBaseActivity() {
                 else getString(R.string.sumrax_manual_tap_hint)
             )
         }
+        homePanel.tvSubscriptionRenewToggle.setOnClickListener {
+            pendingRenewSubscriptionId?.takeIf { it.isNotBlank() }?.let { refreshSubscriptionGroup(it) }
+        }
         homePanel.btnPower.setOnClickListener { handleFabAction() }
         homePanel.btnAiHelper.setOnClickListener {
             toast(getString(R.string.sumrax_nav_ai_coming_soon))
         }
         homePanel.btnClipboard.setOnClickListener { importClipboard() }
         homePanel.btnQrCode.setOnClickListener { importQRcode() }
+        homeAuthorFooter.tvHomeFooterPing.setOnClickListener { handleLayoutTestClick() }
         homePanel.tvHomeConnectionTest.setOnClickListener { handleLayoutTestClick() }
-        homePanel.tvTestCurrentConfig.setOnClickListener { handleLayoutTestClick() }
         homePanel.tvHideAll.setOnClickListener { toggleServersListHidden() }
         val copyHwid = View.OnClickListener { copyHomeHwid() }
         homePanel.llHwid.setOnClickListener(copyHwid)
@@ -251,9 +260,6 @@ class MainActivity : HelperBaseActivity() {
         homePanel.emptyStateFooter.isVisible = !hasServers
         homePanel.rlConfigGroups.isVisible = hasServers && !serversListHidden
         homePanel.tvHideAll.isVisible = hasServers
-        val testLabel = homePanel.tvTestCurrentConfig.text?.toString().orEmpty()
-        val pending = getString(R.string.connection_test_pending)
-        homePanel.tvTestCurrentConfig.isVisible = hasServers && testLabel != pending
         if (!hasServers) {
             serversListHidden = false
             homePanel.tvHideAll.text = getString(R.string.hide_everything)
@@ -283,8 +289,12 @@ class MainActivity : HelperBaseActivity() {
                 override fun onPingGroup(subscriptionId: String) = pingSubscriptionGroup(subscriptionId)
                 override fun onMoreGroup(subscriptionId: String, anchor: View) =
                     showHomeGroupMenu(subscriptionId, anchor)
+                override fun onServerPingTap(guid: String) = showHomeServerPingDetails(guid)
             }
         )
+        homePanel.watchDaysRemaining.setOnClickListener {
+            MmkvManager.getSelectServer()?.takeIf { it.isNotBlank() }?.let(::showHomeServerPingDetails)
+        }
         homePanel.rvConfigGroups.layoutManager = LinearLayoutManager(this)
         homePanel.rvConfigGroups.adapter = homeServerAdapter
         homePanel.rvConfigGroups.setBackgroundResource(android.R.color.transparent)
@@ -360,6 +370,72 @@ class MainActivity : HelperBaseActivity() {
         mainViewModel.reloadServerList()
         handlePingProfiles(showAnimation = false)
         refreshPickerList()
+    }
+
+    private fun showHomeServerPingDetails(guid: String) {
+        val profile = MmkvManager.decodeServerConfig(guid) ?: return
+        val subscriptionId = profile.subscriptionId
+        val delay = MmkvManager.decodeServerAffiliationInfo(guid)?.testDelayMillis ?: 0L
+
+        fun presentDialog(measuredDelay: Long) {
+            val pingLine = when {
+                measuredDelay > 0L -> getString(R.string.sumrax_server_detail_ping, measuredDelay)
+                measuredDelay < 0L -> getString(R.string.sumrax_server_detail_ping_fail)
+                else -> getString(R.string.sumrax_server_detail_ping_unknown)
+            }
+            val protocol = HappServerProtocol.format(profile)
+            val days = ProfileRemarkParser.resolveLiveRemainingDays(
+                profile.remarks,
+                subscriptionId,
+                guid,
+            )
+            val message = buildString {
+                appendLine(pingLine)
+                if (protocol.isNotBlank()) {
+                    appendLine(getString(R.string.sumrax_server_detail_protocol, protocol))
+                }
+                days?.let {
+                    appendLine(
+                        getString(
+                            R.string.sumrax_server_detail_days,
+                            ProfileRemarkParser.formatRemainingDays(this@MainActivity, it),
+                        ),
+                    )
+                }
+                val host = profile.server?.trim()
+                if (!host.isNullOrBlank()) {
+                    appendLine(getString(R.string.sumrax_server_detail_host, host))
+                }
+                val remark = profile.remarks?.trim().orEmpty()
+                if (remark.isNotBlank()) {
+                    appendLine(getString(R.string.sumrax_server_detail_remark, remark))
+                }
+            }.trimEnd()
+            MaterialAlertDialogBuilder(this)
+                .setTitle(ServerDisplayName.fromProfile(profile.remarks, profile.server))
+                .setMessage(message)
+                .setPositiveButton(R.string.sumrax_ping_retest) { _, _ ->
+                    setTestState(getString(R.string.connection_test_testing))
+                    mainViewModel.testSingleServerPing(guid) { result ->
+                        refreshServerPickerBar()
+                        refreshPickerList()
+                        presentDialog(result)
+                    }
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .show()
+        }
+
+        if (delay == 0L) {
+            setTestState(getString(R.string.connection_test_testing))
+            mainViewModel.testSingleServerPing(guid) { result ->
+                refreshServerPickerBar()
+                refreshPickerList()
+                presentDialog(result)
+            }
+        } else {
+            presentDialog(delay)
+        }
     }
 
     private fun showHomeGroupMenu(subscriptionId: String, @Suppress("UNUSED_PARAMETER") anchor: View) {
@@ -710,6 +786,56 @@ class MainActivity : HelperBaseActivity() {
         if (days != null) {
             binding.tvDaysRemaining.text = ProfileRemarkParser.formatRemainingDays(this, days)
         }
+        applySubscriptionRenewalUi(days, subscriptionId)
+    }
+
+    private fun applySubscriptionRenewalUi(days: Int?, subscriptionId: String?) {
+        pendingRenewSubscriptionId = subscriptionId?.takeIf { it.isNotBlank() }
+        val toggleRenewal = SubscriptionRenewalReminder.resolveExpiredToggle(this, days)
+
+        if (toggleRenewal != null) {
+            homePanel.tvSubscriptionRenewToggle.text = toggleRenewal.message
+            homePanel.tvSubscriptionRenewToggle.isVisible = true
+            homePanel.connectionModeSwitch.isVisible = false
+            if (days == 0 && SubscriptionRenewalReminder.shouldHourlyExpiredPulse(subscriptionId)) {
+                SubscriptionRenewalReminder.markHourlyExpiredPulse(subscriptionId)
+                pulseSubscriptionRenewToggle()
+            }
+            if (days == 0) {
+                ensureSubscriptionRenewHourlyLoop()
+            } else {
+                stopSubscriptionRenewHourlyLoop()
+            }
+        } else {
+            homePanel.tvSubscriptionRenewToggle.isVisible = false
+            homePanel.connectionModeSwitch.isVisible = true
+            stopSubscriptionRenewHourlyLoop()
+        }
+
+        if (days != null && SubscriptionRenewalReminder.shouldShowDailyLowDaysReminder(days, subscriptionId)) {
+            SubscriptionRenewalReminder.markDailyLowDaysReminderShown(subscriptionId)
+            toast(SubscriptionRenewalReminder.dailyReminderMessage(this, days))
+        }
+    }
+
+    private fun pulseSubscriptionRenewToggle() {
+        homePanel.tvSubscriptionRenewToggle.alpha = 0.4f
+        homePanel.tvSubscriptionRenewToggle.animate().alpha(1f).setDuration(400).start()
+    }
+
+    private fun ensureSubscriptionRenewHourlyLoop() {
+        if (subscriptionRenewHourlyJob?.isActive == true) return
+        subscriptionRenewHourlyJob = lifecycleScope.launch {
+            while (isActive) {
+                delay(AppConfig.SUBSCRIPTION_RENEW_HOURLY_INTERVAL_MS)
+                refreshDaysRemaining()
+            }
+        }
+    }
+
+    private fun stopSubscriptionRenewHourlyLoop() {
+        subscriptionRenewHourlyJob?.cancel()
+        subscriptionRenewHourlyJob = null
     }
 
     private fun findFirstProfileWithDays(): Pair<String, String>? {
@@ -750,12 +876,31 @@ class MainActivity : HelperBaseActivity() {
             homePanel.layoutHomeTraffic.isVisible = false
             homePanel.tvHomeConnectionTest.isVisible = false
             homePanel.tvHomeConnectionIp.isVisible = false
+            homePanel.tvHomeSpeedCompact.isVisible = false
             updateTrafficFooterUi(0.0, 0.0, 0.0, 0.0, MonthlyTrafficTracker.loadCurrentTotals())
         }
     }
 
     private fun formatTrafficSpeedLine(tag: String, upBps: Double, downBps: Double): String {
         return "$tag • ${upBps.toLong().toSpeedString()}↑  ${downBps.toLong().toSpeedString()}↓"
+    }
+
+    private fun formatCompactProxySpeed(proxyUpBps: Double, proxyDownBps: Double): String {
+        return getString(
+            R.string.sumrax_home_speed_compact,
+            proxyUpBps.toLong().toSpeedString(),
+            proxyDownBps.toLong().toSpeedString(),
+        )
+    }
+
+    private fun updateHomeSpeedCompact(proxyUpBps: Double, proxyDownBps: Double) {
+        val running = mainViewModel.isRunning.value == true
+        if (!running || (proxyUpBps < 1.0 && proxyDownBps < 1.0)) {
+            homePanel.tvHomeSpeedCompact.isVisible = false
+            return
+        }
+        homePanel.tvHomeSpeedCompact.text = formatCompactProxySpeed(proxyUpBps, proxyDownBps)
+        homePanel.tvHomeSpeedCompact.isVisible = true
     }
 
     private fun updateTrafficFooterUi(
@@ -805,20 +950,12 @@ class MainActivity : HelperBaseActivity() {
         )
 
         withContext(Dispatchers.Main) {
-            homePanel.layoutHomeTraffic.isVisible = true
-            homePanel.tvHomeProxyTraffic.text = formatTrafficSpeedLine(
-                AppConfig.TAG_PROXY,
-                traffic.proxyUplink / sinceSeconds,
-                traffic.proxyDownlink / sinceSeconds
-            )
-            homePanel.tvHomeDirectTraffic.text = formatTrafficSpeedLine(
-                AppConfig.TAG_DIRECT,
-                traffic.directUplink / sinceSeconds,
-                traffic.directDownlink / sinceSeconds
-            )
+            val proxyUpBps = traffic.proxyUplink / sinceSeconds
+            val proxyDownBps = traffic.proxyDownlink / sinceSeconds
+            updateHomeSpeedCompact(proxyUpBps, proxyDownBps)
             updateTrafficFooterUi(
-                traffic.proxyUplink / sinceSeconds,
-                traffic.proxyDownlink / sinceSeconds,
+                proxyUpBps,
+                proxyDownBps,
                 traffic.directUplink / sinceSeconds,
                 traffic.directDownlink / sinceSeconds,
                 monthlyTotals
@@ -924,7 +1061,7 @@ class MainActivity : HelperBaseActivity() {
         mainViewModel.testAllPingWithSort(
             onStatus = { status ->
                 if (generation != smartConnectGeneration) return@testAllPingWithSort
-                homePanel.tvTestCurrentConfig.text = status
+                setTestState(status)
             },
             onComplete = { message ->
                 if (generation != smartConnectGeneration) return@testAllPingWithSort
@@ -1002,17 +1139,48 @@ class MainActivity : HelperBaseActivity() {
     private fun setTestState(content: String?) {
         binding.tvTestState.text = content
         if (content.isNullOrBlank()) {
+            applyHomeFooterPingStatus(null, null)
             homePanel.tvHomeConnectionTest.isVisible = false
             homePanel.tvHomeConnectionIp.isVisible = false
             return
         }
         val lines = content.lines().filter { it.isNotBlank() }
-        homePanel.layoutHomeTraffic.isVisible = true
-        homePanel.tvHomeConnectionTest.text = lines.first()
-        homePanel.tvHomeConnectionTest.isVisible = true
-        val ipLine = lines.getOrNull(1).orEmpty()
-        homePanel.tvHomeConnectionIp.text = ipLine
-        homePanel.tvHomeConnectionIp.isVisible = ipLine.isNotEmpty()
+        applyHomeFooterPingStatus(lines.firstOrNull(), lines.getOrNull(1))
+
+        homePanel.layoutHomeTraffic.isVisible = false
+        homePanel.tvHomeProxyTraffic.isVisible = false
+        homePanel.tvHomeDirectTraffic.isVisible = false
+        homePanel.tvHomeConnectionTest.isVisible = false
+        homePanel.tvHomeConnectionIp.isVisible = false
+    }
+
+    private fun applyHomeFooterPingStatus(primary: String?, secondary: String?) {
+        val mainLine = primary?.trim().orEmpty()
+        val extraLine = secondary?.trim().orEmpty()
+        if (mainLine.isEmpty()) {
+            homeAuthorFooter.tvHomeFooterPing.isVisible = false
+            homeAuthorFooter.tvHomeFooterPingExtra.isVisible = false
+            homeAuthorFooter.tvHomeAuthorLabel.isVisible = true
+            return
+        }
+        val inProgress = isPingProgressMessage(mainLine)
+        homeAuthorFooter.tvHomeFooterPing.text = mainLine
+        homeAuthorFooter.tvHomeFooterPing.isVisible = true
+        homeAuthorFooter.tvHomeAuthorLabel.isVisible = !inProgress
+        homeAuthorFooter.tvHomeFooterPingExtra.text = extraLine
+        homeAuthorFooter.tvHomeFooterPingExtra.isVisible = extraLine.isNotEmpty()
+    }
+
+    private fun isPingProgressMessage(content: String): Boolean {
+        if (content == getString(R.string.connection_test_testing)) return true
+        val sample = getString(R.string.result_ping_testing, 1)
+        val digitIdx = sample.indexOf('1')
+        if (digitIdx < 0) return false
+        val prefix = sample.substring(0, digitIdx)
+        val suffix = sample.substring(digitIdx + 1)
+        if (!content.startsWith(prefix) || !content.endsWith(suffix)) return false
+        val middle = content.substring(prefix.length, content.length - suffix.length)
+        return middle.isNotEmpty() && middle.all { it.isDigit() }
     }
 
     private fun updateStatusDot(isRunning: Boolean) {
@@ -1039,6 +1207,7 @@ class MainActivity : HelperBaseActivity() {
             homePanel.layoutHomeTraffic.isVisible = false
             homePanel.tvHomeConnectionTest.isVisible = false
             homePanel.tvHomeConnectionIp.isVisible = false
+            homePanel.tvHomeSpeedCompact.isVisible = false
         }
 
         updateStatusDot(isRunning)
@@ -1055,6 +1224,7 @@ class MainActivity : HelperBaseActivity() {
     }
 
     override fun onPause() {
+        stopSubscriptionRenewHourlyLoop()
         super.onPause()
     }
 

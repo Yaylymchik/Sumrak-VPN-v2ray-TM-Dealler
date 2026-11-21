@@ -4,7 +4,9 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
 import java.util.Locale
 

@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.v2ray.ang.AppConfig
+import com.v2ray.ang.BuildConfig
 import com.v2ray.ang.R
 import com.v2ray.ang.dto.CheckUpdateResult
 import com.v2ray.ang.extension.toast
@@ -44,11 +45,22 @@ class CheckUpdateActivity : BaseActivity() {
                 val result = withContext(Dispatchers.IO) {
                     UpdateCheckerManager.checkForUpdate(preRelease.isChecked)
                 }
-                if (result.hasUpdate) {
-                    showUpdateDialog(result)
-                    status.text = getString(R.string.update_new_version_found, result.latestVersion)
-                } else {
-                    status.setText(R.string.update_already_latest_version)
+                when {
+                    !result.checkSucceeded -> {
+                        status.setText(R.string.update_check_failed)
+                        toast(getString(R.string.update_check_failed))
+                    }
+                    result.hasUpdate -> {
+                        showUpdateDialog(result)
+                        status.text = getString(R.string.update_new_version_found, result.latestVersion)
+                    }
+                    else -> {
+                        status.text = getString(
+                            R.string.update_already_latest_version_detail,
+                            result.currentVersion.ifBlank { BuildConfig.VERSION_NAME },
+                            result.latestVersion
+                        )
+                    }
                 }
             }
         }
