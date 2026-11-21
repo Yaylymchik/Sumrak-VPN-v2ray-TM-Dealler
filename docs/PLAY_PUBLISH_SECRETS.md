@@ -4,13 +4,15 @@ Workflow: [`.github/workflows/play-publish.yml`](../.github/workflows/play-publi
 
 ## Секреты репозитория
 
-| Secret | Описание |
-|--------|----------|
-| `PLAY_STORE_JSON_BASE64` | Service account JSON из Play Console → **Users and permissions** → **Invite user** (или API access), base64 одной строкой |
-| `APP_KEYSTORE_BASE64` | Release `.jks` в base64 (первый AAB можно подписать upload-ключом) |
-| `APP_KEYSTORE_PASSWORD` | Пароль keystore |
-| `APP_KEYSTORE_ALIAS` | Alias ключа |
-| `APP_KEY_PASSWORD` | Пароль ключа |
+| Secret | Статус | Описание |
+|--------|--------|----------|
+| `PLAY_STORE_JSON_BASE64` | **нужно добавить** | Service account JSON из Play Console → API access, base64 |
+| `APP_KEYSTORE_BASE64` | **уже в GitHub** | Upload keystore `.jks` |
+| `APP_KEYSTORE_PASSWORD` | **уже в GitHub** | Пароль keystore |
+| `APP_KEYSTORE_ALIAS` | **уже в GitHub** (`sumrax`) | Alias ключа |
+| `APP_KEY_PASSWORD` | **уже в GitHub** | Пароль ключа |
+
+Локально: `scripts/setup-play-signing.ps1` и `.build-cache/play-signing.local.txt`.
 
 PowerShell (пример):
 

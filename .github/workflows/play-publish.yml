@@ -34,13 +34,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Require Play credentials
-        run: |
-          test -n "${{ secrets.PLAY_STORE_JSON_BASE64 }}" || {
-            echo "Missing secret PLAY_STORE_JSON_BASE64"
-            exit 1
-          }
-
       - name: Setup Java
         uses: actions/setup-java@v5
         with:
@@ -60,6 +53,9 @@ jobs:
             --channel=0 \
             --install "ndk;29.0.14206865"
           echo "NDK_HOME=$ANDROID_HOME/ndk/29.0.14206865" >> "$GITHUB_ENV"
+          sed -i '10i\
+          \
+              ndkVersion = "29.0.14206865"' "${{ github.workspace }}/V2rayNG/app/build.gradle.kts"
 
       - name: Ensure native deps
         run: |
@@ -98,16 +94,26 @@ jobs:
             ./gradlew :app:bundlePlaystoreRelease
           fi
 
+      - name: Upload AAB artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: sumrak-play-aab
+          path: V2rayNG/app/build/outputs/bundle/playstoreRelease/*.aab
+          if-no-files-found: error
+
       - name: Write Play service account
+        if: ${{ secrets.PLAY_STORE_JSON_BASE64 != '' }}
         run: |
           echo "${{ secrets.PLAY_STORE_JSON_BASE64 }}" | base64 -d > "${{ github.workspace }}/fastlane/play-store-credentials.json"
 
       - name: Setup Ruby + Fastlane
+        if: ${{ secrets.PLAY_STORE_JSON_BASE64 != '' }}
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.3'
 
       - name: Fastlane supply
+        if: ${{ secrets.PLAY_STORE_JSON_BASE64 != '' }}
         env:
           PLAY_STORE_JSON: ${{ github.workspace }}/fastlane/play-store-credentials.json
           SUPPLY_TRACK: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.track || 'internal' }}
@@ -123,3 +129,9 @@ jobs:
             skip_upload_metadata:false \
             skip_upload_images:true \
             skip_upload_screenshots:true
+
+      - name: Play API skipped
+        if: ${{ secrets.PLAY_STORE_JSON_BASE64 == '' }}
+        run: |
+          echo "PLAY_STORE_JSON_BASE64 is not set — AAB saved as artifact only."
+          echo "After Play Console setup, add the service account JSON secret and re-run workflow."
