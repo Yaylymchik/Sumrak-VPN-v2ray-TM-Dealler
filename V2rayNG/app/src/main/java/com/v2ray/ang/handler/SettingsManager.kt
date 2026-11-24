@@ -700,6 +700,8 @@ object SettingsManager {
         ensureDefaultBoolValue(AppConfig.PREF_ROUTING_ENABLED, false)
         ensureDefaultBoolValue(AppConfig.PREF_FORCE_GLOBAL_USER_AGENT, true)
         ensureDefaultBoolValue(AppConfig.PREF_SEND_HWID_HEADER, true)
+        ensureDefaultBoolValue(AppConfig.PREF_USE_CUSTOM_HWID, false)
+        migrateCustomHwidToggleIfNeeded()
         ensureDefaultBoolValue(AppConfig.PREF_SUBSCRIPTION_AUTO_UPDATE_ENABLE, true)
         ensureDefaultBoolValue(AppConfig.PREF_SUBSCRIPTION_UPDATE_ON_LAUNCH, true)
         ensureDefaultBoolValue(AppConfig.PREF_AUTO_CHECK_UPDATE, true)
@@ -734,6 +736,14 @@ object SettingsManager {
     private fun ensureDefaultValue(key: String, default: String) {
         if (MmkvManager.decodeSettingsString(key).isNullOrEmpty()) {
             MmkvManager.encodeSettings(key, default)
+        }
+    }
+
+    private fun migrateCustomHwidToggleIfNeeded() {
+        val legacyCustom = MmkvManager.decodeSettingsString(AppConfig.PREF_HWID_CUSTOM_VALUE)?.trim().orEmpty()
+        if (legacyCustom.isEmpty()) return
+        if (!MmkvManager.hasSettingsKey(AppConfig.PREF_USE_CUSTOM_HWID)) {
+            MmkvManager.encodeSettings(AppConfig.PREF_USE_CUSTOM_HWID, true)
         }
     }
 

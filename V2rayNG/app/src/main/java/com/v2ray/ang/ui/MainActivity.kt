@@ -206,9 +206,38 @@ class MainActivity : HelperBaseActivity() {
         homeAuthorFooter.tvHomeFooterPing.setOnClickListener { handleLayoutTestClick() }
         homePanel.tvHomeConnectionTest.setOnClickListener { handleLayoutTestClick() }
         homePanel.tvHideAll.setOnClickListener { toggleServersListHidden() }
-        val copyHwid = View.OnClickListener { copyHomeHwid() }
-        homePanel.llHwid.setOnClickListener(copyHwid)
-        homePanel.btnCopyHwid.setOnClickListener(copyHwid)
+        homePanel.btnCopyHwid.setOnClickListener { copyHomeHwid() }
+        homePanel.llHwid.setOnClickListener {
+            if (HwidManager.isUseCustomHwid()) {
+                showCustomHwidDialog()
+            } else {
+                copyHomeHwid()
+            }
+        }
+        homePanel.hwidSendSwitch.isHwidOn = HwidManager.isSendHwidEnabled()
+        homePanel.hwidSendSwitch.onChanged = { enabled ->
+            HwidManager.setSendHwidEnabled(enabled)
+            refreshHomeHwid()
+            val toastRes = if (enabled) R.string.sumrax_hwid_enabled_toast else R.string.sumrax_hwid_disabled_toast
+            val hwid = HwidManager.resolveHwid(this)
+            toast(
+                if (enabled && hwid.length > 8) {
+                    getString(toastRes, hwid.take(8))
+                } else {
+                    getString(toastRes, "")
+                }
+            )
+        }
+        homePanel.hwidSourceSwitch.isCustomMode = HwidManager.isUseCustomHwid()
+        homePanel.hwidSourceSwitch.onChanged = { custom ->
+            if (custom && HwidManager.customHwidValue().isEmpty()) {
+                homePanel.hwidSourceSwitch.isCustomMode = false
+                showCustomHwidDialog(pendingEnableCustom = true)
+            } else {
+                HwidManager.setUseCustomHwid(custom)
+                refreshHomeHwid()
+            }
+        }
 
         refreshHomeHwid()
         refreshServerPickerBar()
@@ -252,7 +281,42 @@ class MainActivity : HelperBaseActivity() {
 
     private fun refreshHomeHwid() {
         val hwid = HwidManager.resolveHwid(this)
-        homePanel.tvHwid.text = getString(R.string.sumrax_home_hwid_format, hwid)
+        homePanel.tvHwid.text = if (hwid.isEmpty() && HwidManager.isUseCustomHwid()) {
+            getString(R.string.toast_custom_hwid_required)
+        } else {
+            getString(R.string.sumrax_home_hwid_format, hwid.ifEmpty { "—" })
+        }
+        homePanel.hwidSendSwitch.isHwidOn = HwidManager.isSendHwidEnabled()
+        homePanel.hwidSourceSwitch.isCustomMode = HwidManager.isUseCustomHwid()
+    }
+
+    private fun showCustomHwidDialog(pendingEnableCustom: Boolean = false) {
+        val input = android.widget.EditText(this).apply {
+            setText(HwidManager.customHwidValue())
+            hint = getString(R.string.dialog_custom_hwid_hint)
+            setSingleLine()
+            val pad = resources.getDimensionPixelSize(R.dimen.padding_spacing_dp16)
+            setPadding(pad, pad / 2, pad, pad / 2)
+        }
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.dialog_custom_hwid_title)
+            .setView(input)
+            .setPositiveButton(android.R.string.ok) { _, _ ->
+                val value = input.text?.toString().orEmpty().trim()
+                if (value.isEmpty()) {
+                    toast(getString(R.string.toast_custom_hwid_required))
+                    return@setPositiveButton
+                }
+                HwidManager.setCustomHwidValue(value)
+                if (pendingEnableCustom || !HwidManager.isUseCustomHwid()) {
+                    HwidManager.setUseCustomHwid(true)
+                }
+                refreshHomeHwid()
+            }
+            .setNegativeButton(android.R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun syncHomeLayout() {

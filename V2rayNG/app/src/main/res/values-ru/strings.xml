@@ -452,6 +452,8 @@
     <string name="sumrax_hwid_label">HWID</string>
     <string name="sumrax_hwid_on">Вкл</string>
     <string name="sumrax_hwid_off">Выкл</string>
+    <string name="sumrax_hwid_source_device">Устр.</string>
+    <string name="sumrax_hwid_source_custom">Свой</string>
     <string name="sumrax_hwid_enabled_toast">Заголовок HWID включён (%1$s…)</string>
     <string name="sumrax_hwid_disabled_toast">Заголовок HWID выключен</string>
     <string name="sumrax_settings_tab_all">Все</string>
@@ -463,8 +465,14 @@
     <string name="title_core_dns">Core DNS</string>
     <string name="title_pref_send_hwid_header">Отправлять HWID</string>
     <string name="summary_pref_send_hwid_header">Добавляет X-hwid к запросам подписки.</string>
-    <string name="title_pref_hwid_custom_value">Свой HWID</string>
-    <string name="summary_pref_hwid_custom_value">Пусто — использовать хеш ID устройства.</string>
+    <string name="title_pref_use_custom_hwid">Свой ID для подписки</string>
+    <string name="summary_pref_use_custom_hwid">Если включено, при обновлении подписки отправляется ваш HWID, а не id устройства.</string>
+    <string name="title_pref_hwid_custom_value">Значение HWID</string>
+    <string name="summary_pref_hwid_custom_value">HWID от провайдера в заголовке X-hwid при режиме «Свой».</string>
+    <string name="title_hwid_settings">HWID</string>
+    <string name="dialog_custom_hwid_title">Свой HWID</string>
+    <string name="dialog_custom_hwid_hint">Вставьте HWID из панели провайдера</string>
+    <string name="toast_custom_hwid_required">Сначала введите HWID</string>
     <string name="sumrax_connection_mode_smart">Smart</string>
     <string name="sumrax_connection_mode_manual">Manual</string>
     <string name="sumrax_smart_scanning">Сканирование серверов…</string>

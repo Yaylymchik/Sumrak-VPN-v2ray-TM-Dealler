@@ -7,7 +7,7 @@ import com.v2ray.ang.R
 import com.v2ray.ang.helper.MmkvPreferenceDataStore
 
 class HwidSettingsActivity : SumraxSingleSettingsActivity() {
-    override fun screenTitleRes() = R.string.title_pref_send_hwid_header
+    override fun screenTitleRes() = R.string.title_hwid_settings
     override fun createSettingsFragment() = HwidSettingsFragment()
 }
 

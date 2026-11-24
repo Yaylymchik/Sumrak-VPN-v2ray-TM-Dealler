@@ -32,6 +32,7 @@ object SettingsHubRegistry {
 
         Entry(R.string.title_advanced, AdvancedSettingsActivity::class.java, Tab.ADVANCED),
         Entry(R.string.title_subscription, SubscriptionSettingsActivity::class.java, Tab.ADVANCED),
+        Entry(R.string.title_hwid_settings, HwidSettingsActivity::class.java, Tab.ADVANCED),
         Entry(R.string.title_ping, PingSettingsActivity::class.java, Tab.ADVANCED),
         Entry(R.string.title_pref_proxy_sharing_enabled, LanPortsSettingsActivity::class.java, Tab.ADVANCED),
 

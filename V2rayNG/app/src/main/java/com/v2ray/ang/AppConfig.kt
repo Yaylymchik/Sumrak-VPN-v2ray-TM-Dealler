@@ -40,6 +40,7 @@ object AppConfig {
     const val PREF_DEFAULT_USER_AGENT = "pref_default_user_agent"
     const val PREF_FORCE_GLOBAL_USER_AGENT = "pref_force_global_user_agent"
     const val PREF_SEND_HWID_HEADER = "pref_send_hwid_header"
+    const val PREF_USE_CUSTOM_HWID = "pref_use_custom_hwid"
     const val PREF_HWID_CUSTOM_VALUE = "pref_hwid_custom_value"
     const val PREF_SUBSCRIPTION_AUTO_UPDATE_ENABLE = "pref_subscription_auto_update_enable"
     const val PREF_SUBSCRIPTION_UPDATE_ON_LAUNCH = "pref_subscription_update_on_launch"

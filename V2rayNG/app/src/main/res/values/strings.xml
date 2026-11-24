@@ -456,6 +456,8 @@
     <string name="sumrax_hwid_label">HWID</string>
     <string name="sumrax_hwid_on">On</string>
     <string name="sumrax_hwid_off">Off</string>
+    <string name="sumrax_hwid_source_device">Device</string>
+    <string name="sumrax_hwid_source_custom">Custom</string>
     <string name="sumrax_hwid_enabled_toast">HWID header enabled (%1$s…)</string>
     <string name="sumrax_hwid_disabled_toast">HWID header disabled</string>
     <string name="sumrax_settings_tab_all">All</string>
@@ -467,8 +469,14 @@
     <string name="title_core_dns">Core DNS</string>
     <string name="title_pref_send_hwid_header">Send HWID header</string>
     <string name="summary_pref_send_hwid_header">Adds X-hwid to subscription HTTP requests.</string>
+    <string name="title_pref_use_custom_hwid">Use custom HWID</string>
+    <string name="summary_pref_use_custom_hwid">When enabled, subscription updates use your ID instead of this device.</string>
     <string name="title_pref_hwid_custom_value">Custom HWID</string>
-    <string name="summary_pref_hwid_custom_value">Leave empty to use a hashed device ID.</string>
+    <string name="summary_pref_hwid_custom_value">Your provider HWID sent in X-hwid when custom mode is on.</string>
+    <string name="title_hwid_settings">HWID</string>
+    <string name="dialog_custom_hwid_title">Custom HWID</string>
+    <string name="dialog_custom_hwid_hint">Paste your HWID from the provider</string>
+    <string name="toast_custom_hwid_required">Enter your HWID first</string>
     <string name="sumrax_connection_mode_smart">Smart</string>
     <string name="sumrax_connection_mode_manual">Manual</string>
     <string name="sumrax_smart_scanning">Scanning servers…</string>

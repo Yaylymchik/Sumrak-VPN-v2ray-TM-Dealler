@@ -257,10 +257,29 @@
                 app:iconPadding="8dp" />
 
             <LinearLayout
-                android:id="@+id/ll_hwid"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.v2ray.ang.ui.SegmentedHwidSourceView
+                    android:id="@+id/hwid_source_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.v2ray.ang.ui.SegmentedHwidView
+                    android:id="@+id/hwid_send_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_hwid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
                 android:background="@drawable/bg_sumrax_text_on_main_rounded"
                 android:clickable="true"
                 android:focusable="true"
