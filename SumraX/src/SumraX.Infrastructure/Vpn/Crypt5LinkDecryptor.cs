@@ -3,7 +3,7 @@ using System.Text;
 namespace SumraX.Infrastructure.Vpn;
 
 /// <summary>
-/// happ://crypt5 — C# port of Android <see cref="EncryptedCryptResolver"/> (no JNI).
+/// sumrax://crypt5 — C# port of Android EncryptedCryptResolver (no JNI).
 /// </summary>
 public static class Crypt5LinkDecryptor
 {

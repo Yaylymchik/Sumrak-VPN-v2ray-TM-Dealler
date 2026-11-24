@@ -1,7 +1,7 @@
 # Quick parity report (Android Sumrak VPN vs SumraX PC) — run before release copy to D:\Sumrak
 $ErrorActionPreference = "Continue"
 $AndroidRoot = "D:\Sumrak\v2rayNG-master\v2rayNG-master"
-$DesktopRoot = "D:\Sumrak\v2rayN-master\v2rayN-master\SumraX"
+$DesktopRoot = "D:\Sumrak\v2rayNG-master\v2rayNG-master\SumraX"
 $OutRoot = "D:\Sumrak"
 
 function Gradle-Value($name) {
@@ -37,19 +37,15 @@ if ((Test-Path $androidIcon) -and (Test-Path $desktopIcon)) {
 }
 
 $expected = @(
-    "SumraX-VPN-Setup-2.2.21.exe",
-    "SumraX-VPN-Setup-2.2.21-x86.exe",
-    "SumraX-VPN-Setup-2.2.21-Win7.exe",
-    "SumraX-VPN-Setup-2.2.21-Win7-x86.exe",
-    "SumraX-VPN-Setup-2.2.21-Lite.exe",
-    "SumraX-VPN-Setup-2.2.21-Smart.exe"
+    "SumraX-VPN-Setup-2.2.21-Smart.exe",
+    "SumraX-VPN-Setup-2.2.21-Lite.exe"
 )
 foreach ($name in $expected) {
     $p = Join-Path $OutRoot $name
     if (-not (Test-Path $p)) { $issues.Add("Missing in D:\Sumrak: $name") }
 }
 
-Write-Host "=== Android ↔ Desktop parity ===" -ForegroundColor Cyan
+Write-Host "=== Android <-> Desktop parity ===" -ForegroundColor Cyan
 Write-Host "Android versionName: $av  versionCode: $avc"
 Write-Host "Desktop installer version: $desktopVer"
 Write-Host ""

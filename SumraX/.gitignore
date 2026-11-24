@@ -25,7 +25,6 @@ logs/
 *.db-wal
 
 # Large third-party / reference bundles
-tools/happ-desktop/
 tools/**/bin/
 tools/**/obj/
 

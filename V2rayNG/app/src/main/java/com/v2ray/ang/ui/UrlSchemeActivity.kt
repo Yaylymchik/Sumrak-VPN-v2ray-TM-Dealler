@@ -70,7 +70,7 @@ class UrlSchemeActivity : BaseActivity() {
     private fun deeplinkToImportString(uri: Uri): String {
         val host = uri.host?.lowercase().orEmpty()
         if (host in CRYPT_HOSTS) {
-            val scheme = uri.scheme?.lowercase().orEmpty().ifBlank { "happ" }
+            val scheme = uri.scheme?.lowercase().orEmpty().ifBlank { "sumrax" }
             val payload = uri.encodedPath?.trimStart('/').orEmpty()
             return "$scheme://$host/$payload"
         }

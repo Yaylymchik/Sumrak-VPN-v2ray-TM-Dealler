@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using SumraX.Core.Interfaces;
+using SumraX.Infrastructure.Vpn;
 
 namespace SumraX.Infrastructure.Security;
 
@@ -37,14 +38,52 @@ public static class HwidManager
         return Convert.ToHexString(hash).ToLowerInvariant()[..32];
     }
 
-    public static async Task<IReadOnlyDictionary<string, string>> SubscriptionHeadersAsync(ISettingsRepository settings)
+    public static async Task<IReadOnlyDictionary<string, string>> SubscriptionHeadersAsync(
+        ISettingsRepository settings,
+        string? subscriptionUrl = null)
     {
-        if (!await IsSendEnabledAsync(settings))
+        var s = await settings.GetAsync();
+        var enabled = s.SendHwidHeader;
+        if (!string.IsNullOrWhiteSpace(subscriptionUrl))
+        {
+            var item = SubscriptionItemSettingsHelper.GetOrCreate(s, subscriptionUrl);
+            if (item.SendHwidHeader == false)
+            {
+                return new Dictionary<string, string>();
+            }
+
+            if (item.SendHwidHeader == true)
+            {
+                enabled = true;
+            }
+        }
+        else if (!enabled)
         {
             return new Dictionary<string, string>();
         }
 
-        var hwid = await ResolveHwidAsync(settings);
+        string hwid;
+        if (!string.IsNullOrWhiteSpace(subscriptionUrl))
+        {
+            var item = SubscriptionItemSettingsHelper.GetOrCreate(s, subscriptionUrl);
+            if (item.UseAlternativeHwid == true && !string.IsNullOrWhiteSpace(item.AlternativeHwidValue))
+            {
+                hwid = item.AlternativeHwidValue.Trim();
+            }
+            else if (!string.IsNullOrWhiteSpace(s.CustomHwidValue))
+            {
+                hwid = s.CustomHwidValue.Trim();
+            }
+            else
+            {
+                hwid = ResolveMachineHwid();
+            }
+        }
+        else
+        {
+            hwid = await ResolveHwidAsync(settings);
+        }
+
         if (string.IsNullOrWhiteSpace(hwid))
         {
             return new Dictionary<string, string>();

@@ -28,7 +28,8 @@ public sealed class SpeedTestService : ISpeedTestService
     public async Task<int> MeasurePingAsync(ServerProfile server, CancellationToken cancellationToken = default)
     {
         var settings = await _settings.GetAsync();
-        return settings.PingType switch
+        var pingType = SubscriptionItemSettingsHelper.ResolvePingType(settings, server);
+        return pingType switch
         {
             PingType.Icmp => await MeasureIcmpAsync(server.Address, cancellationToken),
             PingType.Proxy => await MeasureRealPingAsync(server, settings, HttpMethod.Get, cancellationToken),

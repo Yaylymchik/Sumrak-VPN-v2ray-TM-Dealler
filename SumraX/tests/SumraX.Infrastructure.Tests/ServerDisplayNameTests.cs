@@ -17,7 +17,7 @@ public sealed class ServerDisplayNameTests
     [Theory]
     [InlineData("NL Netherlands?serverDescription=RXVyb3BI", "NL Netherlands")]
     [InlineData("TR Google?serverDescription=VMO8cmtpeWU=", "TR Google")]
-    public void FromProfile_hides_happ_query_tail(string raw, string expected)
+    public void FromProfile_hides_server_description_query_tail(string raw, string expected)
     {
         var display = ServerDisplayName.FromProfile(raw, "1.2.3.4");
         Assert.Equal(expected, display);

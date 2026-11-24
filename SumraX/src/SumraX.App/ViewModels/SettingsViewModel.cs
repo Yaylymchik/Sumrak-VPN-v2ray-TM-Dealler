@@ -334,6 +334,12 @@ public partial class SettingsViewModel : LocalizableViewModelBase
         {
             RefreshVpnHotspotPanel();
         }
+
+        if (value is not (SettingsSection.SubscriptionEdit or SettingsSection.SubscriptionPingEdit) &&
+            !string.IsNullOrWhiteSpace(_editSubscriptionUrl))
+        {
+            _ = SaveSubscriptionEditAsync();
+        }
     }
 
     protected override void OnLanguageChanged() => ApplyLabels();
@@ -480,6 +486,7 @@ public partial class SettingsViewModel : LocalizableViewModelBase
         XrayTunEnabledLabel = L("XrayTunEnabled");
         UrlSchemesInfo = L("UrlSchemesInfo");
         ApplyVpnHotspotLabels();
+        ApplySubscriptionEditLabels();
         RebuildHubRows();
         UpdateSectionTitle();
         OnPropertyChanged(nameof(SectionGeneralLabel));
@@ -633,6 +640,12 @@ public partial class SettingsViewModel : LocalizableViewModelBase
             SettingsSection.Routing => SectionRoutingLabel,
             SettingsSection.Logs => SectionLogsLabel,
             SettingsSection.VpnHotspot => SectionVpnHotspotLabel,
+            SettingsSection.SubscriptionEdit => string.IsNullOrWhiteSpace(SubEditRemarks)
+                ? SectionSubscriptionEditLabel
+                : SubEditRemarks.Trim(),
+            SettingsSection.SubscriptionPingEdit => string.IsNullOrWhiteSpace(SubEditRemarks)
+                ? SectionSubscriptionPingEditLabel
+                : $"{SubEditRemarks.Trim()} — {SectionSubscriptionPingEditLabel}",
             _ => PageTitle
         };
         OnPropertyChanged(nameof(SectionTitle));

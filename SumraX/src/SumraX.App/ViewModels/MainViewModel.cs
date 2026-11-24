@@ -158,7 +158,20 @@ public partial class MainViewModel : ObservableObject
     public void OpenSettingsSubscriptions(string? subscriptionUrl = null)
     {
         SelectedNavIndex = 4;
-        Settings.NavigateToSubscription(subscriptionUrl);
+        if (string.IsNullOrWhiteSpace(subscriptionUrl))
+        {
+            Settings.CurrentSection = SettingsSection.Subscriptions;
+        }
+        else
+        {
+            Settings.NavigateToSubscriptionEdit(subscriptionUrl);
+        }
+    }
+
+    public void OpenSettingsSubscriptionPing(string? subscriptionUrl)
+    {
+        SelectedNavIndex = 4;
+        Settings.NavigateToSubscriptionPingEdit(subscriptionUrl);
     }
 
     private void RefreshTitles()

@@ -21,7 +21,7 @@ public static class ServerDisplayName
         }
     }
 
-    /// <summary>Removes Happ-style <c>?serverDescription=</c> query tails and decodes embedded base64 remarks.</summary>
+    /// <summary>Removes <c>?serverDescription=</c> query tails and decodes embedded base64 remarks.</summary>
     public static string UnpackRemarks(string? raw)
     {
         if (string.IsNullOrWhiteSpace(raw))

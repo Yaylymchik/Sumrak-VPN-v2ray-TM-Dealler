@@ -48,18 +48,18 @@ public partial class SettingsViewModel
         [
             Row(L("SettingsRowRouting"), SettingsSection.Routing),
             Row(L("SettingsRowPerAppProxy"), SettingsSection.Routing),
-            Row(L("SettingsRowInbound"), SettingsSection.Network),
         ]);
 
         Fill(HubTunnelAfterRows,
         [
+            Row(L("SettingsRowInbound"), SettingsSection.Network),
             Row(L("SettingsRowTunnelOptions"), SettingsSection.Tunnel),
             Row(L("SettingsRowVpnHotspot"), SettingsSection.VpnHotspot),
         ]);
 
         Fill(HubAdvancedBeforeRows,
         [
-            Row(L("SettingsRowVpnSettings"), SettingsSection.Connection),
+            Row(L("SettingsRowAdvancedMisc"), SettingsSection.Advanced),
             Row(L("SettingsRowSubscriptions"), SettingsSection.Subscriptions),
             Row(L("SettingsRowPing"), SettingsSection.Ping),
         ]);
@@ -67,15 +67,10 @@ public partial class SettingsViewModel
         Fill(HubAdvancedAfterRows,
         [
             Row(L("SettingsRowLan"), SettingsSection.Network),
-            Row(L("SettingsRowAutoStart"), SettingsSection.Connection),
-            Row(L("SettingsRowAdvancedMisc"), SettingsSection.Advanced),
-            Row(L("SettingsRowCoreDns"), SettingsSection.Core),
         ]);
 
         Fill(HubOtherRows,
         [
-            Row(L("SettingsRowCheckUpdate"), SettingsSection.Diagnostics, action: "CheckUpdate"),
-            Row(L("SettingsRowStatistics"), SettingsSection.Diagnostics, action: "Statistics"),
             Row(L("SettingsRowLogs"), SettingsSection.Logs),
             Row(L("SettingsRowOther"), SettingsSection.Data),
             Row(L("SettingsRowReset"), SettingsSection.Data, action: "Reset", isDanger: true),
@@ -135,18 +130,13 @@ public partial class SettingsViewModel
 
     public void NavigateToSubscription(string? subscriptionUrl)
     {
-        CurrentSection = SettingsSection.Subscriptions;
         if (string.IsNullOrWhiteSpace(subscriptionUrl))
         {
+            CurrentSection = SettingsSection.Subscriptions;
             return;
         }
 
-        var match = SubscriptionUrls.FirstOrDefault(u =>
-            string.Equals(u, subscriptionUrl, StringComparison.OrdinalIgnoreCase));
-        if (match != null)
-        {
-            SelectedSubscriptionUrl = match;
-        }
+        NavigateToSubscriptionEdit(subscriptionUrl);
     }
 
     private static void TryOpenUrl(string url)

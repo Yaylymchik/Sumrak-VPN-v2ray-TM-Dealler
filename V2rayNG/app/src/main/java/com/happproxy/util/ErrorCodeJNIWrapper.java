@@ -4,7 +4,7 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * JNI bridge — symbol names must match liberror-code.so
- * (Java_com_happproxy_util_ErrorCodeJNIWrapper_*).
+ * Sumrak VPN — native crypt helpers (JNI symbols: Java_com_happproxy_util_ErrorCodeJNIWrapper_*).
  */
 public final class ErrorCodeJNIWrapper {
 

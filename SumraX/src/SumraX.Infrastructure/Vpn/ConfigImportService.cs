@@ -60,8 +60,9 @@ public sealed class ConfigImportService : IConfigImportService
 
         Exception? lastError = null;
         var attempts = 0;
-        var userAgents = await BuildSubscriptionUserAgentsAsync(cancellationToken);
         var settings = await _settings.GetAsync();
+        var perSubUa = SubscriptionItemSettingsHelper.TryGetUserAgent(settings, url);
+        var userAgents = await BuildSubscriptionUserAgentsAsync(cancellationToken, perSubUa);
         var routes = new List<WebProxy?>(BuildFetchProxyCandidates(settings.LocalHttpPort)) { null };
         Log.Info($"Subscription fetch start: {DescribeUrl(url)}; routes=[{string.Join(" | ", routes.Select(DescribeProxy))}]");
 
@@ -72,7 +73,8 @@ public sealed class ConfigImportService : IConfigImportService
                 attempts++;
                 try
                 {
-                    using var client = await CreateHttpClientAsync(userAgent, proxy, cancellationToken);
+                    var timeout = SubscriptionItemSettingsHelper.TryGetRequestTimeoutSeconds(settings, url);
+                    using var client = await CreateHttpClientAsync(userAgent, proxy, url, timeout, cancellationToken);
                     using var response = await client.GetAsync(uri, cancellationToken);
                     response.EnsureSuccessStatusCode();
                     var content = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -380,12 +382,23 @@ public sealed class ConfigImportService : IConfigImportService
         }
     }
 
-    private async Task<IReadOnlyList<string>> BuildSubscriptionUserAgentsAsync(CancellationToken cancellationToken)
+    private async Task<IReadOnlyList<string>> BuildSubscriptionUserAgentsAsync(
+        CancellationToken cancellationToken,
+        string? subscriptionCustomUserAgent = null)
     {
         _ = cancellationToken;
         var settings = await _settings.GetAsync();
+        var list = new List<string>();
+        if (!string.IsNullOrWhiteSpace(subscriptionCustomUserAgent))
+        {
+            list.Add(subscriptionCustomUserAgent.Trim());
+        }
+
         var preferred = ClientUserAgentProfiles.GetHttpUserAgent(settings.SubscriptionUserAgent);
-        var list = new List<string> { preferred };
+        if (!list.Contains(preferred, StringComparer.Ordinal))
+        {
+            list.Add(preferred);
+        }
         foreach (var fallback in SubscriptionUserAgents)
         {
             if (!list.Contains(fallback, StringComparer.Ordinal))
@@ -469,7 +482,12 @@ public sealed class ConfigImportService : IConfigImportService
         return $"{uri.Scheme}://{uri.Host}{uri.AbsolutePath}{tail}";
     }
 
-    private async Task<HttpClient> CreateHttpClientAsync(string userAgent, WebProxy? proxy, CancellationToken cancellationToken)
+    private async Task<HttpClient> CreateHttpClientAsync(
+        string userAgent,
+        WebProxy? proxy,
+        string subscriptionUrl,
+        int timeoutSeconds,
+        CancellationToken cancellationToken)
     {
         var handler = new HttpClientHandler
         {
@@ -482,10 +500,10 @@ public sealed class ConfigImportService : IConfigImportService
             handler.UseProxy = true;
             handler.Proxy = proxy;
         }
-        var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(20) };
+        var client = new HttpClient(handler) { Timeout = TimeSpan.FromSeconds(Math.Clamp(timeoutSeconds, 5, 120)) };
         client.DefaultRequestHeaders.UserAgent.ParseAdd(userAgent);
         client.DefaultRequestHeaders.TryAddWithoutValidation("Accept", "*/*");
-        foreach (var pair in await HwidManager.SubscriptionHeadersAsync(_settings).WaitAsync(cancellationToken))
+        foreach (var pair in await HwidManager.SubscriptionHeadersAsync(_settings, subscriptionUrl).WaitAsync(cancellationToken))
         {
             client.DefaultRequestHeaders.TryAddWithoutValidation(pair.Key, pair.Value);
         }

@@ -89,9 +89,52 @@ public sealed class AppSettings
     public DateTime LastBackupUtc { get; set; }
     public Dictionary<string, SubscriptionTrafficInfo> SubscriptionTraffic { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public Dictionary<string, string> SubscriptionRemarks { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>Per-subscription options (parity with APK SubEditActivity / SubscriptionItem).</summary>
+    public Dictionary<string, SubscriptionItemSettings> SubscriptionItems { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     public List<string> PinnedSubscriptionUrls { get; set; } = [];
     public bool SendHwidHeader { get; set; } = true;
     public string? CustomHwidValue { get; set; }
+}
+
+public sealed class SubscriptionItemSettings
+{
+    public string Remarks { get; set; } = "";
+    public bool Enabled { get; set; } = true;
+    public bool AutoUpdate { get; set; } = true;
+    /// <summary>Auto-update interval in hours.</summary>
+    public int UpdateIntervalHours { get; set; } = 1;
+    public int UpdateIntervalMinutes { get; set; } = 30;
+    public bool? UpdateNotification { get; set; }
+    public int? RequestTimeoutSeconds { get; set; }
+    public bool? UpdateOnOpen { get; set; }
+    public bool? ConnectOnOpen { get; set; }
+    public bool? SkipFilter { get; set; }
+    public bool? CollapsedByDefault { get; set; }
+    public bool? SendHwidHeader { get; set; }
+    public bool? UseAlternativeHwid { get; set; }
+    public string? AlternativeHwidValue { get; set; }
+    /// <summary>null = default; none | ping | name.</summary>
+    public string? ServerSortMode { get; set; }
+    public string? Filter { get; set; }
+    public bool AllowInsecureUrl { get; set; }
+    public string? UserAgent { get; set; }
+    public string? PrevProfile { get; set; }
+    public string? NextProfile { get; set; }
+    /// <summary>null = inherit global <see cref="AppSettings.PingType"/> (tcp, icmp, proxy, proxy-head).</summary>
+    public string? PingType { get; set; }
+    /// <summary>null = inherit global <see cref="AppSettings.PingOnStart"/>.</summary>
+    public bool? PingOnOpen { get; set; }
+    /// <summary>null = inherit global (lowestdelay, lastused, random).</summary>
+    public string? AutoConnectType { get; set; }
+    public bool? FragmentEnabled { get; set; }
+    public string? FragmentPackets { get; set; }
+    public string? FragmentLength { get; set; }
+    public string? FragmentInterval { get; set; }
+    public bool? MuxEnabled { get; set; }
+    public string? MuxConcurrency { get; set; }
+    public bool? NoiseEnabled { get; set; }
+    public string? NoiseRand { get; set; }
+    public string? NoiseDelay { get; set; }
 }
 
 public sealed class UserProfile

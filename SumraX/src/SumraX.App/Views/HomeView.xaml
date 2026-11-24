@@ -64,14 +64,14 @@
                 <TextBlock Text="+" FontSize="20" FontWeight="Bold" Foreground="#FFD400"/>
                 <Button.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="{Binding DataContext.HomeAddSubscriptionLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                  Command="{Binding DataContext.OpenHomeAddSubscriptionCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                        <MenuItem Header="{Binding DataContext.Servers.PasteLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                  Command="{Binding DataContext.Servers.PasteAndImportCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                        <MenuItem Header="{Binding DataContext.Servers.QrLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                  Command="{Binding DataContext.Servers.ImportQrCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
-                        <MenuItem Header="{Binding DataContext.Servers.ManualLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                  Command="{Binding DataContext.Servers.AddManualCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                        <MenuItem Header="{Binding HomeAddSubscriptionLabel}"
+                                  Command="{Binding OpenHomeAddSubscriptionCommand}"/>
+                        <MenuItem Header="{Binding Servers.PasteLabel}"
+                                  Command="{Binding Servers.PasteAndImportCommand}"/>
+                        <MenuItem Header="{Binding Servers.QrLabel}"
+                                  Command="{Binding Servers.ImportQrCommand}"/>
+                        <MenuItem Header="{Binding Servers.ManualLabel}"
+                                  Command="{Binding Servers.AddManualCommand}"/>
                     </ContextMenu>
                 </Button.ContextMenu>
             </Button>
@@ -160,35 +160,48 @@
                                                         Click="HomeGroupMoreButton_Click">
                                                     <ctrl:GlowIcon Kind="More" Tone="Amber" Width="16" Height="16"/>
                                                     <Button.ContextMenu>
-                                                        <ContextMenu DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
-                                                            <MenuItem Header="{Binding DataContext.Servers.GroupMenuSettingsLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                      Command="{Binding DataContext.Servers.OpenGroupSettingsCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                      CommandParameter="{Binding GroupKey}">
+                                                        <ContextMenu>
+                                                            <MenuItem Header="{Binding Servers.GroupMenuSettingsLabel}"
+                                                                      Command="{Binding Servers.OpenGroupSettingsCommand}"
+                                                                      CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
                                                                 <MenuItem.Style>
-                                                                    <Style TargetType="MenuItem">
+                                                                    <Style TargetType="MenuItem" BasedOn="{StaticResource SumraxMenuItem}">
                                                                         <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding GroupKey}" Value="">
+                                                                            <DataTrigger Binding="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="">
                                                                                 <Setter Property="Visibility" Value="Collapsed"/>
                                                                             </DataTrigger>
                                                                         </Style.Triggers>
                                                                     </Style>
                                                                 </MenuItem.Style>
                                                             </MenuItem>
-                                                            <MenuItem Header="{Binding DataContext.Servers.GroupMenuRoutingLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                      Command="{Binding DataContext.Servers.OpenGroupRoutingCommand, RelativeSource={RelativeSource AncestorType=Window}}"/>
+                                                            <MenuItem Header="{Binding Servers.GroupMenuPingSettingsLabel}"
+                                                                      Command="{Binding Servers.OpenGroupPingSettingsCommand}"
+                                                                      CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                                                <MenuItem.Style>
+                                                                    <Style TargetType="MenuItem" BasedOn="{StaticResource SumraxMenuItem}">
+                                                                        <Style.Triggers>
+                                                                            <DataTrigger Binding="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}" Value="">
+                                                                                <Setter Property="Visibility" Value="Collapsed"/>
+                                                                            </DataTrigger>
+                                                                        </Style.Triggers>
+                                                                    </Style>
+                                                                </MenuItem.Style>
+                                                            </MenuItem>
+                                                            <MenuItem Header="{Binding Servers.GroupMenuRoutingLabel}"
+                                                                      Command="{Binding Servers.OpenGroupRoutingCommand}"/>
                                                             <Separator/>
-                                                            <MenuItem Header="{Binding DataContext.Servers.RefreshSubsLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                      Command="{Binding DataContext.Servers.RefreshHomeGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            <MenuItem Header="{Binding Servers.RefreshSubsLabel}"
+                                                                      Command="{Binding Servers.RefreshHomeGroupCommand}"
                                                                       CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                            <MenuItem Header="{Binding DataContext.Servers.TestAllLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                      Command="{Binding DataContext.Servers.PingHomeGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            <MenuItem Header="{Binding Servers.TestAllLabel}"
+                                                                      Command="{Binding Servers.PingHomeGroupCommand}"
                                                                       CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
-                                                            <MenuItem Header="{Binding DataContext.Servers.GroupMenuPinLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                      Command="{Binding DataContext.Servers.TogglePinHomeGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            <MenuItem Header="{Binding Servers.GroupMenuPinLabel}"
+                                                                      Command="{Binding Servers.TogglePinHomeGroupCommand}"
                                                                       CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                             <Separator/>
-                                                            <MenuItem Header="{Binding DataContext.Servers.GroupMenuDeleteLabel, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                                      Command="{Binding DataContext.Servers.DeleteHomeGroupCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                            <MenuItem Header="{Binding Servers.GroupMenuDeleteLabel}"
+                                                                      Command="{Binding Servers.DeleteHomeGroupCommand}"
                                                                       CommandParameter="{Binding PlacementTarget.Tag, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
                                                         </ContextMenu>
                                                     </Button.ContextMenu>

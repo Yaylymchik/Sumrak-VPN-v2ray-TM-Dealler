@@ -5,7 +5,7 @@ using System.Text.RegularExpressions;
 namespace SumraX.Infrastructure.Vpn;
 
 /// <summary>
-/// Decrypts encrypted subscription links (happ://crypt*).
+/// Decrypts encrypted subscription links (sumrax://crypt*, legacy schemes).
 /// Keys are the public RSA material bundled for crypt1–4 link compatibility.
 /// </summary>
 public static class CryptLinkDecryptor

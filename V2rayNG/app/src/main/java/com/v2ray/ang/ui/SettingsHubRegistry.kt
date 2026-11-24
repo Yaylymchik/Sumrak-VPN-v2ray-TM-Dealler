@@ -30,17 +30,11 @@ object SettingsHubRegistry {
         Entry(R.string.title_tunnel, TunnelOptionsActivity::class.java, Tab.TUNNEL),
         Entry(R.string.title_vpn_hotspot, VpnHotspotActivity::class.java, Tab.TUNNEL),
 
-        Entry(R.string.title_vpn_settings, VpnSettingsActivity::class.java, Tab.ADVANCED),
+        Entry(R.string.title_advanced, AdvancedSettingsActivity::class.java, Tab.ADVANCED),
         Entry(R.string.title_subscription, SubscriptionSettingsActivity::class.java, Tab.ADVANCED),
         Entry(R.string.title_ping, PingSettingsActivity::class.java, Tab.ADVANCED),
-        Entry(R.string.title_pref_send_hwid_header, HwidSettingsActivity::class.java, Tab.ADVANCED),
         Entry(R.string.title_pref_proxy_sharing_enabled, LanPortsSettingsActivity::class.java, Tab.ADVANCED),
-        Entry(R.string.title_pref_auto_start_vpn, AutoStartSettingsActivity::class.java, Tab.ADVANCED),
-        Entry(R.string.title_advanced, AdvancedSettingsActivity::class.java, Tab.ADVANCED),
-        Entry(R.string.title_core_dns, CoreDnsSettingsActivity::class.java, Tab.ADVANCED),
 
-        Entry(R.string.title_pref_update_button_check, CheckUpdateActivity::class.java, Tab.OTHER),
-        Entry(R.string.title_statistics, StatisticsSettingsActivity::class.java, Tab.OTHER),
         Entry(R.string.title_logs, LogsSettingsActivity::class.java, Tab.OTHER),
         Entry(R.string.title_other, OtherSettingsActivity::class.java, Tab.OTHER),
         Entry(R.string.title_reset, ResetSettingsActivity::class.java, Tab.OTHER),

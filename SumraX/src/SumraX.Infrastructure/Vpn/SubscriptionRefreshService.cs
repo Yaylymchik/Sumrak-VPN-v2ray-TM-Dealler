@@ -94,7 +94,10 @@ public sealed class SubscriptionRefreshService : ISubscriptionRefreshService, ID
         var settings = await _settings.GetAsync();
         if (!string.IsNullOrWhiteSpace(import.ProfileTitle))
         {
-            settings.SubscriptionRemarks[url] = import.ProfileTitle.Trim();
+            var title = import.ProfileTitle.Trim();
+            var subItem = SubscriptionItemSettingsHelper.GetOrCreate(settings, url);
+            subItem.Remarks = title;
+            SubscriptionItemSettingsHelper.SyncRemark(settings, url, title);
             await _settings.SaveAsync(settings);
         }
         var purge = settings.PurgeOldProfilesOnSubscriptionUpdate;

@@ -8,6 +8,8 @@ public enum SettingsSection
     Core,
     Ping,
     Subscriptions,
+    SubscriptionEdit,
+    SubscriptionPingEdit,
     Tunnel,
     Routing,
     Connection,

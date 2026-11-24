@@ -6,7 +6,7 @@ import com.v2ray.ang.util.LogUtil
 
 object EncryptedCryptResolver {
 
-    private val knownSchemes = listOf("happ://", "sumrax://", "v2rayng://")
+    private val knownSchemes = listOf("sumrax://", "v2rayng://", "happ://")
     private val corruptFragmentSuffixes = listOf("=ff", "#ff", "%23ff")
 
     enum class CryptMode(val prefix: String) {
@@ -28,7 +28,7 @@ object EncryptedCryptResolver {
     }
 
     /**
-     * Decrypts encrypted crypt deeplinks (`happ://`, `sumrax://`, …). Returns the original [value] when it is not encrypted.
+     * Decrypts encrypted crypt deeplinks (`sumrax://`, …). Returns the original [value] when it is not encrypted.
      * Returns null when decryption fails.
      */
     fun resolve(value: String?): String? {

@@ -6,14 +6,14 @@ namespace SumraX.App.ViewModels;
 
 public sealed class SettingsHubRowViewModel
 {
-    public required string Title { get; init; }
-    public SettingsSection Section { get; init; } = SettingsSection.Root;
-    public string? Action { get; init; }
-    public bool IsDanger { get; init; }
+    public string Title { get; set; } = "";
+    public SettingsSection Section { get; set; } = SettingsSection.Root;
+    public string? Action { get; set; }
+    public bool IsDanger { get; set; }
 }
 
 public sealed class SettingsHubGroupViewModel
 {
-    public required string Title { get; init; }
+    public string Title { get; set; } = "";
     public ObservableCollection<SettingsHubRowViewModel> Rows { get; } = [];
 }

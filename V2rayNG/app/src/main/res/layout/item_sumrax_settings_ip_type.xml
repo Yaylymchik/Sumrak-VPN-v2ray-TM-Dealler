@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_sumrax_text_on_main"
+    android:gravity="center_vertical"
+    android:minHeight="52dp"
+    android:orientation="horizontal"
+    android:paddingHorizontal="@dimen/sumrax_ui_activity_horizontal_margin"
+    android:paddingVertical="10dp">
+
+    <TextView
+        android:id="@+id/tv_ip_type_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textColor="@color/sumrax_ui_text_primary"
+        android:textSize="16sp"
+        tools:text="@string/title_pref_ip_type" />
+
+    <Spinner
+        android:id="@+id/spinner_ip_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:minWidth="120dp"
+        android:entries="@array/pref_ip_type" />
+</LinearLayout>

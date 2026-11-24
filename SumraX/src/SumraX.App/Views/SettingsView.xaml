@@ -11,6 +11,7 @@
         <conv:TunProviderDisplayConverter x:Key="TunProviderDisplay"/>
         <conv:ClientUserAgentDisplayConverter x:Key="UserAgentDisplay"/>
         <conv:PingTypeDisplayConverter x:Key="PingTypeDisplay"/>
+        <conv:InverseBoolConverter x:Key="InverseBool"/>
         <BooleanToVisibilityConverter x:Key="BoolVis"/>
         <DataTemplate x:Key="HubRowTemplate" DataType="{x:Type vm:SettingsHubRowViewModel}">
             <Button Style="{StaticResource SecondaryButton}" Margin="0,0,0,1" Padding="12,10" HorizontalContentAlignment="Stretch"
@@ -70,7 +71,16 @@
                         <Border Height="1" Background="#22FFFFFF" Margin="8,0"/>
                         <ctrl:SettingsToggleRow Title="{Binding MuxEnabledLabel}" IsChecked="{Binding MuxEnabled}"/>
                         <Border Height="1" Background="#22FFFFFF" Margin="8,0"/>
-                        <ctrl:SettingsToggleRow Title="{Binding XrayTunEnabledLabel}" IsChecked="{Binding UseTunMode}"/>
+                        <Grid Margin="12,8,12,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="140"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding PreferredIpTypeLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="13"
+                                       Foreground="{DynamicResource TextPrimaryBrush}" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Column="1" ItemsSource="{Binding PreferredIpTypeOptions}" SelectedItem="{Binding SelectedPreferredIpType}"
+                                      Style="{StaticResource ComboPremium}"/>
+                        </Grid>
                     </StackPanel>
                 </Border>
                 <ItemsControl ItemsSource="{Binding HubTunnelAfterRows}" ItemTemplate="{StaticResource HubRowTemplate}"/>
@@ -78,19 +88,6 @@
                 <TextBlock Text="{Binding HubAdvancedLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="14" FontWeight="Bold"
                            Foreground="#FFD400" Margin="4,20,0,6"/>
                 <ItemsControl ItemsSource="{Binding HubAdvancedBeforeRows}" ItemTemplate="{StaticResource HubRowTemplate}"/>
-                <Border Background="#121212" BorderBrush="#33FFD400" BorderThickness="1" CornerRadius="4" Margin="0,4,0,4" Padding="4,2">
-                    <StackPanel>
-                        <ctrl:SettingsToggleRow Title="{Binding SendHwidHeaderLabel}" IsChecked="{Binding SendHwidHeader}"/>
-                        <TextBlock Text="{Binding SendHwidHeaderSummary}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"
-                                   TextWrapping="Wrap" Margin="12,0,12,8"/>
-                        <Border Height="1" Background="#22FFFFFF" Margin="8,0"/>
-                        <TextBlock Text="{Binding CustomHwidValueLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextPrimaryBrush}" Margin="12,10,12,4"/>
-                        <TextBox Text="{Binding CustomHwidValue}" Style="{StaticResource SearchBox}" Margin="12,0,12,4" Padding="10,6"/>
-                        <TextBlock Text="{Binding CustomHwidValueSummary}" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"
-                                   TextWrapping="Wrap" Margin="12,0,12,10"/>
-                    </StackPanel>
-                </Border>
                 <ItemsControl ItemsSource="{Binding HubAdvancedAfterRows}" ItemTemplate="{StaticResource HubRowTemplate}"/>
 
                 <TextBlock Text="{Binding HubOtherLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="14" FontWeight="Bold"
@@ -402,6 +399,170 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- SUBSCRIPTION PING (per group + global, like SubEdit + Ping settings) -->
+            <StackPanel>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentSection}" Value="{x:Static vm:SettingsSection.SubscriptionPingEdit}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <Border Style="{StaticResource GlassCard}" Margin="0,0,0,12" Padding="8">
+                    <StackPanel>
+                        <TextBlock Text="{Binding SubEditPingTypeLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <ComboBox ItemsSource="{Binding SubEditPingTypeChoices}" SelectedItem="{Binding SubEditSelectedPingType}"
+                                  Style="{StaticResource ComboPremium}" Margin="12,8,12,0"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUseGlobalLabel}" IsChecked="{Binding SubEditPingOnOpenUseGlobal}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditPingOnOpenLabel}" IsChecked="{Binding SubEditPingOnOpen}"
+                                                IsEnabled="{Binding SubEditPingOnOpenUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <Button Content="{Binding SubEditSaveLabel}" Style="{StaticResource PrimaryButton}"
+                                Command="{Binding SaveSubscriptionEditCommand}" Margin="12,12,12,8" HorizontalAlignment="Left"/>
+                        <TextBlock Text="{Binding SubEditGlobalPingHint}" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" FontSize="11" Margin="12,8,12,4"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource HudCard}" Padding="8">
+                    <StackPanel>
+                        <TextBlock Text="{Binding PingTypeLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <ComboBox ItemsSource="{Binding PingTypes}" SelectedItem="{Binding SelectedPingType}" Style="{StaticResource ComboPremium}" Margin="12,8,12,0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource PingTypeDisplay}}" FontFamily="{StaticResource PrimaryFont}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                        <Border Style="{StaticResource SettingsRowSeparator}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding PingOnStartLabel}" IsChecked="{Binding PingOnStart}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding AutoSelectFastestLabel}" IsChecked="{Binding AutoSelectFastest}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding AutoSortAfterTestLabel}" IsChecked="{Binding AutoSortAfterTest}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding AutoRemoveInvalidAfterTestLabel}" IsChecked="{Binding AutoRemoveInvalidAfterTest}"/>
+                        <Border Style="{StaticResource SettingsRowSeparator}"/>
+                        <TextBlock Text="{Binding DelayTestUrlLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding DelayTestUrl}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+                        <TextBlock Text="{Binding IpApiUrlLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding IpApiUrl}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+                        <TextBlock Text="{Binding RealPingConcurrencyLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding RealPingConcurrency}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+                        <Button Content="{Binding SaveLabel}" Style="{StaticResource SecondaryButton}" Command="{Binding SaveCommand}" Margin="12,12,12,8" HorizontalAlignment="Left"/>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+
+            <!-- SUBSCRIPTION EDIT (APK SubEditActivity parity) -->
+            <StackPanel>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding CurrentSection}" Value="{x:Static vm:SettingsSection.SubscriptionEdit}">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <Border Style="{StaticResource GlassCard}" Margin="0,0,0,12" Padding="8">
+                    <StackPanel>
+                        <TextBlock Text="{Binding SubEditRemarksLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditRemarks, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+                        <TextBlock Text="{Binding SubEditUrlLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditUrlDisplay}" Style="{StaticResource SearchBox}" Margin="12,8,12,0" IsReadOnly="True" TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding SubEditSectionUpdateLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="Bold"
+                                   Foreground="#FFD400" Margin="12,12,12,4"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditEnabledLabel}" IsChecked="{Binding SubEditEnabled}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditAutoUpdateLabel}" IsChecked="{Binding SubEditAutoUpdate}"/>
+                        <TextBlock Text="{Binding SubEditUpdateIntervalLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditUpdateIntervalHours, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUpdateNotificationLabel}" IsChecked="{Binding SubEditUpdateNotification}"/>
+                        <TextBlock Text="{Binding SubEditRequestTimeoutLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditRequestTimeoutSeconds, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+
+                        <TextBlock Text="{Binding SubEditSectionOnOpenLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="Bold"
+                                   Foreground="#FFD400" Margin="12,16,12,4"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUseGlobalLabel}" IsChecked="{Binding SubEditUpdateOnOpenUseGlobal}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUpdateOnOpenLabel}" IsChecked="{Binding SubEditUpdateOnOpen}"
+                                                IsEnabled="{Binding SubEditUpdateOnOpenUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUseGlobalLabel}" IsChecked="{Binding SubEditPingOnOpenUseGlobal}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditPingOnOpenLabel}" IsChecked="{Binding SubEditPingOnOpen}"
+                                                IsEnabled="{Binding SubEditPingOnOpenUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUseGlobalLabel}" IsChecked="{Binding SubEditConnectOnOpenUseGlobal}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditConnectOnOpenLabel}" IsChecked="{Binding SubEditConnectOnOpen}"
+                                                IsEnabled="{Binding SubEditConnectOnOpenUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <TextBlock Text="{Binding SubEditAutoConnectLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <ComboBox ItemsSource="{Binding SubEditAutoConnectChoices}" SelectedItem="{Binding SubEditSelectedAutoConnect}"
+                                  Style="{StaticResource ComboPremium}" Margin="12,8,12,0"/>
+                        <TextBlock Text="{Binding SubEditPingTypeLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <ComboBox ItemsSource="{Binding SubEditPingTypeChoices}" SelectedItem="{Binding SubEditSelectedPingType}"
+                                  Style="{StaticResource ComboPremium}" Margin="12,8,12,0"/>
+
+                        <TextBlock Text="{Binding SubEditSectionOtherLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="Bold"
+                                   Foreground="#FFD400" Margin="12,16,12,4"/>
+                        <TextBlock Text="{Binding SubEditFilterLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditFilter, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditSkipFilterLabel}" IsChecked="{Binding SubEditSkipFilter}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditCollapsedLabel}" IsChecked="{Binding SubEditCollapsedByDefault}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditAllowInsecureLabel}" IsChecked="{Binding SubEditAllowInsecureUrl}"/>
+                        <TextBlock Text="{Binding SubEditUserAgentLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditUserAgent, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+                        <TextBlock Text="{Binding SubEditUserAgentHint}" TextWrapping="Wrap" FontSize="10"
+                                   Foreground="{DynamicResource TextMutedBrush}" Margin="12,4,12,8"/>
+
+                        <TextBlock Text="{Binding SubEditSectionDataLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="Bold"
+                                   Foreground="#FFD400" Margin="12,16,12,4"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUseGlobalLabel}" IsChecked="{Binding SubEditSendHwidUseGlobal}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditSendHwidLabel}" IsChecked="{Binding SubEditSendHwid}"
+                                                IsEnabled="{Binding SubEditSendHwidUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <TextBlock Text="{Binding SubEditHwidHint}" TextWrapping="Wrap" FontSize="10"
+                                   Foreground="{DynamicResource TextMutedBrush}" Margin="12,4,12,8"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditAlternativeHwidLabel}" IsChecked="{Binding SubEditUseAlternativeHwid}"/>
+                        <TextBlock Text="{Binding SubEditAlternativeHwidValueLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditAlternativeHwidValue, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"
+                                 IsEnabled="{Binding SubEditUseAlternativeHwid}"/>
+
+                        <TextBlock Text="{Binding SubEditServerSortLabel}" FontFamily="{StaticResource PrimaryFont}" FontSize="13" FontWeight="Bold"
+                                   Foreground="#FFD400" Margin="12,16,12,4"/>
+                        <ComboBox ItemsSource="{Binding SubEditServerSortChoices}" SelectedItem="{Binding SubEditSelectedServerSort}"
+                                  Style="{StaticResource ComboPremium}" Margin="12,8,12,0"/>
+                        <TextBlock Text="{Binding SubEditPrevProfileLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditPrevProfile, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+                        <TextBlock Text="{Binding SubEditNextProfileLabel}" Style="{StaticResource StatLabel}" Margin="12,8,12,0"/>
+                        <TextBox Text="{Binding SubEditNextProfile, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,8,12,0"/>
+
+                        <TextBlock Text="{Binding SubEditGroupTunnelLabel}" FontFamily="{StaticResource MonoFont}" FontSize="11" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextSecondaryBrush}" Margin="12,16,12,4"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUseGlobalLabel}" IsChecked="{Binding SubEditFragmentUseGlobal}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding FragmentEnabledLabel}" IsChecked="{Binding SubEditFragmentEnabled}"
+                                                IsEnabled="{Binding SubEditFragmentUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <TextBox Text="{Binding SubEditFragmentPackets, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,4,12,0"
+                                 IsEnabled="{Binding SubEditFragmentUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <TextBox Text="{Binding SubEditFragmentLength, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,4,12,0"
+                                 IsEnabled="{Binding SubEditFragmentUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <TextBox Text="{Binding SubEditFragmentInterval, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,4,12,0"
+                                 IsEnabled="{Binding SubEditFragmentUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUseGlobalLabel}" IsChecked="{Binding SubEditMuxUseGlobal}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding MuxEnabledLabel}" IsChecked="{Binding SubEditMuxEnabled}"
+                                                IsEnabled="{Binding SubEditMuxUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <TextBox Text="{Binding SubEditMuxConcurrency, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,4,12,0"
+                                 IsEnabled="{Binding SubEditMuxUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding SubEditUseGlobalLabel}" IsChecked="{Binding SubEditNoiseUseGlobal}"/>
+                        <ctrl:SettingsToggleRow Title="{Binding NoiseEnabledLabel}" IsChecked="{Binding SubEditNoiseEnabled}"
+                                                IsEnabled="{Binding SubEditNoiseUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <TextBox Text="{Binding SubEditNoiseRand, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,4,12,0"
+                                 IsEnabled="{Binding SubEditNoiseUseGlobal, Converter={StaticResource InverseBool}}"/>
+                        <TextBox Text="{Binding SubEditNoiseDelay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource SearchBox}" Margin="12,4,12,0"
+                                 IsEnabled="{Binding SubEditNoiseUseGlobal, Converter={StaticResource InverseBool}}"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="12,16,12,8">
+                            <Button Content="{Binding SubEditSaveLabel}" Style="{StaticResource PrimaryButton}" Command="{Binding SaveSubscriptionEditCommand}" Margin="0,0,8,0"/>
+                            <Button Content="{Binding SubEditUpdateNowLabel}" Style="{StaticResource SecondaryButton}" Command="{Binding RefreshSubscriptionEditCommand}"/>
+                        </StackPanel>
                     </StackPanel>
                 </Border>
             </StackPanel>

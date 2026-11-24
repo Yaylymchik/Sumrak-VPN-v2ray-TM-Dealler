@@ -36,6 +36,7 @@ public partial class ServersViewModel : LocalizableViewModelBase
     private Dictionary<string, bool> _homeGroupExpanded = new(StringComparer.Ordinal);
     private Dictionary<string, SubscriptionTrafficInfo> _subscriptionTraffic = new(StringComparer.OrdinalIgnoreCase);
     private Dictionary<string, string> _subscriptionRemarks = new(StringComparer.OrdinalIgnoreCase);
+    private Dictionary<string, SubscriptionItemSettings> _subscriptionItems = new(StringComparer.OrdinalIgnoreCase);
     private List<string> _pinnedSubscriptionUrls = [];
     [ObservableProperty] private string _importLink = string.Empty;
     [ObservableProperty] private string _searchQuery = string.Empty;
@@ -69,6 +70,7 @@ public partial class ServersViewModel : LocalizableViewModelBase
     [ObservableProperty] private string _pickerSortLabel = "";
     [ObservableProperty] private string _activeBadgeLabel = "";
     [ObservableProperty] private string _groupMenuSettingsLabel = "";
+    [ObservableProperty] private string _groupMenuPingSettingsLabel = "";
     [ObservableProperty] private string _groupMenuRoutingLabel = "";
     [ObservableProperty] private string _groupMenuPinLabel = "";
     [ObservableProperty] private string _groupMenuDeleteLabel = "";
@@ -125,6 +127,7 @@ public partial class ServersViewModel : LocalizableViewModelBase
         PickerTabLoad = L("PickerTabLoad");
         ActiveBadgeLabel = L("ActiveBadge");
         GroupMenuSettingsLabel = L("GroupMenuSettings");
+        GroupMenuPingSettingsLabel = L("GroupMenuPingSettings");
         GroupMenuRoutingLabel = L("GroupMenuRouting");
         GroupMenuPinLabel = L("GroupMenuPin");
         GroupMenuDeleteLabel = L("GroupMenuDelete");
@@ -188,10 +191,19 @@ public partial class ServersViewModel : LocalizableViewModelBase
         foreach (var group in grouped)
         {
             var key = group.Key;
-            var servers = group.OrderBy(s => s.DisplayName, StringComparer.OrdinalIgnoreCase).ToList();
+            if (!string.IsNullOrWhiteSpace(key) &&
+                _subscriptionItems.TryGetValue(key, out var subMeta) &&
+                !subMeta.Enabled)
+            {
+                continue;
+            }
+            var servers = OrderServersInGroup(group.ToList(), key);
             var title = ResolveGroupTitle(key);
             var subtitle = ResolveGroupSubtitle(key, _subscriptionTraffic);
-            var expanded = !_homeGroupExpanded.TryGetValue(key, out var state) || state;
+            _subscriptionItems.TryGetValue(key, out var subMetaForExpand);
+            var expanded = _homeGroupExpanded.TryGetValue(key, out var state)
+                ? state
+                : subMetaForExpand?.CollapsedByDefault != true;
 
             HomeGroups.Add(new ServerSubscriptionGroup
             {
@@ -202,6 +214,27 @@ public partial class ServersViewModel : LocalizableViewModelBase
                 IsExpanded = expanded
             });
         }
+    }
+
+    private List<ServerProfile> OrderServersInGroup(List<ServerProfile> servers, string subscriptionKey)
+    {
+        if (string.IsNullOrWhiteSpace(subscriptionKey) ||
+            !_subscriptionItems.TryGetValue(subscriptionKey, out var sub) ||
+            string.IsNullOrWhiteSpace(sub.ServerSortMode))
+        {
+            return servers.OrderBy(s => s.DisplayName, StringComparer.OrdinalIgnoreCase).ToList();
+        }
+
+        return sub.ServerSortMode.ToLowerInvariant() switch
+        {
+            "ping" => servers
+                .OrderBy(s => s.PingMs < 0 ? int.MaxValue : s.PingMs)
+                .ThenBy(s => s.DisplayName, StringComparer.OrdinalIgnoreCase)
+                .ToList(),
+            "none" => servers,
+            "name" => servers.OrderBy(s => s.DisplayName, StringComparer.OrdinalIgnoreCase).ToList(),
+            _ => servers.OrderBy(s => s.DisplayName, StringComparer.OrdinalIgnoreCase).ToList(),
+        };
     }
 
     private static string NormalizeGroupKey(ServerProfile server)
@@ -220,6 +253,12 @@ public partial class ServersViewModel : LocalizableViewModelBase
         if (string.IsNullOrWhiteSpace(subscriptionUrl))
         {
             return L("DefaultServerGroup");
+        }
+
+        if (_subscriptionItems.TryGetValue(subscriptionUrl, out var sub) &&
+            !string.IsNullOrWhiteSpace(sub.Remarks))
+        {
+            return sub.Remarks.Trim();
         }
 
         if (_subscriptionRemarks.TryGetValue(subscriptionUrl, out var remark) && !string.IsNullOrWhiteSpace(remark))
@@ -355,6 +394,17 @@ public partial class ServersViewModel : LocalizableViewModelBase
     }
 
     [RelayCommand]
+    private void OpenGroupPingSettings(string? groupKey)
+    {
+        if (string.IsNullOrWhiteSpace(groupKey))
+        {
+            return;
+        }
+
+        App.HostApp.Services.GetRequiredService<MainViewModel>().OpenSettingsSubscriptionPing(groupKey);
+    }
+
+    [RelayCommand]
     private void OpenGroupRouting()
     {
         App.HostApp.Services.GetRequiredService<MainViewModel>().OpenSettingsRouting();
@@ -463,6 +513,7 @@ public partial class ServersViewModel : LocalizableViewModelBase
         _lastSelectedServerId = settings.LastSelectedServerId;
         _subscriptionTraffic = settings.SubscriptionTraffic;
         _subscriptionRemarks = settings.SubscriptionRemarks;
+        _subscriptionItems = settings.SubscriptionItems;
         _pinnedSubscriptionUrls = settings.PinnedSubscriptionUrls.ToList();
         OnPropertyChanged(nameof(SelectedServerId));
 

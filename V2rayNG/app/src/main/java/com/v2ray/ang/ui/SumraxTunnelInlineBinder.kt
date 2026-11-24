@@ -1,9 +1,12 @@
 package com.v2ray.ang.ui
 
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.AdapterView
 import android.widget.LinearLayout
 import com.v2ray.ang.AppConfig
 import com.v2ray.ang.R
+import com.v2ray.ang.databinding.ItemSumraxSettingsIpTypeBinding
 import com.v2ray.ang.databinding.ItemSumraxSettingsToggleBinding
 import com.v2ray.ang.handler.MmkvManager
 

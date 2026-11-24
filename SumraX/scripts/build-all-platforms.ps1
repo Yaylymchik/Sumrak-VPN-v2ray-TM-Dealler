@@ -16,13 +16,14 @@ function Publish-Sumrak {
         [switch]$FrameworkDependent
     )
     $AppProj = Join-Path $Root "src\SumraX.App\SumraX.App.csproj"
+    $tfm = "net8.0-windows10.0.19041.0"
     if ($FrameworkDependent) {
-        dotnet publish $AppProj -c $Configuration -r $Rid -o $OutDir `
+        dotnet publish $AppProj -c $Configuration -f $tfm -r $Rid -o $OutDir `
             --self-contained false `
             -p:PublishSingleFile=false
     }
     else {
-        dotnet publish $AppProj -c $Configuration -r $Rid -o $OutDir `
+        dotnet publish $AppProj -c $Configuration -f $tfm -r $Rid -o $OutDir `
             --self-contained true `
             -p:PublishSingleFile=true `
             -p:IncludeNativeLibrariesForSelfExtract=true `

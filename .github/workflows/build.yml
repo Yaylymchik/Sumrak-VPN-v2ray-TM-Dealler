@@ -195,7 +195,7 @@ jobs:
             - **arm64:** `SumraX_${{ needs.build.outputs.version_name }}_arm64-v8a.apk`
 
             ### Highlights
-            - Encrypted `crypt5` deeplink import (`happ://`, `sumrax://`)
+            - Encrypted `crypt5` deeplink import (`sumrax://`)
             - Profile tunnel settings applied on connect
           files: release-apks/*.apk
           generate_release_notes: true

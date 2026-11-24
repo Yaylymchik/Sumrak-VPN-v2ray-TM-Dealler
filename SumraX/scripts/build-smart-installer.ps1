@@ -21,7 +21,21 @@ foreach ($name in $required) {
 
 if ($missing.Count -gt 0 -or $ForceRebuildAll) {
     Write-Host "Building child installers (missing: $($missing -join ', '))..." -ForegroundColor Yellow
-    & (Join-Path $PSScriptRoot "package-ideal-release.ps1") -SkipXrayDownload
+    & (Join-Path $PSScriptRoot "sync-android-icon.ps1")
+    & (Join-Path $PSScriptRoot "download-dotnet-runtimes.ps1")
+    & (Join-Path $PSScriptRoot "build-all-platforms.ps1") -SkipXrayDownload -Lite -BuildInstaller
+    & (Join-Path $PSScriptRoot "build-legacy-win7.ps1") -SkipXrayDownload -BuildInstaller
+    $isccChild = @(
+        "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+        "$env:ProgramFiles\Inno Setup 6\ISCC.exe"
+    ) | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if ($isccChild) {
+        & $isccChild (Join-Path $Root "installer\SumraXSetup.iss")
+        & $isccChild (Join-Path $Root "installer\SumraXSetup-x86.iss")
+        & $isccChild (Join-Path $Root "installer\SumraXSetup-Lite.iss")
+        & $isccChild (Join-Path $Root "installer\SumraXSetup-Win7.iss")
+        & $isccChild (Join-Path $Root "installer\SumraXSetup-Win7-x86.iss")
+    }
 }
 
 foreach ($name in $required) {

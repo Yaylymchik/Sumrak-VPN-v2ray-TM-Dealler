@@ -22,51 +22,31 @@ if ($iscc) {
     & $iscc (Join-Path $Root "installer\SumraXSetup.iss")
     & $iscc (Join-Path $Root "installer\SumraXSetup-x86.iss")
     & $iscc (Join-Path $Root "installer\SumraXSetup-Lite.iss")
-    if ((Test-Path (Join-Path $Root "dist\SumraX-VPN-Setup-2.2.21-Win7.exe")) -and
-        (Test-Path (Join-Path $Root "dist\SumraX-VPN-Setup-2.2.21-Win7-x86.exe"))) {
-        & $iscc (Join-Path $Root "installer\SumraXSetup-Smart.iss")
-    }
+    & $iscc (Join-Path $Root "installer\SumraXSetup-Win7.iss")
+    & $iscc (Join-Path $Root "installer\SumraXSetup-Win7-x86.iss")
+    & (Join-Path $PSScriptRoot "build-smart-installer.ps1") -ForceRebuildAll:$false
 }
 
 $dist = Join-Path $Root "dist"
 New-Item -ItemType Directory -Force -Path $OutRoot | Out-Null
 
-foreach ($f in Get-ChildItem $dist -Filter "SumraX-VPN-Setup-*.exe" -ErrorAction SilentlyContinue) {
-    $dest = Join-Path $OutRoot $f.Name
-    Copy-Item $f.FullName $dest -Force
+$version = "2.2.21"
+$publishNames = @(
+    "SumraX-VPN-Setup-$version-Smart.exe",
+    "SumraX-VPN-Setup-$version-Lite.exe"
+)
+foreach ($name in $publishNames) {
+    $src = Join-Path $dist $name
+    if (-not (Test-Path $src)) {
+        Write-Warning "Missing dist payload (build only): $name"
+        continue
+    }
+    $dest = Join-Path $OutRoot $name
+    Copy-Item $src $dest -Force
     Write-Host "Copied installer: $dest" -ForegroundColor Green
 }
 
-$portable = Join-Path $Root "publish\Sumrak VPN.exe"
-if (Test-Path $portable) {
-    $dest = Join-Path $OutRoot "SumrakVPN_Desktop_2.2.21_x64_Portable.exe"
-    Copy-Item $portable $dest -Force
-    Write-Host "Copied portable: $dest" -ForegroundColor Green
-}
-
-$portableX86 = Join-Path $Root "publish-x86\Sumrak VPN.exe"
-if (Test-Path $portableX86) {
-    $dest = Join-Path $OutRoot "SumrakVPN_Desktop_2.2.21_x86_Portable.exe"
-    Copy-Item $portableX86 $dest -Force
-    Write-Host "Copied portable x86: $dest" -ForegroundColor Green
-}
-
-foreach ($pattern in @("*-Win7*.exe", "*-Lite.exe", "*-Smart.exe")) {
-    foreach ($f in Get-ChildItem $dist -Filter $pattern -ErrorAction SilentlyContinue) {
-        $dest = Join-Path $OutRoot $f.Name
-        Copy-Item $f.FullName $dest -Force
-        Write-Host "Copied installer: $dest" -ForegroundColor Green
-    }
-}
-
-$win7ZipName = "SumrakVPN_Desktop_2.2.21_Win7_x64.zip"
-$win7Pub = Join-Path $Root "publish-win7"
-if (Test-Path $win7Pub) {
-    $zipDest = Join-Path $OutRoot $win7ZipName
-    if (Test-Path $zipDest) { Remove-Item $zipDest -Force }
-    Compress-Archive -Path (Join-Path $win7Pub "*") -DestinationPath $zipDest
-    Write-Host "Copied Win7 portable zip: $zipDest" -ForegroundColor Green
-}
+& (Join-Path $PSScriptRoot "prune-d-sumrak-vpn.ps1") -Version $version -OutRoot $OutRoot
 
 $assetIcon = Join-Path $Root "src\SumraX.App\Assets\sumrax-icon.png"
 $assetIco = Join-Path $Root "src\SumraX.App\Assets\sumrax.ico"

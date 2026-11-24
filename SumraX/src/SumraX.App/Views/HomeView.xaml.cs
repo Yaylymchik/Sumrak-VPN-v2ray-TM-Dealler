@@ -91,7 +91,7 @@ public partial class HomeView : UserControl
             return;
         }
 
-        button.ContextMenu.PlacementTarget = button;
+        if (Window.GetWindow(button)?.DataContext is MainViewModel main)
         button.ContextMenu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
         button.ContextMenu.IsOpen = true;
         e.Handled = true;

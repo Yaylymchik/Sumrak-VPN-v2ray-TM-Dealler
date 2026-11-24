@@ -24,15 +24,23 @@ sealed class SumrakHomeRow {
 
 object SumrakHomeListBuilder {
 
+    internal fun subscriptionSortComparator(pinOrder: Map<String, Int>): Comparator<SubscriptionCache> =
+        compareBy<SubscriptionCache> { pinOrder[it.guid] ?: Int.MAX_VALUE }
+            .thenBy { it.subscription.remarks.lowercase() }
+            .thenBy { it.guid }
+
+    internal fun serverDelayComparator(): Comparator<ServersCache> =
+        compareBy<ServersCache> { sc ->
+            val delay = MmkvManager.decodeServerAffiliationInfo(sc.guid)?.testDelayMillis ?: Long.MAX_VALUE
+            if (delay < 0L) Long.MAX_VALUE else delay
+        }.thenBy { it.guid }
+
     fun build(expandedSubscriptionIds: Set<String>): List<SumrakHomeRow> {
         val pinnedIds = loadPinnedSubscriptionIds()
+        val pinOrder = pinnedIds.withIndex().associate { (index, id) -> id to index }
         val subs = MmkvManager.decodeSubscriptions()
             .filter { it.subscription.enabled }
-            .sortedWith(
-                compareByDescending<SubscriptionCache> { it.guid in pinnedIds }
-                    .thenBy { pinnedIds.indexOf(it.guid).takeIf { i -> i >= 0 } ?: Int.MAX_VALUE }
-                    .thenBy { it.subscription.remarks }
-            )
+            .sortedWith(subscriptionSortComparator(pinOrder))
         if (subs.isEmpty()) {
             return flatUncategorized(expandedSubscriptionIds)
         }
@@ -55,11 +63,7 @@ object SumrakHomeListBuilder {
             if (!expanded) continue
             var servers = serversForSubscription(id)
             if (autoSort) {
-                servers = servers.sortedBy { sc ->
-                    val delay = MmkvManager.decodeServerAffiliationInfo(sc.guid)?.testDelayMillis
-                        ?: Long.MAX_VALUE
-                    if (delay < 0) Long.MAX_VALUE else delay
-                }
+                servers = servers.sortedWith(serverDelayComparator())
             }
             servers.forEachIndexed { index, sc ->
                 rows += SumrakHomeRow.Server(
