@@ -477,6 +477,7 @@
     <string name="dialog_custom_hwid_title">Custom HWID</string>
     <string name="dialog_custom_hwid_hint">Paste your HWID from the provider</string>
     <string name="toast_custom_hwid_required">Enter your HWID first</string>
+    <string name="toast_npvs_encrypted">Could not import this .npvs/.npvt. Password-protected files need the password; otherwise paste share links or use NPVO1.</string>
     <string name="sumrax_connection_mode_smart">Smart</string>
     <string name="sumrax_connection_mode_manual">Manual</string>
     <string name="sumrax_smart_scanning">Scanning servers…</string>

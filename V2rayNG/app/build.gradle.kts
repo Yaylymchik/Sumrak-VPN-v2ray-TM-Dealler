@@ -12,8 +12,8 @@ android {
         applicationId = "com.sumrax.app"
         minSdk = 24
         targetSdk = 37
-        versionCode = 752
-        versionName = "2.2.22"
+        versionCode = 753
+        versionName = "2.2.23"
         multiDexEnabled = true
 
         val abiFilterList = (properties["ABI_FILTERS"] as? String)?.split(';')
@@ -226,6 +226,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     testImplementation(libs.org.mockito.mockito.inline)
     testImplementation(libs.mockito.kotlin)
+    implementation(libs.bouncycastle)
     coreLibraryDesugaring(libs.desugar.jdk.libs)
 
     implementation(platform(libs.firebase.bom))

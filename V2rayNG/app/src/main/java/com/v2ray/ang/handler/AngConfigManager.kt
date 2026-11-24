@@ -31,6 +31,7 @@ import com.v2ray.ang.util.ProfileDaysCountdown
 import com.v2ray.ang.util.ProfileFinalMaskApplier
 import com.v2ray.ang.util.ProfileRemarkParser
 import com.v2ray.ang.util.QRCodeDecoder
+import com.v2ray.ang.util.NpvsImportHelper
 import com.v2ray.ang.util.Utils
 import com.v2ray.ang.util.encrypt.EncryptedCryptResolver
 import java.net.URI
@@ -181,6 +182,20 @@ object AngConfigManager {
      * @param append Whether to append the configurations.
      * @return A pair containing the number of configurations and subscriptions imported.
      */
+    fun importBatchConfigFromBytes(
+        context: Context,
+        data: ByteArray,
+        subid: String,
+        append: Boolean,
+        password: String = "",
+    ): Pair<Int, Int> {
+        val unwrapped = NpvsImportHelper.unwrapBinaryNpvs(context, data, password)
+        if (unwrapped != null) {
+            return importBatchConfig(unwrapped, subid, append)
+        }
+        return importBatchConfig(data.toString(Charsets.UTF_8), subid, append)
+    }
+
     fun importBatchConfig(server: String?, subid: String, append: Boolean): Pair<Int, Int> {
         val input = server?.let { EncryptedCryptResolver.canonicalize(it) }
         val resolvedServer = when {
@@ -192,17 +207,20 @@ object AngConfigManager {
         if (resolvedServer.isNullOrBlank()) {
             return 0 to 0
         }
-        var count = parseBatchConfig(Utils.decode(resolvedServer), subid, append)
+        val npvsLinks = NpvsImportHelper.unwrapToShareLinks(resolvedServer)
+        val importPayload = npvsLinks ?: resolvedServer
+
+        var count = parseBatchConfig(Utils.decode(importPayload), subid, append)
         if (count <= 0) {
-            count = parseBatchConfig(resolvedServer, subid, append)
+            count = parseBatchConfig(importPayload, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(resolvedServer, subid, append)
+            count = parseCustomConfigServer(importPayload, subid, append)
         }
 
-        var countSub = parseBatchSubscription(resolvedServer)
+        var countSub = parseBatchSubscription(importPayload)
         if (countSub <= 0) {
-            countSub = parseBatchSubscription(Utils.decode(resolvedServer))
+            countSub = parseBatchSubscription(Utils.decode(importPayload))
         }
         if (countSub > 0) {
             updateConfigViaSubAll()
@@ -662,12 +680,13 @@ object AngConfigManager {
      * @return The number of configurations parsed.
      */
     private fun parseConfigViaSub(server: String?, subid: String, append: Boolean): Int {
-        var count = parseBatchConfig(Utils.decode(server), subid, append)
+        val importPayload = server?.let { NpvsImportHelper.unwrapToShareLinks(it) ?: it } ?: return 0
+        var count = parseBatchConfig(Utils.decode(importPayload), subid, append)
         if (count <= 0) {
-            count = parseBatchConfig(server, subid, append)
+            count = parseBatchConfig(importPayload, subid, append)
         }
         if (count <= 0) {
-            count = parseCustomConfigServer(server, subid, append)
+            count = parseCustomConfigServer(importPayload, subid, append)
         }
         return count
     }

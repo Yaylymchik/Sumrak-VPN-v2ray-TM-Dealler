@@ -58,6 +58,7 @@ import com.v2ray.ang.util.ProfileAutoSelector
 import com.v2ray.ang.util.ProfileRemarkParser
 import com.v2ray.ang.util.SumrakServerProtocol
 import com.v2ray.ang.util.HwidManager
+import com.v2ray.ang.util.NpvsImportHelper
 import com.v2ray.ang.util.ServerDisplayName
 import com.v2ray.ang.util.ProfileSettingsApplier
 import com.v2ray.ang.util.Utils
@@ -1502,6 +1503,8 @@ class MainActivity : HelperBaseActivity() {
                         countSub > 0 -> setupGroupTab()
                         EncryptedCryptResolver.isEncryptedDeeplink(server?.let { EncryptedCryptResolver.canonicalize(it) }) ->
                             toastError(R.string.toast_encrypted_import_failed)
+                        server != null && NpvsImportHelper.isLikelyEncryptedNpvsEnvelope(server) ->
+                            toastError(R.string.toast_npvs_encrypted)
                         else -> toastError(R.string.toast_failure)
                     }
                     hideLoading()
@@ -1652,10 +1655,49 @@ class MainActivity : HelperBaseActivity() {
     private fun readContentFromUri(uri: Uri) {
         try {
             contentResolver.openInputStream(uri).use { input ->
-                importBatchConfig(input?.bufferedReader()?.readText())
+                if (input == null) return
+                val bytes = input.readBytes()
+                if (NpvsImportHelper.isBinaryNpvsV5(bytes)) {
+                    importBatchConfigBytes(bytes)
+                } else {
+                    importBatchConfig(bytes.toString(Charsets.UTF_8))
+                }
             }
         } catch (e: Exception) {
             LogUtil.e(AppConfig.TAG, "Failed to read content from URI", e)
+        }
+    }
+
+    private fun importBatchConfigBytes(data: ByteArray) {
+        showLoading()
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val (count, countSub) = AngConfigManager.importBatchConfigFromBytes(
+                    applicationContext,
+                    data,
+                    mainViewModel.subscriptionId,
+                    true,
+                )
+                delay(500L)
+                withContext(Dispatchers.Main) {
+                    when {
+                        count > 0 -> {
+                            toast(getString(R.string.title_import_config_count, count))
+                            mainViewModel.reloadServerList()
+                            refreshGroupTabTitles()
+                        }
+                        countSub > 0 -> setupGroupTab()
+                        else -> toastError(R.string.toast_npvs_encrypted)
+                    }
+                    hideLoading()
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    toastError(R.string.toast_failure)
+                    hideLoading()
+                }
+                LogUtil.e(AppConfig.TAG, "Failed to import NPVS binary", e)
+            }
         }
     }
 
